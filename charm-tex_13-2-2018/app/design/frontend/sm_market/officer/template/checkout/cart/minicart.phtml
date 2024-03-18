@@ -1,0 +1,90 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magento.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magento.com for more information.
+ *
+ * @category    design
+ * @package     rwd_default
+ * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+
+/**
+ * Shoping cart sidebar
+ *
+ * @see Mage_Checkout_Block_Cart_Sidebar
+ */
+
+?>
+<div class="awtopcart">
+    <?php
+        $_cartQty = $this->getSummaryCount();
+        if(empty($_cartQty)) {
+            $_cartQty = 0;
+        }
+    ?>
+    <!--<a class="skip-link skip-cart <?php if($_cartQty <= 0): ?> no-count<?php endif; ?>"href="#header-cart">
+    <i class="fa fa-shopping-cart"></i></a>-->
+    <div class="cart-container">
+        <a class="skip-link skip-cart <?php if($_cartQty <= 0): ?> no-count<?php endif; ?>" href="<?php echo $this->helper('checkout/cart')->getCartUrl(); ?>" data-target-element="#header-cart">
+            <span class="label">Cart (<?php echo $_cartQty; ?>)</span>  
+            <?php
+                Mage::getSingleton('core/session', array('name' => 'frontend'));
+                $sessionCustomer = Mage::getSingleton("customer/session");
+                if($sessionCustomer->isLoggedIn()) {
+            ?>
+                    <script type="text/javascript">
+                        jQuery(document).ready(function(){
+                            jQuery('.header-minicart').find( "a:nth-child(2)" ).children(".text1").addClass('aftlog');
+                            jQuery('.header-minicart').find( "a:nth-child(2)" ).children(".text2").addClass('aftlog2'); 
+                        });
+                    </script>
+                    <!--<span class="count text2"><?php //echo $_cartQty; ?></span>-->
+            <?php
+                } /* else {
+            ?>
+                    <span class="text2"><a href="<?php echo Mage::helper('customer')->getLoginUrl(); ?>">Login</a> to see pricing</span>
+            <?php
+                } */
+            ?>
+        </a>
+    </div>
+     
+    <div id="header-cart" class="block block-cart skip-content">
+        <?php echo $this->getChildHtml('minicart_content');?>
+    </div>
+</div>
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        /*jQuery('.cart-container').hover(function() {
+            jQuery(this).children('.skip-cart').addClass("skip-active");
+            jQuery(this).next('.skip-content').addClass("skip-active");
+        }, function() {
+            jQuery('.skip-content').hover(function(){  
+            }, function(){ 
+                jQuery('.cart-container').children('.skip-cart').removeClass("skip-active");
+                jQuery('.cart-container').next('.skip-content').removeClass("skip-active");
+            });
+        });*/
+        jQuery(".awtopcart").hover(function(){
+            jQuery(this).children('.block-cart').addClass("skip-active");
+        },function(){
+            jQuery(this).children('.block-cart').removeClass("skip-active");
+        });
+    });
+</script>

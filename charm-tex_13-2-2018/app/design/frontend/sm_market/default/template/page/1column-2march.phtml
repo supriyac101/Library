@@ -1,0 +1,190 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category   design_default
+ * @package    Mage
+ * @copyright  Copyright (c) 2008 Irubin Consulting Inc. DBA Varien (http://www.varien.com)
+ * @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+
+
+global $var_yttheme;
+?>
+<!DOCTYPE html>
+<html xml:lang="<?php echo $this->getLang() ?>" lang="<?php echo $this->getLang() ?>">
+<head>
+<meta name="format-detection" content="telephone=no">
+	<?php echo $this->getChildHtml('head') ?>
+</head>
+
+<?php 
+	if( $var_yttheme->getParam('usebgimage') == 1 && $var_yttheme->getParam('usecustomizeimage') == 0 ){
+		$bg_image = $var_yttheme->getParam('bgimage');
+	}else{
+		$bg_image = '';
+	}
+
+    $hdStyles = $var_yttheme->getParam('headerstyles');
+    $classHeader = "";
+    $classHome = "";
+    if($hdStyles == 'header1'){
+         $classHeader = "header1-wrap";  
+    } elseif($hdStyles == 'header2') {
+        $classHeader = "header2-wrap";
+    } elseif($hdStyles == 'header3') {
+        $classHeader = "header3-wrap";
+    } elseif($hdStyles == 'header4') {
+        $classHeader = "header4-wrap"; 
+    }
+
+    if( Mage::getSingleton('cms/page')->getIdentifier() == 'home-v4'  && 
+                Mage::app()->getFrontController()->getRequest()->getRouteName() == 'cms' ) {
+        $classHome = "homepagev4";
+    }
+
+?>
+
+<body id="bd" class="<?php echo $var_yttheme->template ?> <?php echo $bg_image;?> <?php if( $var_yttheme->getParam('layoutstyle') == '2' ){echo "layout-boxed";}?> <?php echo $this->getBodyClass();?> <?php echo $classHome;?>">
+<?php echo $this->getChildHtml('after_body_start') ?>
+    <div id="yt_wrapper">
+    
+        <!-- BEGIN: Header -->
+		<div id="yt_header" class="yt-header wrap <?php echo $classHeader; ?>">        	
+		     <?php echo $this->getChildHtml('header') ?>
+             
+             <?php
+			 if( Mage::getSingleton('cms/page')->getIdentifier() == 'home'  && 
+                Mage::app()->getFrontController()->getRequest()->getRouteName() == 'cms' ) { /* if is home page*/
+				
+				$hide='yes';
+?>
+
+<?php echo $this->getChildHtml('content');
+							
+							 ?>
+                              <?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('tabs')->toHtml(); ?>
+                            <div class="bannerarea">
+                            <div class="bannerbox">
+                            <h3>HAVE QUESTIONS?</h3>
+                            <p>CONTACT ONE OF OUR JAIL SUPPLY EXPERTS WHO ARE ANXIOUSLY AWAITING YOUR CALLARE</p>
+                            <img src="/skin/frontend/sm_market/default/images/questionimg.png" alt=""></div>
+                            <div class="bannerbox">
+                            <h2>ORDER ONLINE AND WIN A FREE IPOD</h2>
+                            <img src="/skin/frontend/sm_market/default/images/orderimg.png" alt=""></div>
+                            <div class="bannerbox1">
+                            <h3>GET ALL <br>YOUR WINTER <br>GEAR HERE</h3>
+                            <img src="/skin/frontend/sm_market/default/images/winter.png" alt=""></div>
+                            </div>
+                            
+                            
+
+ </div>
+    </div>
+    
+</div>
+</div>
+</div>
+<?php } ?>
+		</div>
+		<!-- END: Header -->
+		
+		<!-- BEGIN: content -->        
+        <div id="yt_content" class="yt-content wrap">
+
+        	<div id="yt_main" class="yt-main col-main">
+        		<div class="yt-main-inner yt-content-inner">
+	        		<div class="container">
+		                <div class ="row">                    
+                        	<?php if($this->getChildHtml('breadcrumbs')){ ?>          
+								<?php echo $this->getChildHtml('breadcrumbs') ?>
+                            <?php } ?>
+                            <div class="columns-w">
+							<?php echo $this->getChildHtml('global_notices') ?>
+							<?php echo $this->getChildHtml('global_messages') ?>
+                            
+                            
+                            <?php if( $this->getChildHtml('banner-top-home') ){?>					
+								<?php echo $this->getChildHtml('banner-top-home');?>							
+							<?php }?>
+                            
+                            
+		                	<?php 
+							if($hide!='yes')
+							{
+							echo $this->getChildHtml('content');
+							}
+							
+							 ?>
+                            
+         
+                        
+                        </div>
+		        		</div>
+	        		</div>   
+                    <!-- Hot categories home page -->
+                    <?php /*?><?php if( $this->getChildHtml('hot-categories') ){?>
+                        <div class="hotcate-wrap">
+                        	<div class="container">
+                            <div class ="row">					
+                            	<?php echo $this->getChildHtml('hot-categories');?>	
+                            </div>
+                            </div>						
+                        </div>
+                    <?php }?>  <?php */?>                  
+        		</div>
+        	</div>
+             <?php
+			 if($hide=='yes') { /* if is home page*/
+				
+				
+?>
+            <div class="footerbanner">
+                <div class="main2">
+                       <div class="bannerslid">
+                    <?php if( $this->getChildHtml('dynamic-slideshow') ){ ?>
+                    <div class="slideshow-wrap">
+                         <?php echo $this->getChildHtml('dynamic-slideshow') ?> 
+                    </div>            
+                    <?php } ?>
+                    </div>
+                </div>        
+                                               
+            </div>	
+            <?php } ?>		
+         </div>      
+        <!-- END: content -->
+        
+        <!-- BEGIN: footer -->
+        <div id="yt_footer" class="yt-footer wrap">
+        	<?php echo $this->getChildHtml('footer') ?>
+        </div>
+        <!-- END: footer -->
+        <?php 
+        if( Mage::getSingleton('cms/page')->getIdentifier() == 'home'  && 
+                        Mage::app()->getFrontController()->getRequest()->getRouteName() == 'cms' && $var_yttheme->getParam('showPopup') == 1  ) { 
+        ?>
+            <?php echo $this->getChildHtml('popup_location') ?>
+        <?php } ?>
+
+		<?php echo $this->getChildHtml('before_body_end') ?>
+        <?php echo $this->getAbsoluteFooter() ?>
+    </div>
+</body>
+</html>

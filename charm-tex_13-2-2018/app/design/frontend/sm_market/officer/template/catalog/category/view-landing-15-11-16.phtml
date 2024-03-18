@@ -1,0 +1,43 @@
+<?php $categoryImage = Mage::getModel('catalog/layer')->getCurrentCategory()->getImage();?>
+	<?php $_helper = Mage::helper('catalog/category'); ?>
+	<?php $_categories = Mage::getModel('catalog/category')->getCollection();?>
+	<?php $currentCategory = Mage::registry('current_category');?>
+	<div class="proListBox">
+		<?php if (count($_categories) > 0): //echo "--".$currentCategory->getName();?>
+		<ul>
+		    <?php foreach ($_categories as $_category): ?>
+			     <?php if ($currentCategory && $currentCategory->getId() == $_category->getId()): ?>
+			     <?php $_category = Mage::getModel('catalog/category')->load($_category->getId()) ?>
+				    <?php $_subcategories = $_category->getChildrenCategories() ?>
+					<?php if (count($_subcategories) > 0): ?>
+					    <?php foreach ($_subcategories as $_subcategory): ?>
+							<li class="item">
+								<a href="<?php echo $_helper->getCategoryUrl($_subcategory) ?>">
+									<?php
+										$subcategory = Mage::getModel('catalog/category')->load($_subcategory->getId());
+										$img_url = $subcategory->getImage();
+										if ($img_url):
+									?>
+										<img src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA)?>catalog/category/<?php echo $img_url; ?>" />
+									<?php else: ?>
+										<img src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA)?>catalog/category/default-cat.png" />
+									<?php endif; ?>
+								</a>
+								<div class="product-info">	
+									<h2 class="product-name">
+										<a href="<?php echo $_helper->getCategoryUrl($_subcategory) ?>">
+											<?php echo $_subcategory->getName() ?>
+											<?php //echo $_subcategory->getThumbnail() ?>
+										</a>
+									</h2>
+									<p><a href="<?php echo $_helper->getCategoryUrl($_subcategory) ?>">View Products</a></p>
+								</div>
+							</li>
+					    <?php endforeach; ?>
+				    <?php endif; ?>
+			     <?php endif; ?>
+		     <?php endforeach; ?>
+	     </ul>
+		<?php endif; ?>
+	</div>
+<!--</div>-->

@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<layout>
+	<adminhtml_ewpribbon_ribbon_edit>
+        <update handle="ewcore_chooser"/>
+    </adminhtml_ewpribbon_ribbon_edit>
+</layout>

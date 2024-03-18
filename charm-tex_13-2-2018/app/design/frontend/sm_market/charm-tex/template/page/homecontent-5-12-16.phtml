@@ -1,0 +1,362 @@
+<div class="banner bannerSec">
+    <?php /* ?>
+    <div id="fullSlider" class="owl-carousel owl-theme desktop-view">
+	<?php
+		    $bannercollection = Mage::getModel('banner/banner')->getCollection()->addFieldToFilter('status',1);
+		    $bannercollection->setOrder('sortby', Varien_Db_Select::SQL_ASC);
+		    $i=1;
+		    $count_bannercollection = count($bannercollection);
+		    foreach($bannercollection as $banner){
+	?>
+			    <div class="item <?php echo $banner->getSortby();?>">
+				    <a href="<?php echo $this->getUrl();?><?php echo $banner->geturl();?>"><img src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA).$banner->getFilename(); ?>" alt="<?php echo $banner->getTitle();?>" /></a>
+				    <?php if($banner->getContent()):?>
+					    <div class="banCap"><?php echo $banner->getContent();?></div>
+				    <?php endif;?>
+			    </div>
+	    <?php
+			    $i++;
+		    }
+	?>
+    </div>
+    
+    <div id="fullSlider1" class="owl-carousel owl-theme mobile-view">
+        <?php
+			$bannercollection1 = Mage::getModel('mobilebanner/mobilebanner')->getCollection()->addFieldToFilter('status',1);
+			$bannercollection->setOrder('sortby', Varien_Db_Select::SQL_ASC);
+			$i=1;
+			$count_bannercollection = count($bannercollection1);
+			foreach($bannercollection1 as $banner1){
+	    ?>
+				<div class="item">
+					<a href="<?php echo $this->getUrl();?><?php echo $banner1->geturl();?>"><img src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA).$banner1->getFilename(); ?>" alt="<?php echo $banner1->getTitle();?>" /></a>
+					<?php if($banner->getContent()):?>
+						<div class="banCap"><?php echo $banner->getContent();?></div>
+					<?php endif;?>
+				</div>
+		
+        <?php
+				$i++;
+			}
+	    ?>
+    </div>
+    <?php */ ?>
+    
+    <div class="block-under-main-banner">
+		<?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('block-under-main-banner')->toHtml();?>
+		<?php //echo $this->getLayout()->createBlock('cms/block')->setBlockId('homepage-promo-banner')->toHtml();?>
+		<?php echo $this->getLayout()->createBlock('dailyfeature/dailyfeature')->setTemplate('dailyfeature/dailyfeature.phtml')->toHtml(); ?>
+	
+	</div>
+	<div class="tabWithSlider" id="parentHorizontalTab">
+		<!--<div class="clearfix tabHdg">
+			<ul id="tabs" class="resp-tabs-list hor_1 tab-one">
+				<li>on sale</li>
+			</ul>
+		</div>-->
+		<div class="resp-tabs-container hor_1 con-one" id="">
+			<div class="tabDetails active">
+				<div class="categoryList products-grid">
+					<div id="owlDemo1" class="owl-carousel">
+						<?php
+							$categoryid = 291;
+						
+							$category = new Mage_Catalog_Model_Category();
+							$category->load($categoryid);
+							$collection = $category->getProductCollection();
+							$collection->addAttributeToSelect('*');
+							
+							$totalproduct = count($collection);
+							$x= 0; $_column = 2;
+							
+							foreach ($collection as $_product) { ?>
+								<?php if ($x++%$_column==0): ?>
+								<div class="item">
+								<?php endif; ?>
+								<div class="allpro">
+									<div class="category-image">
+										<a href="<?php echo $_product->getProductUrl() ?>"><img src="<?php echo $this->helper('catalog/image')->init($_product, 'small_image')->resize(135); ?>" width="135" height="135" alt="<?php echo $_product->getName(); ?>" /></a>
+									</div>
+									<div class="product-info">
+										<h2 class="product-name"><a href="<?php echo $_product->getProductUrl(); ?>"><?php echo $_product->getName(); ?></a></h2>
+										<?php if (Mage::getSingleton('customer/session')->isLoggedIn()) { ?>
+											<div class="price-box">
+												<span id="product-price" class="regular-price">
+												<span class="price"><?php echo Mage::helper('core')->currency($_product->getFinalPrice());?></span>
+											</div>
+				
+										<?php } else { ?>
+											<div class="priceLogin"><a href="<?php echo Mage::helper('customer')->getLoginUrl(); ?>">Log in</a> to see prices</div>
+										<?php } ?>
+									</div>
+								</div>
+									<?php if ($x%$_column==0 || $x==$totalproduct): ?>
+								</div>
+								<?php endif; ?>
+							<?php } ?>
+					</div>
+				</div>
+			</div>
+		</div>
+				
+				
+				
+				
+		<!--<div class="clearfix tabHdg">
+			<ul id="tabs" class="resp-tabs-list hor_1 tab-two">
+				<li>featured items</li>
+			</ul>
+		</div>
+		<div class="resp-tabs-container hor_1 con-two" id="">
+			<div class="tabDetails active">
+				<div class="categoryList products-grid">
+					<div id="owlDemo2" class="owl-carousel">
+						<?php
+							/*$categoryid = 292;
+						
+							$category = new Mage_Catalog_Model_Category();
+							$category->load($categoryid);
+							$collection = $category->getProductCollection();
+							$collection->addAttributeToSelect('*');
+							
+							$totalproduct = count($collection);
+							$x= 0; $_column = 2;
+							
+							foreach ($collection as $_product) { ?>
+								<?php if ($x++%$_column==0): ?>
+								<div class="item">
+								<?php endif; ?>
+								<div class="allpro">
+									<div class="category-image">
+										<a href="<?php echo $_product->getProductUrl() ?>"><img src="<?php echo $this->helper('catalog/image')->init($_product, 'small_image')->resize(135); ?>" width="135" height="135" alt="<?php echo $_product->getName(); ?>" /></a>
+									</div>
+									<div class="product-info">
+										<h2 class="product-name"><a href="<?php echo $_product->getProductUrl(); ?>"><?php echo $_product->getName(); ?></a></h2>
+										<?php if (Mage::getSingleton('customer/session')->isLoggedIn()) { ?>
+											<div class="price-box">
+												<span id="product-price" class="regular-price">
+												<span class="price"><?php echo Mage::helper('core')->currency($_product->getFinalPrice());?></span>
+											</div>
+				
+										<?php } else {
+						?>
+											<div class="priceLogin"><a href="<?php echo Mage::helper('customer')->getLoginUrl(); ?>">Log in</a> to see prices</div>
+										<?php } ?>
+									</div>
+								</div>
+									<?php if ($x%$_column==0 || $x==$totalproduct): ?>
+								</div>
+								<?php endif; ?>
+						<?php }*/ ?>
+					</div>
+				</div>
+			</div>
+		</div>-->
+			
+			
+			
+		<div class="clearfix tabHdg">
+			<ul id="tabs" class="resp-tabs-list hor_1 tab-three">
+				<li>clearance</li>
+			</ul>
+		</div>
+		<div class="resp-tabs-container hor_1 con-three" id="">
+			<div class="tabDetails active">
+				<div class="categoryList products-grid">
+					<div id="owlDemo3" class="owl-carousel">
+							<?php
+						
+							$categoryid = 293;
+						
+							$category = new Mage_Catalog_Model_Category();
+							$category->load($categoryid);
+							$collection = $category->getProductCollection();
+							$collection->addAttributeToSelect('*');
+							
+							$totalproduct = count($collection);
+							$x= 0; $_column = 2;
+							
+							foreach ($collection as $_product) { ?>
+								<?php if ($x++%$_column==0): ?>
+								<div class="item">
+								<?php endif; ?>
+								<div class="allpro">
+									<div class="category-image">
+										<a href="<?php echo $_product->getProductUrl() ?>"><img src="<?php echo $this->helper('catalog/image')->init($_product, 'small_image')->resize(135); ?>" width="135" height="135" alt="<?php echo $_product->getName(); ?>" /></a>
+									</div>
+									<div class="product-info">
+										<h2 class="product-name"><a href="<?php echo $_product->getProductUrl(); ?>"><?php echo $_product->getName(); ?></a></h2>
+										<?php if (Mage::getSingleton('customer/session')->isLoggedIn()) { ?>
+										<div class="price-box">
+											<span id="product-price" class="regular-price">
+											<span class="price"><?php echo Mage::helper('core')->currency($_product->getFinalPrice());?></span>
+										</div>
+			
+										<?php
+											} else {
+											?>
+											<div class="priceLogin"><a href="<?php echo Mage::helper('customer')->getLoginUrl(); ?>">Log in</a> to see prices</div>
+											<?php
+										} ?>
+									</div>
+								</div>
+								<?php if ($x%$_column==0 || $x==$totalproduct): ?>
+								</div>
+								<?php endif; ?>
+							<?php } ?>
+					</div>
+				</div>
+			</div>
+		</div>
+			
+			
+			
+		<!--<div class="clearfix tabHdg">
+			<ul id="tabs" class="resp-tabs-list hor_1 tab-four">
+				<li>high security</li>
+			</ul>
+		</div>
+		<div class="resp-tabs-container hor_1 con-four" id="">
+			<div class="tabDetails active">
+				<div class="categoryList products-grid">
+					<div id="owlDemo4" class="owl-carousel">
+						<?php
+							/*$categoryid = 412;
+						
+							$category = new Mage_Catalog_Model_Category();
+							$category->load($categoryid);
+							$collection = $category->getProductCollection();
+							$collection->addAttributeToSelect('*');
+							
+							$totalproduct = count($collection);
+							$x= 0; $_column = 2;
+							
+							foreach ($collection as $_product) { ?>
+								<?php if ($x++%$_column==0): ?>
+								<div class="item">
+								<?php endif; ?>
+								<div class="allpro">
+									   <div class="category-image">
+										   <a href="<?php echo $_product->getProductUrl() ?>"><img src="<?php echo $this->helper('catalog/image')->init($_product, 'small_image')->resize(135); ?>" width="135" height="135" alt="<?php echo $_product->getName(); ?>" /></a>
+										</div>
+										<div class="product-info">
+											<h2 class="product-name"><a href="<?php echo $_product->getProductUrl(); ?>"><?php echo $_product->getName(); ?></a></h2>
+					<?php if (Mage::getSingleton('customer/session')->isLoggedIn()) { ?>
+					<div class="price-box">
+												<span id="product-price" class="regular-price">
+												<span class="price"><?php echo Mage::helper('core')->currency($_product->getFinalPrice());?></span>
+											</div>
+				
+					<?php
+						} else {
+						?>
+						<div class="priceLogin"><a href="<?php echo Mage::helper('customer')->getLoginUrl(); ?>">Log in</a> to see prices</div>
+						<?php
+					} ?>
+										</div>
+								</div>
+								<?php if ($x%$_column==0 || $x==$totalproduct): ?>
+								</div>
+								<?php endif; ?>
+									<?php }*/ ?>
+					</div>
+				</div>
+			</div>
+		</div>-->
+			
+			
+			
+		<div class="clearfix tabHdg">
+			<ul id="tabs" class="resp-tabs-list hor_1 tab-five">
+				<li>new</li>
+			</ul>
+		</div>
+		<div class="resp-tabs-container hor_1 con-five" id="">
+			<div class="tabDetails active">
+				<div class="categoryList products-grid">
+					<div id="owlDemo5" class="owl-carousel">
+							<?php
+						
+							$categoryid = 413;
+						
+							$category = new Mage_Catalog_Model_Category();
+							$category->load($categoryid);
+							$collection = $category->getProductCollection();
+							$collection->addAttributeToSelect('*');
+						
+							$totalproduct = count($collection);
+							$x= 0; $_column = 2;
+							
+							foreach ($collection as $_product) { ?>
+								<?php if ($x++%$_column==0): ?>
+								<div class="item">
+								<?php endif; ?>
+								<div class="allpro">
+									<div class="category-image">
+										<a href="<?php echo $_product->getProductUrl() ?>"><img src="<?php echo $this->helper('catalog/image')->init($_product, 'small_image')->resize(135); ?>" width="135" height="135" alt="<?php echo $_product->getName(); ?>" /></a>
+									</div>
+									<div class="product-info">
+										<h2 class="product-name"><a href="<?php echo $_product->getProductUrl(); ?>"><?php echo $_product->getName(); ?></a></h2>
+										<?php if (Mage::getSingleton('customer/session')->isLoggedIn()) { ?>
+										<div class="price-box">
+											<span id="product-price" class="regular-price">
+											<span class="price"><?php echo Mage::helper('core')->currency($_product->getFinalPrice());?></span>
+										</div>
+			
+										<?php
+											} else {
+											?>
+											<div class="priceLogin"><a href="<?php echo Mage::helper('customer')->getLoginUrl(); ?>">Log in</a> to see prices</div>
+											<?php
+										} ?>
+									</div>
+								</div>
+								<?php if ($x%$_column==0 || $x==$totalproduct): ?>
+								</div>
+								<?php endif; ?>
+							<?php } ?>
+					</div>
+				</div>
+			</div>
+		</div>
+    </div>
+<?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('boxs_banner')->toHtml() ?>     
+   <?php $categories = Mage::getModel('catalog/category')->getCollection()->setStoreId(Mage::app()->getStore()->getId());
+$categories->addAttributeToSelect('*')
+	->addAttributeToFilter('parent_id',2)
+	->addAttributeToFilter('is_active', 1)//get only active categories if you want
+	->addAttributeToSort('position');
+?>
+	<div class="allCategorySec">
+		<h4>all categories</h4>
+		<div class="categoryList products-grid">
+			<div id="owlDemo6" class="owl-carousel">
+			<?php $totalproduct = count($categories);
+			$x= 0; $_column = 2; ?>
+			<?php foreach($categories as $category){ ?>
+				<?php if ($x++%$_column==0): ?>
+					<div class="item">
+						<?php endif; ?>
+						<div class="allpro">
+							<div class="category-image">
+								<?php $_catObj = Mage::getModel('catalog/category')->load($category->getId());?>
+								<a href="<?php echo $category->getUrl();?>"><img height="140" width="140" src="<?php echo Mage::getBaseUrl('media').'catalog/category/'.$_catObj->getThumbnail(); ?>"  alt="<?php echo $category->getName();?>"/></a>
+							</div>
+							<div class="product-info">
+							   <h2 class="product-name"><a href="<?php echo $category->getUrl();?>"><?php echo $category->getName();?></a></h2>
+							</div>
+						</div>
+						<?php if ($x%$_column==0 || $x==$totalproduct): ?>
+					</div>
+			<?php endif; ?>
+			<?php } ?>
+			</div>
+		</div>
+	</div>
+</div>
+<style>
+	@media only screen and (max-width: 768px) {
+		
+		.con-two, .con-three, .con-four, .con-five {display:none;}
+	}
+</style>

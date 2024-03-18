@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+	<adminhtml_customer_edit>
+		<reference name="head">
+			<action method="addCss">
+			    <name>css/price.css</name>
+			</action>
+			<action method="addItem">
+	        	<type>skin_js</type>
+	            <name>js/jquery-1.11.0.min.js</name>
+	        </action>
+	        <action method="addItem">
+	        	<type>skin_js</type>
+	            <name>js/price.js</name>
+	        </action>
+	        <action method="addItem"><type>js</type><name>extjs/ext-tree.js</name><params/></action>
+			<action method="addItem"><type>js</type><name>extjs/fix-defer.js</name><params/></action>
+			<action method="addItem"><type>js</type><name>extjs/ext-tree-checkbox.js</name><params/></action>
+			<action method="addItem"><type>js</type><name>mage/adminhtml/rules.js</name><params/></action>
+			<action method="addItem"><type>js_css</type><name>extjs/resources/css/ext-all.css</name><params/></action>
+			<action method="addItem"><type>js_css</type><file>extjs/resources/css/ytheme-magento.css</file></action>
+        </reference>
+		<reference name="customer_edit_tabs">
+			<action method="addTab">
+				<name>tab</name>
+				<block>price/tab</block>
+			</action>
+			<action method="addTab">
+				<name>global</name>
+				<block>price/tab_global</block>
+			</action>
+		</reference>
+	</adminhtml_customer_edit>
+</layout>

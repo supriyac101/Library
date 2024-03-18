@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+<config>
+	<extendware>
+		<quickaccess>
+			<ewpribbon>
+                <resource>extendware/ewpribbon</resource>
+				<children>
+					<ribbon translate="title" module="ewpribbon">
+						<title>Ribbons</title>
+						<action>adminhtml/ewpribbon_ribbon</action>
+						<resource>extendware/ewpribbon/ribbon</resource>
+						<sort_order>1</sort_order>
+					</ribbon>
+					<image translate="title" module="ewpribbon">
+						<title>Ribbon Images</title>
+						<action>adminhtml/ewpribbon_image</action>
+						<resource>extendware/ewpribbon/image</resource>
+						<sort_order>2</sort_order>
+					</image>
+				</children>
+				<title/>
+			</ewpribbon>
+		</quickaccess>
+	</extendware>
+	<menu>
+	    <ewcore translate="title" module="ewpribbon">
+			<title>Extendware</title>
+			<sort_order>89</sort_order>
+			<resource>extendware/ewcore</resource>
+			<class>ewcore-main</class>
+	        <children>
+	            <quickaccess translate="title" module="ewpribbon">
+	                <title>Manage Extensions</title>
+	                <sort_order>1</sort_order>
+	                <resource>extendware/ewpribbon</resource>
+	                <children>
+	                	<ewpribbon translate="title" module="ewpribbon">
+			                <title>Product Ribbons</title>
+			                <sort_order>48547</sort_order>
+			                <resource>extendware/ewpribbon</resource>
+			                <children>
+			                	<ribbon translate="title" module="ewpribbon">
+									<title>Ribbons</title>
+									<action>adminhtml/ewpribbon_ribbon</action>
+									<resource>extendware/ewpribbon/ribbon</resource>
+									<sort_order>1</sort_order>
+								</ribbon>
+								<image translate="title" module="ewpribbon">
+									<title>Ribbon Images</title>
+									<action>adminhtml/ewpribbon_image</action>
+									<resource>extendware/ewpribbon/image</resource>
+									<sort_order>2</sort_order>
+								</image>
+								<configure translate="title" module="ewpribbon">
+									<title>Configure</title>
+									<sort_order>9999999</sort_order>
+									<action>adminhtml/ewpribbon_config/index</action>
+									<resource>extendware/ewpribbon/configure</resource>
+								</configure>
+			                </children>
+			            </ewpribbon>
+	                </children>
+	            </quickaccess>
+	            <userguides translate="title" module="ewpribbon">
+	                <title>User Guides / Help</title>
+	                <sort_order>9</sort_order>
+	                <action>adminhtml/ewpribbon_config/gotoExtendwareUserguides</action>
+	                <resource>extendware/ewcore/redirect/userguide</resource>
+	                <class>ewcore-extendware-userguide</class>
+	            </userguides>
+	            <storelink translate="title" module="ewpribbon">
+		            <title>Improve Your Store</title>
+		            <sort_order>9999</sort_order>
+		            <action>adminhtml/ewpribbon_config/gotoExtendware</action>
+		            <resource>extendware/ewcore/redirect/extendware</resource>
+		            <class>ewcore-extendware-link</class>
+		        </storelink>
+	        </children>
+	    </ewcore>
+		<catalog>
+			<children>
+				<ewpribbon>
+					<title>Product Ribbons</title>
+					<action>adminhtml/ewpribbon_ribbon</action>
+					<resource>extendware/ewpribbon/ribbon</resource>
+					<sort_order>101</sort_order>
+				</ewpribbon>
+			</children>
+		</catalog>
+	</menu>
+	<acl>
+		<resources>
+            <admin>
+                <children>
+                    <extendware translate="title" module="ewpribbon">
+                    	<title>Extendware</title>
+                    	<sort_order>0</sort_order>
+                        <children>
+                        	<ewpribbon translate="title" module="ewpribbon">
+                        		<title>Product Ribbons</title>
+                        		<children>
+                        			<ribbon translate="title">
+                        				<title>Ribbons</title>
+			            			</ribbon>
+			            			<image translate="title">
+                        				<title>Images</title>
+			            			</image>
+                        			<settings translate="title">
+                        				<title>Settings</title>
+                        				<children>
+				                            <main translate="title">
+				                                <title>Main</title>
+				                                <children>
+					                                <ewpribbon translate="title">
+						                                <title>General</title>
+						                            </ewpribbon>
+					                            </children>
+				                            </main>
+			                            </children>
+			            			</settings>
+			            		</children>
+			            	</ewpribbon>
+                        </children>
+                    </extendware>
+                </children>
+            </admin>
+        </resources>
+	</acl>
+</config>

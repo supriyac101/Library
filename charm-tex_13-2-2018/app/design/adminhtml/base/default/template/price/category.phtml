@@ -1,0 +1,12 @@
+<div style="padding:2px">
+	<?php $categories = $this->getCategories() ?>
+	<?php if ($categories): ?>
+		<div class="price-categories">
+			<?php foreach ($categories as $category) : ?>
+				<div class="price-category"><?php echo $category ?></div>
+			<?php endforeach; ?>
+		</div>
+	<?php else: ?>
+		No category(ies) selected
+	<?php endif; ?>
+</div>

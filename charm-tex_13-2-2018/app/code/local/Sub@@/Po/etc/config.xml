@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<config>
+    <global>
+        <modules>
+            <Sub_Po>
+                <version>0.1.0</version>
+            </Sub_Po>
+        </modules>
+        <helpers>
+            <myorder>
+                <class>Sub_Po_Helper</class>
+            </myorder>
+        </helpers>
+    </global>
+    <frontend>
+        <events>
+            <checkout_type_onepage_save_order>
+                <observers>
+                    <po_set_customerpo>
+                        <type>model</type>
+                            <class>Sub_Po_Helper_CustomerPo</class>
+                        <method>setCustomerPo</method>
+                    </po_set_customerpo>
+                </observers>
+            </checkout_type_onepage_save_order>
+        </events>
+    </frontend>
+</config>

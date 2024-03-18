@@ -1,0 +1,14 @@
+<?php $_product = $this->getProduct();?>
+<?php $tabs = $this->helper('frontendconfigurableproductmatrix')->getDisplayTabs($_product);?>
+<?php $aco = ($this->helper('frontendconfigurableproductmatrix')->isAdvancedCustomOptionEnabled() ? 'customoptions/catalog-product-view-options.phtml' : 'catalog/product/view/options.phtml'); ?>
+<?php if($this->helper('frontendconfigurableproductmatrix')->isEnable($_product) && $this->helper('frontendconfigurableproductmatrix')->isSecondMatrix($_product) != 1): $mPosition = $this->helper('frontendconfigurableproductmatrix')->getMatrixPosition($_product);?>
+	<?php if($mPosition == 1 || $mPosition == 3 || $tabs == 2):?>
+		<?php if($mPosition != 2 && $this->helper('frontendconfigurableproductmatrix')->isShowFDD($_product) == 1):?>
+            <?php echo $this->setTemplate($aco)->toHtml();?>
+        <?php endif;?>
+    <?php elseif($tabs == 0 || $tabs == 1):?>
+    	<?php echo $this->setTemplate($aco)->toHtml();?>
+    <?php endif;?>
+<?php else:?>
+	<?php echo $this->setTemplate($aco)->toHtml();?>
+<?php endif;?>

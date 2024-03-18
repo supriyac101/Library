@@ -1,0 +1,137 @@
+<?php
+$formErrors = $this->getParentBlock()->formErrors;
+$formErrors = (!empty($formErrors['billing_errors'])) ? $formErrors['billing_errors'] : array();
+
+$helper = Mage::helper('onestepcheckout/checkout');
+$dataHelper = Mage::helper('onestepcheckout');
+    $billingFields['firstname'] = '
+        <div class="input-box input-firstname'.((in_array('firstname', $formErrors)) ? ' input-error' : '').'">
+            <label for="billing:firstname">'.$this->__('First Name').' <span class="required">*</span></label><br />
+            <input class="required-entry input-text" type="text" name="billing[firstname]" id="billing:firstname" value="'.$dataHelper->clearDash($this->getQuote()->getBillingAddress()->getFirstname()).'" />
+        </div>';
+    $billingFields['lastname'] = '
+        <div class="input-box input-lastname'.((in_array('lastname', $formErrors)) ? ' input-error' : '').'">
+            <label for="billing:lastname">'.$this->__('Last Name').' <span class="required">*</span></label><br />
+            <input class="required-entry input-text" type="text" name="billing[lastname]" id="billing:lastname" value="'.$dataHelper->clearDash($this->getQuote()->getBillingAddress()->getLastname()).'" />
+        </div>';
+    ?>
+
+<?php if(!$this->settings['exclude_address']):?>
+    <?php if(Mage::getStoreConfig('onestepcheckout/exclude_fields/enable_address_fields')):?>
+        <?php
+        $addressFields = '';
+            for ($_i=1, $_n=$this->helper('customer/address')->getStreetLines(); $_i<=$_n; $_i++){
+
+                    $addressFields .= '<div class="input-box input-address-short'.((in_array('address', $formErrors)) ? ' input-error' : '').'">
+                    <label for="billing:street'.$_i.'">'.$this->__('Street Address '.$_i).' <span class="required">*</span></label><br />
+                    <input type="text" title="'.$this->__('Street Address '.$_i).'" name="billing[street][]" id="billing:street'.$_i.'" value="'.$dataHelper->clearDash($this->getQuote()->getBillingAddress()->getStreet($_i)).'" class="required-entry input-text onestepcheckout-address-line" />
+                    </div>';
+            }
+            $billingFields['street'] = $addressFields;
+        ?>
+    <?php else:?>
+        <?php
+        $addressFields = '';
+            for ($_i=1, $_n=$this->helper('customer/address')->getStreetLines(); $_i<=$_n; $_i++){
+
+                    $addressFields .= '<input type="text" title="'.$this->__('Street Address '.$_i).'" name="billing[street][]" id="billing:street'.$_i.'" value="'.$dataHelper->clearDash($this->getQuote()->getBillingAddress()->getStreet($_i)).'" class="'.(($_i == 1)? 'required-entry ' : '').'input-text onestepcheckout-address-line" />';
+                    $addressFields .= (($_i != $this->helper('customer/address')->getStreetLines()) ? '<br/>': '');
+            }
+            $billingFields['street'] = '
+                <div class="input-box input-address'.((in_array('address', $formErrors)) ? ' input-error' : '').'">
+                    <label for="billing:street1">'.$this->__('Address').' <span class="required">*</span></label><br />
+                    '.$addressFields.'
+                </div>';
+        ?>
+    <?php endif; ?>
+<?php endif; ?>
+
+<?php if(!$this->settings['exclude_country_id']):?>
+<?php
+$billingFields['country_id'] = '
+    <div class="input-box input-country'.((in_array('country', $formErrors)) ? ' input-error' : '').'">
+        <label for="billing:country_id">'.$this->__('Country').' <span class="required">*</span></label><br />
+            '.$this->getCountryHtmlSelect('billing').'
+    </div>';
+?>
+<?php else: ?>
+<?php $billingFields['country_id'] = '
+    <input type="hidden" name="billing[country_id]" id="billing:country_id" value="'.$this->settings['default_country'].'" />';
+?>
+<?php endif; ?>
+<?php if(!$this->settings['exclude_region'] ): ?>
+    <?php $billingFields['region_id'] = '
+        <div class="input-box input-region'.((in_array('region', $formErrors)) ? ' input-error' : '').'">
+            <label for="billing:region">'.$this->__('State/Province').' <span class="required">*</span></label><br/>
+            <select id="billing:region_id" name="billing[region_id]" title="'.$this->__('State/Province').'" class="validate-select" style="display:none">
+                <option value="">'.$this->__('Please select region, state or province').'</option>
+            </select>
+            <script type="text/javascript">
+                $("billing:region_id").setAttribute("defaultValue",  "'.$dataHelper->clearDash($this->getQuote()->getBillingAddress()->getRegionId()).'");
+            </script>
+            <input type="text" id="billing:region" name="billing[region]" value="'.$dataHelper->clearDash($this->getQuote()->getBillingAddress()->getRegion()).'"  title="'.$this->__('State/Province').'" class="required-entry input-text" style="display:none" />
+        </div>';
+    ?>
+<?php endif; ?>
+<?php if(!$this->settings['exclude_city']):?>
+    <?php $billingFields['city'] = '
+        <div class="input-box input-city'.((in_array('city', $formErrors)) ? ' input-error' : '').'">
+            <label for="billing:city">'.$this->__('City').' <span class="required">*</span></label><br/>
+            <input type="text" name="billing[city]" value="'.$dataHelper->clearDash($this->getQuote()->getBillingAddress()->getCity()).'" title="'.$this->__('City').'" class="required-entry input-text" id="billing:city" />
+        </div>';
+    ?>
+<?php endif; ?>
+<?php if(!$this->settings['exclude_zip']): ?>
+    <?php $billingFields['postcode'] = '
+        <div class="input-box input-postcode'.((in_array('postcode', $formErrors)) ? ' input-error' : '').'" >
+            <label for="billing:postcode">'.$this->__('Zip/Postal Code').' <span class="required">*</span></label><br />
+            <input type="text" title="'.$this->__('Zip/Postal Code').'" name="billing[postcode]" id="billing:postcode" value="'.$dataHelper->clearDash($this->getQuote()->getBillingAddress()->getPostcode()).'" class="validate-zip-international required-entry input-text" />
+        </div>';
+    ?>
+<?php endif; ?>
+<?php if(!$this->settings['exclude_telephone']):?>
+    <?php $billingFields['telephone'] = '
+        <div class="input-box input-telephone'.((in_array('telephone', $formErrors)) ? ' input-error' : '').'">
+            <label for="billing:telephone">'.$this->__('Telephone').' <span class="required">*</span></label><br/>
+            <input type="text" name="billing[telephone]" value="'.$dataHelper->clearDash($this->getQuote()->getBillingAddress()->getTelephone()).'" title="'.$this->__('Telephone').'" class="required-entry input-text" id="billing:telephone" />
+        </div>';
+    ?>
+<?php endif; ?>
+<?php if(!$this->settings['exclude_company']): ?>
+    <?php $billingFields['company'] = '
+        <div class="input-box input-company'.((in_array('company', $formErrors)) ? ' input-error' : '').'">
+            <label for="billing:company">'.$this->__('Company').'</label><br/>
+            <input type="text" name="billing[company]" value="'.$dataHelper->clearDash($this->getQuote()->getBillingAddress()->getCompany()).'" title="'.$this->__('Company').'" class="input-text" id="billing:company" />
+        </div>';
+    ?>
+<?php endif; ?>
+
+<?php if(!$this->settings['exclude_fax']): ?>
+    <?php $billingFields['fax'] = '
+        <div class="input-box input-fax'.((in_array('fax', $formErrors)) ? ' input-error' : '').'">
+            <label for="billing:fax">'.$this->__('Fax').'</label><br/>
+            <input type="text" name="billing[fax]" value="'.$dataHelper->clearDash($this->getQuote()->getBillingAddress()->getFax()).'" title="'.$this->__('Fax').'" class="input-text" id="billing:fax" />
+        </div>';
+    ?>
+<?php endif; ?>
+
+<?php if ($this->isCustomerLoggedIn() && $this->customerHasAddresses()):?>
+    <?php $billingFields['save_in_address_book'] = '
+        <li class="control">
+            <input type="checkbox" name="billing[save_in_address_book]" value="1" title="'.$this->__('Save in address book').'" id="billing:save_in_address_book" '.(($this->getQuote()->getBillingAddress()->getSaveInAddressBook()) ? 'checked="checked"':'').' class="checkbox" /><label for="billing:save_in_address_book">'.$this->__('Save in address book').'</label>
+        </li>';
+    ?>
+<?php else:?>
+    <?php $billingFields['save_in_address_book'] = '
+        <li class="no-display"><input type="hidden" name="billing[save_in_address_book]" value="1" /></li>';
+    ?>
+<?php endif; ?>
+
+<?php $billingFields = $this->getbillingFieldsOrder($billingFields);?>
+<?php foreach($billingFields as $key => $value):?>
+    <?php if(!empty($value['has_li'])):?>
+        <?php echo implode('',$value['fields']);?>
+    <?php else:?>
+        <li class="clearfix"><?php echo implode('',$value['fields']);?></li>
+    <?php endif;?>
+<?php endforeach;?>

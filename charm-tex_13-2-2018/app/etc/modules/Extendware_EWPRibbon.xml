@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<config>
+   <modules>
+      <Extendware_EWPRibbon>
+         <active>false</active>
+         <codePool>local</codePool>
+         <depends>
+            <Extendware_EWCore/>
+         </depends>
+         <extendware>
+            <name>Product Ribbons</name>
+         </extendware>
+      </Extendware_EWPRibbon>
+   </modules>
+</config>

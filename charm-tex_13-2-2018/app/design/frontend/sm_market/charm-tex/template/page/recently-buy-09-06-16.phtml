@@ -1,0 +1,149 @@
+<div class="my-account">
+    <div class="page-title">
+        <h1>Recently Purchased Items</h1>
+    </div>
+    <form action="#" method="post" name="recent_cart_form" id="recent_cart_form" enctype="multipart/form-data">
+        <table class="recent-buy">
+            <thead>
+                <tr class="first">
+                    <th class="recent-image"></th>
+                    <th class="recent-name">PRODUCT NAME</th>
+                    <th class="recent-price">PRICE</th>
+                    <th class="recent-qunty">QUANTITY</th>
+                    <th class="recent-addcart"></th>
+                </tr>
+            </thead>
+            <tbody class="recent-buy-tbd">
+                <?php
+                    $helper = Mage::helper('catalog/product_configuration');
+                    $orders = Mage::getResourceModel('sales/order_collection')
+                    ->addFieldToSelect('*')
+                    ->addFieldToFilter('customer_id', Mage::getSingleton('customer/session')->getCustomer()->getId());
+                    //->addFieldToFilter('status', 'complete');
+                    
+                    $this->setOrders($orders);
+                    foreach ($orders as $order){
+                        $order_id=$order->getRealOrderId();
+                        $order = Mage::getModel('sales/order')->load($order_id, 'increment_id');
+                        $order->getAllVisibleItems();
+                        $orderItems = $order->getItemsCollection()
+                        ->addAttributeToSelect('*')
+                        ->load();
+                        //echo "Order Total:".$order->getSubtotal();
+                
+                        foreach($orderItems as $Items){
+                            /*$attributeSetModel = Mage::getModel("eav/entity_attribute_set")->load($Items->getAttributeSetId());
+                            $parentIds = Mage::getResourceSingleton('catalog/product_type_configurable')->getParentIdsByChild($Items->getId());
+                            if ($Items->getTypeId() == 'simple') {
+                                echo "simple product";
+                            }else{
+                               
+                                
+                            } */
+                            $Item = Mage::getModel('catalog/product')->setStoreId($Items->getStoreId())->load($Items->getProductId());
+                ?>
+                
+                <tr class="recent-details" id="recent-details-<?php echo $Item->getId()?>">
+                    <td>
+                        <a href="<?php echo $Item->getProductUrl(); ?>"><img src="<?php echo $Item->getImageUrl(); ?>" /></a>
+                    </td>
+                    <td>
+                        <a href="<?php echo $Item->getProductUrl(); ?>"><?php echo $Item->getName(); ?></a>
+                        <?php
+                            $arr=array();
+                            $arr1=array();
+                            $options = $Items->getProductOptions(); 
+                            $customOptions = $options['options'];   
+                            if(!empty($customOptions)){
+                                foreach ($customOptions as $option){ 
+                                    $optionId = $option['option_id'];
+                                    $optionvalId = $option['option_value'];
+                                    echo '<input type="hidden" name="ordered-pro-id" value="'.$Item->getId().'" />';
+                                    echo '<input type="hidden" name="data-optionid" value="'.$optionId.'" />';
+                                    echo '<input type="hidden" name="data-optionvalid" value="'.$optionvalId.'" />';
+                                    echo '<span class="option-name">'.$optionTitle = $option['label'].': '.'</span>';
+                                    echo '<span class="option-value">'.$optionValue = $option['value'].'</span>'.'</br>';
+                                    array_push($arr,$optionId);
+                                    array_push($arr1,$optionvalId);
+                                }
+                            }
+                            $arrComb = array_combine($arr,$arr1);
+                            //echo "<pre>";
+                            //print_r($arrComb);
+                            //echo $params = json_encode($arrComb, JSON_PRETTY_PRINT);
+                        ?>
+                    </td>
+                    <td>
+                        <a href="<?php echo $Item->getProductUrl(); ?>"><?php echo "$".number_format($Items->getPrice(), '2'); ?></a> 
+                    </td>
+                    <td>
+                        <?php echo '<input type="text" class="buy-qnty" name="buy-qnty" length="12" value="'. number_format($Items->getQtyOrdered(), '0').'" />';?>
+                    </td>
+                    <td>
+                        <?php if(!$Item->canConfigure() && $Item->isSaleable()){ ?>
+                            <a class="custom" href="<?php echo $this->getBaseUrl(); ?>checkout/cart/add/?product=<?php echo $Item->getId(); ?>&qty=<?php echo number_format($Items->getQtyOrdered(), '0');?>"><?php echo $this->__('Add To Cart'); ?></a>
+                        <?php }else if($Item->canConfigure()){ ?>
+                            <span class="opt-url" style="display: none;"><?php echo $this->getBaseUrl(); ?>checkout/cart/add/?product=<?php echo $Item->getId(); ?>&<?php echo http_build_query(array('options' => $arrComb))?>&qty=<?php echo number_format($Items->getQtyOrdered(), '0');?></span>
+                            <a class="custom recent-addcart" href="<?php echo $this->getBaseUrl(); ?>checkout/cart/add/?product=<?php echo $Item->getId(); ?>&<?php echo http_build_query(array('options' => $arrComb))?>&qty=1"><?php echo $this->__('Add To Cart'); ?></a>
+                            <!--<a class="custom recent-addcart" id="recent-addcart-<?php echo $Item->getId(); ?>" href="javascript:void(0);"><?php echo $this->__('Add To Cart'); ?></a>-->
+                        <?php }else{ ?>
+                            <p class="action availability out-of-stock"><span><?php echo $this->__('Out of stock') ?></span></p>
+                        <?php } ?>
+                    </td>
+                </tr>
+                
+                    <?php
+                        }
+                    ?>
+                <?php
+                    }
+                ?>   
+            </tbody>
+        </table>
+    </form>
+</div>
+<script type="text/javascript">
+    jQuery(document).ready(function($j){
+        $j('.recent-buy-tbd .recent-details').each(function(){
+            $j(this).children('td:nth-child(4)').find('input[name="buy-qnty"]').on('keyup',function(){
+                var sendurl = $j(this).parent('td').next('td').children('a.custom').attr('href');
+                sendurl = sendurl.split("qty=");
+                var qty = sendurl[1];
+                var newqty = $j(this).val();
+                var newurl = sendurl[0]+"qty="+newqty;
+                $j(this).parent('td').next('td').children('a.custom').attr('href',newurl);
+            });
+            
+            /*var product = '<?php echo $Item->getId();?>';
+            var qty = '1';
+            var options = '<?php echo json_encode($params); ?>';
+            alert(options);
+            jQuery.ajax({
+                url : '<?php echo $this->getUrl()."ordergrid/index/recentaddtocart/";?>',
+                type : 'POST',
+                contentType: "application/json; charset=utf-8",
+                dataType : 'json',
+                data: {product: product, qty: qty, dataparam: JSON.stringify(options)},
+                success : function(data){
+                    // Do something with data that came back
+                },
+            });*/
+            /*var product = $j(this).parents('.recent-details').find('input[name="ordered-pro-id"]').attr('value');
+            var qty = $j(this).parents('.recent-details').find('input[name="buy-qnty"]').attr('value');
+            var optid = $j(this).parents('.recent-details').find('input[name="data-optionid"]').attr('value');
+            var optvalid = $j(this).parents('.recent-details').find('input[name="data-optionvalid"]').attr('value');
+            var formdata = $j("form").children('#recent-details-'+product).serialize();
+            alert(formdata);*/
+            /*jQuery.ajax({
+                url : '<?php echo $this->getUrl()."ordergrid/index/recentaddtocart/";?>',
+                type : 'POST',
+                //contentType: "application/json; charset=utf-8",
+                dataType : 'json',
+                data: {product: product, qty: qty, optid: optid, optvalid: optvalid},
+                success : function(data){
+                    // Do something with data that came back.
+                },
+            });*/
+        });
+    });
+</script>

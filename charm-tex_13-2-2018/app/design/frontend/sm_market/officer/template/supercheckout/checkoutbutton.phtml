@@ -1,0 +1,13 @@
+<?php if($this->isEnabled()){ ?>
+<button type="button" title="<?php echo $this->__('Proceed to Checkout') ?>"
+        class="button btn-proceed-checkout btn-checkout<?php if (!true){ echo 'no-checkout'; }?>"
+            <?php if (!$this->checkAllowed()){ echo ' disabled="disabled" ';} ?> 
+        onclick="window.location='<?php echo $this->getSupercheckoutUrl() ?>';">
+    <span>
+        <span><?php echo $this->__('Proceed to Checkout') ?></span>
+    </span></button>
+<?php } ?>
+
+
+
+

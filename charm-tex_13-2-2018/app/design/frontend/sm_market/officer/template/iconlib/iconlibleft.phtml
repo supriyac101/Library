@@ -1,0 +1,124 @@
+<?php
+  /**
+ * M-Connect Solutions.
+ *
+ * NOTICE OF LICENSE
+ *
+
+ * It is also available through the world-wide-web at this URL:
+ * http://www.mconnectsolutions.com/lab/
+ *
+ * @category   M-Connect
+ * @package    M-Connect
+ * @copyright  Copyright (c) 2009-2010 M-Connect Solutions. (http://www.mconnectsolutions.com)
+ */ 
+?>
+<?php
+if(Mage::registry('product') && Mage::getStoreConfig('iconlib/advancediconblocksettings/icondisplayleftblockenabled',Mage::app()->getStore()) && !Mage::getStoreConfig('advanced/modules_disable_output/Mconnect_Iconlib',Mage::app()->getStore()))
+{    
+    $iconDataCollection = Mage::getModel('iconlib/iconlib')->getCollection();
+    $resource = Mage::getSingleton('core/resource');
+    $iconDataCollection->getSelect()->join(array('icon2prod'=>$resource->getTableName('iconlibtoproducts/iconlibtoproducts')),'icon2prod.iconid = main_table.iconlib_id',array('main_table.iconlib_id as iconlib_id','main_table.iconlabel as iconlabel','main_table.iconfilename as iconfilename','main_table.icon as icon'));
+    $iconDataCollection->addFieldToFilter('status','1')
+    ->addFieldToFilter('icon2prod.productid',Mage::registry('product')->getId());
+    if(Mage::getStoreConfig('iconlib/advancediconsettings/icondisplayrandomlyenabled',Mage::app()->getStore()))
+    {
+        $iconDataCollection->getSelect()->order(new Zend_Db_Expr('RAND()'));
+    }    
+    $iconDataCollection->getSelect()->group('main_table.iconlib_id');   
+    $iconDataCollection->getData();
+
+    //echo $iconDataCollection->getSelect(); exit;
+    if(count($iconDataCollection) > 0)
+    {        
+        $iconDisplayLimit = Mage::getStoreConfig('iconlib/general/icondisplaylimit',Mage::app()->getStore());        
+        if(is_numeric($iconDisplayLimit) && $iconDisplayLimit > 0)
+        {
+        
+        $iconCnt = 1;
+        $iconImgBorderEnabled = '';
+        $iconImgHeight = '';
+        $iconImgWidth = 'width:170px; ';
+        $iconImgHeightVal = 130;
+        $iconImgWidthVal = 170;
+        
+        $iconDisplayBlockTitle = Mage::getStoreConfig('iconlib/advancediconblocksettings/icondisplayblocktitle',Mage::app()->getStore());        
+        
+        
+        if(Mage::getStoreConfig('iconlib/advancediconsettings/icondisplaystyleenabled',Mage::app()->getStore()))
+        {            
+            if(Mage::getStoreConfig('iconlib/advancediconsettings/iconimgborderenabled',Mage::app()->getStore()))
+            {
+                $iconImgBorderEnabled = 'border: 1px solid #000;';
+            }
+            $iconImgHeightVal = Mage::getStoreConfig('iconlib/advancediconsettings/iconimgheight',Mage::app()->getStore());
+            $iconImgWidthVal = Mage::getStoreConfig('iconlib/advancediconsettings/iconimgwidth',Mage::app()->getStore());
+            $iconImgHeight = 'height: '.Mage::getStoreConfig('iconlib/advancediconsettings/iconimgheight',Mage::app()->getStore()).'px; ';
+            $iconImgWidth = 'width: '.Mage::getStoreConfig('iconlib/advancediconsettings/iconimgwidth',Mage::app()->getStore()).'px; ';
+        }
+?>    
+    <div class="block">
+        <div class="block-title">
+            <strong><span><?php echo $iconDisplayBlockTitle; ?></span></strong>
+        </div>
+        <div class="block-content">
+            <?php
+        foreach($iconDataCollection as $iconData)
+        {
+        if($iconCnt <= $iconDisplayLimit)        
+        {
+// actual path of image
+$_imageUrl = Mage::getBaseDir('media').'/admin_mconnect_iconlib_uploads/'.$iconData['iconlib_id'].'/'.$iconData['iconfilename'];
+ 
+// path of the resized image to be saved
+// here, the resized image is saved in media/resized folder
+$imageResized = Mage::getBaseDir('media').'/admin_mconnect_iconlib_uploads/'.$iconData['iconlib_id']."/resized/".$iconData['iconfilename'];
+
+$_imageSize = getimagesize($imageResized);
+
+// resize image only if the image file exists and the resized image file doesn't exist
+// the image is resized proportionally with the width/height 135px
+if (!file_exists($imageResized) && file_exists($_imageUrl)){
+    $imageObj = new Varien_Image($_imageUrl);
+    $imageObj->constrainOnly(TRUE);
+    $imageObj->keepAspectRatio(TRUE);
+    $imageObj->keepFrame(FALSE);
+    $imageObj->resize($iconImgWidthVal, $iconImgHeightVal);
+    $imageObj->save($imageResized);
+} else if (file_exists($imageResized) && file_exists($_imageUrl) && $_imageSize[0] != $iconImgWidth){
+    $imageObj = new Varien_Image($_imageUrl);
+    $imageObj->constrainOnly(TRUE);
+    $imageObj->keepAspectRatio(TRUE);
+    $imageObj->keepFrame(FALSE);
+    $imageObj->resize($iconImgWidthVal, $iconImgHeightVal);
+    $imageObj->save($imageResized);
+}
+
+            if(file_exists(Mage::getBaseDir('media').'/admin_mconnect_iconlib_uploads/'.$iconData['iconlib_id'].'/resized/'.$iconData['iconfilename'])){
+            $iconUrl = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA).'/admin_mconnect_iconlib_uploads/'.$iconData['iconlib_id'].'/resized/'.$iconData['iconfilename'];
+            } else {
+            $iconUrl = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA) . 'admin_mconnect_iconlib_uploads/PlaceHolder/ImageNotAvailable.jpg';
+	     }
+        ?>    
+                <div align="center">
+                    <img src="<?php echo $iconUrl; ?>" style="margin: 5px; <?php echo $iconImgWidth,$iconImgHeight,$iconImgBorderEnabled; ?>" alt="<?php echo $iconData['iconlabel']; ?>" title="<?php echo $iconData['iconlabel']; ?>" />
+                    <?php if(Mage::getStoreConfig('iconlib/advancediconsettings/icondisplaylabelenabled',Mage::app()->getStore())){?>
+                    <br /><div align="center"><strong><?php echo $iconData['iconlabel']; ?></strong></div>    
+                    <?php 
+                    }?>
+                </div>    
+                <?php $iconCnt++; ?>
+                <?php    
+        }
+        } ?>            
+        </div>
+    </div>
+    <ul>
+           
+    </ul>
+    <?php 
+        }   
+    }
+    
+} 
+?>

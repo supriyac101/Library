@@ -1,0 +1,21 @@
+<?php if (!$this->getOutputInlineJs()): ?><script><?php endif; ?>
+<?php if ($this->getWrapInDomLoadedEvent()): ?>Event.observe(document, 'ewpribbon:loaded', function(){<?php endif; ?>
+	<?php $configTemplates = $this->getConfigTemplates(); ?>
+	<?php foreach ($configTemplates as $key => $data): ?>ewpribbon.addConfigTemplate(<?php echo json_encode($key); ?>, <?php echo $data['params']; ?>);<?php endforeach; ?>
+	<?php $categoryRibbons = $this->getCategoryRibbons(); ?>
+	<?php foreach ($categoryRibbons as $productId => $ribbons): ?>
+		<?php foreach ($ribbons as $ribbon): ?>ewpribbon.addRibbon('category', <?php echo json_encode($ribbon['config_template_key']); ?>, <?php echo json_encode($productId); ?>);<?php endforeach; ?>
+	<?php endforeach; ?>
+
+	<?php $productRibbons = $this->getProductRibbons(); ?>
+	<?php foreach ($productRibbons as $productId => $ribbons): ?>
+		<?php foreach ($ribbons as $ribbon): ?>ewpribbon.addRibbon('product', <?php echo json_encode($ribbon['config_template_key']); ?>, <?php echo json_encode($productId); ?>);<?php endforeach; ?>
+	<?php endforeach; ?>
+	ewpribbon.rewritePage(<?php echo json_encode($this->getRewriteSection()); ?>);
+	<?php if ($this->getWrapInDomLoadedEvent()): ?>});<?php endif; ?>
+	<?php if ($this->getWrapInDomLoadedEvent()): ?>
+		Event.observe(document, 'ewpribbon:loaded', function(){
+			ewpribbon.rewritePage(<?php echo json_encode($this->getRewriteSection()); ?>);
+		});
+	<?php endif; ?>
+<?php if (!$this->getOutputInlineJs()): ?></script><?php endif; ?>

@@ -1,0 +1,45 @@
+<style type="text/css">
+body,td { color:#2f2f2f; font:11px/1.35em Verdana, Arial, Helvetica, sans-serif; }
+</style>
+
+<div style="font:11px/1.35em Verdana, Arial, Helvetica, sans-serif;">
+    <table cellspacing="0" cellpadding="0" border="0" width="98%" style="margin-top:10px; font:11px/1.35em Verdana, Arial, Helvetica, sans-serif; margin-bottom:10px;">
+        <tr>
+            <td align="center" valign="top">
+                <!-- [ header starts here] -->
+                <table cellspacing="0" cellpadding="0" border="0" width="650">
+                    <tr>
+                        <td valign="top">
+                            <a href="{{store url=""}}"><img src="{{skin url="images/logo_email.gif" _area='frontend'}}" alt="{{var store_name}}"  style="margin-bottom:10px;" border="0"/></a>
+						</td>
+                    </tr>
+                </table>
+                <!-- [ middle starts here] -->
+                <table cellspacing="0" cellpadding="0" border="0" width="650">
+                    <tr>
+                        <td valign="top">
+                            <p><strong>Dear {{var name}}</strong>,<br/>
+								<br />                       
+								Thank you for choosing our store.
+							</p>
+							<p>
+                            <div style="color:#036; padding-top:10px; padding-left:5px; background-color:#999; height:32px; font-size:20px;">HERE IS YOUR {{var discount_amount}} COUPON CODE : <span style="color:#F00">{{var code}}</span></div>
+                          <br />
+							  <img src="{{skin url="images/banner.JPG" _area='frontend'}}" />
+							</p>
+                            {{var registration_message}}
+							<p>If you have any questions about your account or any other matter, please feel free to contact us 
+							at <a href="mailto:{{var support_email}}" style="color:#1E7EC8;">{{var support_email}}</a> 
+							{{depend support_phone}}
+							or by phone at {{var support_phone}}
+							{{/depend}}	.
+							</p>
+                            <p>Thanks again!</p>
+                        </td>
+                    </tr>
+                </table>
+
+            </td>
+        </tr>
+    </table>
+</div>

@@ -1,0 +1,102 @@
+<?php
+$todaysDeal = Mage::getModel('dailyfeature/dailyfeature')->getTodaysDeal();
+$_helper = $this->helper('catalog/output');
+//echo "<pre>";
+//print_r($todaysDeal);
+?>
+	
+<?php if($todaysDeal->getProduct()): ?>
+
+<?php
+$deal_content = $todaysDeal->getContent();
+$_product = Mage::getModel('catalog/product')->load($todaysDeal->getProduct());
+$_productName=$_helper->productAttribute($_product, $_product->getName(), 'name');
+$_shortDescription = $_helper->productAttribute($_product, nl2br($_product->getShortDescription()), 'description');
+if(strlen($_shortDescription) > 160 )
+$_shortDescription=substr($_shortDescription,0,160).'....';
+$_specialPrice=$_product->getSpecialPrice();
+$_finalPrice=$_product->getFinalPrice();
+$_limitText=$todaysDeal->getLimittext();
+$_freeShippingBanner=$todaysDeal->getBanner();
+$_atcUrl=$this->getUrl('checkout/cart/add/');
+$_weeklyDealUrl=$this->getUrl('weekly-deal'); 
+?>
+
+<div class="deal_block clearfix">
+    <form id="product_addtocart_form" method="post" action="<?php echo $_atcUrl ?>">
+    
+        <input type="hidden" name="product" value="<?php echo $_product->getId() ?>" />
+                    
+        <?php /*
+        if(!empty($_freeShippingBanner))
+        echo $this->getLayout()->createBlock('cms/block')->setBlockId('free_shipping_banner')->toHtml(); 
+        */
+        ?>
+    
+        <div class="d_head">
+            <h2>Deal of the week</h2>
+        </div>
+    
+        <div class="d_content">
+            <div class="d_left_block">
+                <a href="<?php echo $_weeklyDealUrl ?>" title="<?php echo $_product->getName() ?>" style="display: block;">
+                    <?php /*<img src="<?php echo $this->helper('catalog/image')->init($_product, 'small_image')->resize(170,260); ?>" width="170" height="260" alt="<?php echo $_productName ?>" />*/ ?>
+                    <img src="<?php echo $this->helper('catalog/image')->init($_product, 'small_image'); ?>" height="260" alt="<?php echo $_productName ?>" />
+                </a>
+                <?php if(!empty($_limitText)): ?>
+                <span><?php echo $_limitText; ?> </span>
+                <?php endif; ?>
+            </div>
+
+            <div class="d_right_block">
+                <h3>
+                    <a href="<?php echo $_weeklyDealUrl ?>" title="<?php echo $_product->getName() ?>" class="">
+                    <?php echo $_productName ?>
+                    </a>
+                </h3>
+                <div class="product-rating clearfix">
+                    <?php
+                    $summaryData = Mage::getModel('review/review_summary')
+					->setStoreId($storeId)
+					->load($_product->getId());
+ 
+                    if ($summaryData['rating_summary']):?>
+                        <div class="ratings clearfix">
+                            <div class="rating-box">
+                                <div class="rating" style="width:<?php echo $summaryData['rating_summary']; ?>%"></div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                <div class="deal-details clearfix">
+                    <div class="d_des">
+                        <?php if($deal_content){
+                            echo $deal_content;
+                        } else {
+                            echo $_shortDescription;
+                        } ?>
+                    </div>
+                    <div class="deal-price">
+                        <?php if($_specialPrice) { ?>
+                        <div class="regular_price">
+                            <label>Raguler</label>
+                            <span><?php echo $this->helper('core')->currency($_product->getPrice(),true,false); ?></span>
+                        </div>
+                        <?php } ?>
+                        <div class="sale_price">
+                            <label>Sale</label>
+                            <span><?php echo $this->helper('core')->currency($_finalPrice,true,false); ?></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="deal-addtocart clearfix">
+                    <button class="button btn-cart" onclick="setLocation('<?php echo $this->helper('checkout/cart')->getAddUrl($_product) ?>')" title="Add to Cart" type="button">Shop this deal</button>
+                </div>
+            </div><!-- end d_right_block -->
+        </div> <!-- end d_content -->
+    </form>
+</div> <!-- end deal_block -->
+
+
+<?php endif; ?>
+

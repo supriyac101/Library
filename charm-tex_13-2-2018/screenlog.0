@@ -1,0 +1,27 @@
+root@cp21 [/home/charmtex/public_html]# scpman scpchown tladmin:tladmin cpmove-charmtex.tar.gzmod 644 /charmtex/back/cpmove-charmtex.tar.gz[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[3Pown tladmin:tladmin cpmove-charmtex.tar.gz[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[Cman scp[K[4Pscp[Kcd ..
+root@cp21 [/home/charmtex]# ls
+[0m[01;34m.[0m/            .bash_profile  .contactemail  [01;34m.cphorde[0m/  .htaccess      [01;34mlogs[0m/           [01;34mpublic_html[0m/            [01;34m.softaculous[0m/  [01;36mwww[0m@
+[01;34m..[0m/           .bashrc        [01;34m.cpaddons[0m/     [01;34metc[0m/       [01;34m.htpasswds[0m/    [01;34mmail[0m/           [01;31mpublic_html17jun.zip[0m    [01;34mssl[0m/           .zshrc
+[01;36maccess-logs[0m@  [01;34m.cagefs[0m/       [01;34m.cpanel[0m/       .ftpquota  [01;34m.HttpRequest[0m/  [01;34m.MirrorSearch[0m/  [01;31mpublic_html24march.zip[0m  [01;34mtmp[0m/
+.bash_logout  [01;34m.cl.selector[0m/  [01;34mcpanel3-skel[0m/  .gemrc     .lastlogin     [01;34mpublic_ftp[0m/     [01;31mpublic_html.zip[0m         [01;34m.trash[0m/
+[mroot@cp21 [/home/charmtex]# cd bac,[Kkk[K
+bash: cd: back: No such file or directory
+root@cp21 [/home/charmtex]# cd [iu[K[K[Kpublic_
+bash: cd: public_: No such file or directory
+root@cp21 [/home/charmtex]# cd public_jj[K[Kh
+bash: cd: public_h: No such file or directory
+root@cp21 [/home/charmtex]# cd public_html
+root@cp21 [/home/charmtex/public_html]# ls
+[0m[01;34m.[0m/         [01;34mclasses[0m/          [34;42merrors[0m/                 [01;32mindex.php[0m*         [01;32mmailcatalog.jpg[0m*           screenlog.0           [01;32mtimthumb.php[0m*
+[01;34m..[0m/        composer.json     [01;32mfavicon.ico[0m*            [01;32mindex.php.sample[0m*  [34;42mmedia[0m/                     [01;32msecurimage.php[0m*       t.php
+[01;31m24jun.zip[0m  [01;34mcpmove[0m/           [01;32mfree-samples-mail.php[0m*  [01;32minstall.php[0m*       modman                     [01;32msecurimage_show.php[0m*  [34;42mutility[0m/
+[01;32maa.php[0m*    [01;32mcron.php[0m*         [01;32mfree-samples.php[0m*       [34;42mjs[0m/                [01;32mphp.ini.sample[0m*            sendmail.php          [34;42mvar[0m/
+[01;32mapi.php[0m*   [01;32mcron.sh[0m*          [01;32m.ftpquota[0m*              [34;42mlib[0m/               [34;42mpkginfo[0m/                   [34;42mshell[0m/
+[01;34mapp[0m/       [34;42mdata_quickstart[0m/  [01;32mget.php[0m*                library.php        README.md                  [34;42mskin[0m/
+[01;34mapp-old[0m/   [01;32mdemo.php[0m*         [01;32m.htaccess[0m*              [01;32mLICENSE_AFL.txt[0m*   readme.txt                 smtpgmail.php
+[01;31mapp.zip[0m    [34;42mdownloader[0m/       [01;32m.htaccess.sample[0m*       [01;32mLICENSE.html[0m*      [01;32mRELEASE_NOTES.txt[0m*         testa.php
+[34;42mcache[0m/     [01;32melephant.ttf[0m*     [34;42mimages[0m/                 [01;32mLICENSE.txt[0m*       [01;32mrequest-catalog-mail.php[0m*  test.php
+[34;42mcgi-bin[0m/   [01;32merror_log[0m*        [34;42mincludes[0m/               [01;32mmage[0m*              [01;32mrequest-catalog.php[0m*       [01;32mtest.txt[0m*
+[mroot@cp21 [/home/charmtex/public_html]# cd back
+bash: cd: back: No such file or directory
+root@cp21 [/home/charmtex/public_html]# exit

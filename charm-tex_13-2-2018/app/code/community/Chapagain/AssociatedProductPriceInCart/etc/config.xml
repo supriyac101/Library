@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Chapagain_AssociatedProductPriceInCart>
+            <version>0.1.1</version>
+        </Chapagain_AssociatedProductPriceInCart>
+    </modules>
+	<frontend>
+		<events>
+			<sales_quote_add_item>
+				<observers>
+					<associatedproductpriceincart_observer>
+						<type>singleton</type>
+						<class>Chapagain_AssociatedProductPriceInCart_Model_Observer</class>
+						<method>updateCartPrice</method>
+					</associatedproductpriceincart_observer>
+				</observers>
+			</sales_quote_add_item>
+		</events>
+	</frontend>	
+</config>

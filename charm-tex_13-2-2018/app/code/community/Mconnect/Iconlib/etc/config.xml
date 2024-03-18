@@ -1,0 +1,173 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category   Mconnect
+ * @package   Mconnect_Iconlib
+ * @author     M-Connect Solutions. (http://www.mconnectsolutions.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+-->
+<config>
+    <modules>
+        <Mconnect_Iconlib>
+            <version>2.0.0</version>
+        </Mconnect_Iconlib>
+    </modules>
+    <frontend>
+        <routers>
+            <iconlib>
+                <use>standard</use>
+                <args>
+                    <module>Mconnect_Iconlib</module>
+                    <frontName>iconlib</frontName>
+                </args>
+            </iconlib>
+        </routers>
+        <layout>
+            <updates>
+                <iconlib>
+                    <file>mcsiconlib.xml</file>
+                </iconlib>
+            </updates>
+        </layout>
+    </frontend>
+    <admin>
+        <routers>
+			<iconlib>
+				<use>admin</use>
+				<args>
+					<module>Mconnect_Iconlib</module>
+					<frontName>iconlib</frontName>
+				</args>
+			</iconlib>
+        </routers>
+    </admin>
+    <adminhtml>    
+        <events>
+            <core_block_abstract_prepare_layout_after>
+                <observers>
+                    <mconnect_iconlib_injectTabs>
+                        <type>singleton</type>
+                        <class>iconlib/observer_product</class>
+                        <method>injectTabs</method>
+                    </mconnect_iconlib_injectTabs>
+                </observers>
+            </core_block_abstract_prepare_layout_after>
+            <catalog_product_save_after>
+                <observers>
+                    <mconnect_iconlib>
+                        <type>singleton</type>
+                        <class>iconlib/observer_product</class>
+                        <method>saveIconLibTabData</method>
+                    </mconnect_iconlib>
+                </observers>
+            </catalog_product_save_after>
+        </events>
+		<menu>
+			<iconlib module="iconlib">
+				<title>ICON Library</title>
+				<sort_order>71</sort_order>               
+				<children>
+					<items module="iconlib">
+						<title>Manage Icons</title>
+						<sort_order>0</sort_order>
+						<action>iconlib/adminhtml_iconlib</action>
+					</items>
+				</children>
+			</iconlib>
+		</menu>
+		<acl>
+			<resources>
+				<all>
+					<title>Allow Everything</title>
+				</all>
+					<admin>
+					<children>
+						<iconlib  translate="title" module="iconlib">
+							<title>Iconlib Module</title>
+							<sort_order>10</sort_order>
+							<children>
+					<subitem translate="title" module="iconlib" >
+						<title>Manage Icons</title>
+						<sort_order>0</sort_order>
+						<action>iconlib/adminhtml_iconlib</action>
+					</subitem>
+				</children>
+						</iconlib>
+                        <system>
+                         <children>
+                            <config>
+                                <children>
+                                    <iconlib translate="title" module="iconlib"> 
+                                        <title>Iconlib - All</title>
+                                    </iconlib>
+                                </children>
+                            </config>
+                         </children>
+                        </system>
+					</children>
+				</admin>
+			</resources>
+		</acl>
+		<layout>
+			<updates>
+				<iconlib>
+					<file>mcsiconlib.xml</file>
+				</iconlib>
+			</updates>
+		</layout>
+    </adminhtml>   
+    <global>
+        <models>
+            <iconlib>
+                <class>Mconnect_Iconlib_Model</class>
+                <resourceModel>iconlib_mysql4</resourceModel>
+            </iconlib>
+            <iconlibtoproducts>
+                <class>Mconnect_Iconlib_Model</class>
+                <resourceModel>iconlib_mysql4</resourceModel>
+            </iconlibtoproducts>
+            <iconlib_mysql4>
+                <class>Mconnect_Iconlib_Model_Mysql4</class>
+                <entities>
+                    <iconlib>
+                        <table>iconlib</table>
+                    </iconlib>                    
+                    <iconlibtoproducts>
+                        <table>iconlib_to_products_relation</table>
+                    </iconlibtoproducts>
+                </entities>
+            </iconlib_mysql4>
+        </models>
+        <resources>
+            <iconlib_setup>
+                <setup>
+                    <module>Mconnect_Iconlib</module>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </iconlib_setup>
+            <iconlib_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </iconlib_write>
+            <iconlib_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </iconlib_read>
+        </resources>
+        <blocks>
+            <iconlib>
+                <class>Mconnect_Iconlib_Block</class>
+            </iconlib>
+        </blocks>
+        <helpers>
+            <iconlib>
+                <class>Mconnect_Iconlib_Helper</class>
+            </iconlib>
+        </helpers>
+    </global>
+</config>

@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:typens="urn:{{var wsdl.name}}" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" name="{{var wsdl.name}}" targetNamespace="urn:{{var wsdl.name}}">
+    <wsdl:types>
+        <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:{{var wsdl.name}}">
+            <xsd:complexType name="listingEntityItem">
+                <xsd:sequence>
+                    <xsd:element name="price_id" type="xsd:int" />
+                    <xsd:element name="price_customer_id" type="xsd:int" />
+                    <xsd:element name="price_product_id" type="xsd:int" />
+                    <xsd:element name="price_type" type="xsd:int" />
+                    <xsd:element name="price" type="xsd:double" minOccurs="1" />
+                    <xsd:element name="price_discount" type="xsd:double" minOccurs="1" />
+                    <xsd:element name="firstname" type="xsd:string" minOccurs="1" />
+                    <xsd:element name="lastname" type="xsd:string" minOccurs="1" />
+                    <xsd:element name="price_tier_quantity" type="xsd:int" minOccurs="0" />
+                    <xsd:element name="price_valid_from" type="xsd:string" minOccurs="0" />
+                    <xsd:element name="price_valid_to" type="xsd:string" minOccurs="0" />
+                    <xsd:element name="price_category_id" type="typens:ArrayOfString" minOccurs="0" />
+                    <xsd:element name="price_apply_further" type="xsd:int" minOccurs="0" />
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="listingEntityArray">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" maxOccurs="unbounded" name="complexObjectArray" type="typens:listingEntityItem" />
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:element name="apiCreatePriceRequestParam">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="1" maxOccurs="1" name="sessionId" type="xsd:string" />
+                        <xsd:element minOccurs="1" maxOccurs="1" name="price_customer_id" type="xsd:int" />
+                        <xsd:element minOccurs="1" maxOccurs="1" name="price_product_id" type="xsd:int" />
+                        <xsd:element minOccurs="1" maxOccurs="1" name="price_type" type="xsd:int" />
+                        <xsd:element minOccurs="1" maxOccurs="1" name="price" type="xsd:double" />
+                        <xsd:element minOccurs="1" maxOccurs="1" name="price_discount" type="xsd:double" />
+                        <xsd:element minOccurs="0" maxOccurs="1" name="price_category_id" type="typens:ArrayOfString" />
+                        <xsd:element minOccurs="0" maxOccurs="1" name="price_tier_quantity" type="xsd:int" />
+                        <xsd:element minOccurs="0" maxOccurs="1" name="price_valid_from" type="xsd:string" />
+                        <xsd:element minOccurs="0" maxOccurs="1" name="price_valid_to" type="xsd:string" /> 
+                        <xsd:element minOccurs="0" maxOccurs="1" name="price_apply_further" type="xsd:int" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="apiCreatePriceResponseParam">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="1" maxOccurs="1" name="result" type="xsd:int" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="apiDeletePriceRequestParam">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="1" maxOccurs="1" name="sessionId" type="xsd:string" />
+                        <xsd:element minOccurs="0" maxOccurs="1" name="price_customer_id" type="xsd:int" />
+                        <xsd:element minOccurs="0" maxOccurs="1" name="price_product_id" type="xsd:int" />
+                        <xsd:element minOccurs="0" maxOccurs="1" name="price_id" type="xsd:int" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="apiDeletePriceResponseParam">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="1" maxOccurs="1" name="result" type="xsd:boolean" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="apiGetPricesRequestParam">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="1" maxOccurs="1" name="sessionId" type="xsd:string" />
+                        <xsd:element minOccurs="0" maxOccurs="1" name="customerID" type="xsd:int" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="apiGetPricesResponseParam">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="1" maxOccurs="1" name="result" type="typens:listingEntityArray" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="apiCreateDiscountRequestParam">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="1" maxOccurs="1" name="sessionId" type="xsd:string" />
+                        <xsd:element minOccurs="0" maxOccurs="1" name="price_global_customer_id" type="xsd:int" />
+                        <xsd:element minOccurs="0" maxOccurs="1" name="price_global_discount" type="xsd:float" />
+                        <xsd:element minOccurs="0" maxOccurs="1" name="price_global_valid_from" type="xsd:string" />
+                        <xsd:element minOccurs="0" maxOccurs="1" name="price_global_valid_to" type="xsd:string" /> 
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="apiCreateDiscountResponseParam">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="1" maxOccurs="1" name="result" type="xsd:int" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="apiDeleteDiscountRequestParam">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="1" maxOccurs="1" name="sessionId" type="xsd:string" />
+                        <xsd:element minOccurs="0" maxOccurs="1" name="price_global_customer_id" type="xsd:int" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="apiDeleteDiscountResponseParam">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="1" maxOccurs="1" name="result" type="xsd:int" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="apiGetDiscountRequestParam">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="1" maxOccurs="1" name="sessionId" type="xsd:string" />
+                        <xsd:element minOccurs="0" maxOccurs="1" name="price_global_customer_id" type="xsd:int" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="apiGetDiscountResponseParam">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element minOccurs="1" maxOccurs="1" name="result" type="xsd:int" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:schema>
+    </wsdl:types>
+    <wsdl:message name="apiCreatePriceRequest">
+        <wsdl:part name="parameters" element="typens:apiCreatePriceRequestParam" />
+    </wsdl:message>
+    <wsdl:message name="apiCreatePriceResponse">
+        <wsdl:part name="parameters" element="typens:apiCreatePriceResponseParam" />
+    </wsdl:message>
+    <wsdl:message name="apiDeletePriceRequest">
+        <wsdl:part name="parameters" element="typens:apiDeletePriceRequestParam" />
+    </wsdl:message>
+    <wsdl:message name="apiDeletePriceResponse">
+        <wsdl:part name="parameters" element="typens:apiDeletePriceResponseParam" />
+    </wsdl:message>
+    <wsdl:message name="apiGetPricesRequest">
+        <wsdl:part name="parameters" element="typens:apiGetPricesRequestParam" />
+    </wsdl:message>
+    <wsdl:message name="apiGetPricesResponse">
+        <wsdl:part name="parameters" element="typens:apiGetPricesResponseParam" />
+    </wsdl:message>
+    <wsdl:message name="apiCreateDiscountRequest">
+        <wsdl:part name="parameters" element="typens:apiCreateDiscountRequestParam" />
+    </wsdl:message>
+    <wsdl:message name="apiCreateDiscountResponse">
+        <wsdl:part name="parameters" element="typens:apiCreateDiscountResponseParam" />
+    </wsdl:message>
+    <wsdl:message name="apiDeleteDiscountRequest">
+        <wsdl:part name="parameters" element="typens:apiDeleteDiscountRequestParam" />
+    </wsdl:message>
+    <wsdl:message name="apiDeleteDiscountResponse">
+        <wsdl:part name="parameters" element="typens:apiDeleteDiscountResponseParam" />
+    </wsdl:message>
+    <wsdl:message name="apiGetDiscountRequest">
+        <wsdl:part name="parameters" element="typens:apiGetDiscountRequestParam" />
+    </wsdl:message>
+    <wsdl:message name="apiGetDiscountResponse">
+        <wsdl:part name="parameters" element="typens:apiGetDiscountResponseParam" />
+    </wsdl:message>
+    <wsdl:portType name="{{var wsdl.handler}}PortType">
+        <wsdl:operation name="apiCreatePrice">
+            <wsdl:documentation>Create customer price</wsdl:documentation>
+            <wsdl:input message="typens:apiCreatePriceRequest" />
+            <wsdl:output message="typens:apiCreatePriceResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="apiDeletePrice">
+            <wsdl:documentation>Delete customer price</wsdl:documentation>
+            <wsdl:input message="typens:apiDeletePriceRequest" />
+            <wsdl:output message="typens:apiDeletePriceResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="apiGetPrices">
+            <wsdl:documentation>Get price list</wsdl:documentation>
+            <wsdl:input message="typens:apiGetPricesRequest" />
+            <wsdl:output message="typens:apiGetPricesResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="apiCreateDiscount">
+            <wsdl:documentation>Create global discount</wsdl:documentation>
+            <wsdl:input message="typens:apiCreateDiscountRequest" />
+            <wsdl:output message="typens:apiCreateDiscountResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="apiDeleteDiscount">
+            <wsdl:documentation>Delete global discount</wsdl:documentation>
+            <wsdl:input message="typens:apiDeleteDiscountRequest" />
+            <wsdl:output message="typens:apiDeleteDiscountResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="apiGetDiscount">
+            <wsdl:documentation>Get predefined global discount</wsdl:documentation>
+            <wsdl:input message="typens:apiGetDiscountRequest" />
+            <wsdl:output message="typens:apiGetDiscountResponse" />
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="{{var wsdl.handler}}Binding" type="typens:{{var wsdl.handler}}PortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="apiCreatePrice">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="apiDeletePrice">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="apiGetPrices">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="apiCreateDiscount">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="apiDeleteDiscount">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="apiGetDiscount">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+</wsdl:definitions>

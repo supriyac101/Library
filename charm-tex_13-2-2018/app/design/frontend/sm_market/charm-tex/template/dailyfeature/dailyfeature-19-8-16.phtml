@@ -1,0 +1,92 @@
+<?php
+$todaysDeal = Mage::getModel('dailyfeature/dailyfeature')->getTodaysDeal();
+$_helper = $this->helper('catalog/output');
+?>
+	
+<?php if($todaysDeal->getProduct()): ?>
+
+<?php
+
+$_product = Mage::getModel('catalog/product')->load($todaysDeal->getProduct());
+$_productName=$_helper->productAttribute($_product, $_product->getName(), 'name');
+$_shortDescription = $_helper->productAttribute($_product, nl2br($_product->getDescription()), 'description');
+if(strlen($_shortDescription) > 160 )
+$_shortDescription=substr($_shortDescription,0,160).'....';
+$_specialPrice=$_product->getSpecialPrice();
+$_finalPrice=$_product->getFinalPrice();
+$_limitText=$todaysDeal->getLimittext();
+$_freeShippingBanner=$todaysDeal->getBanner();
+$_atcUrl=$this->getUrl('checkout/cart/add/');
+$_weeklyDealUrl=$this->getUrl('weekly-deal'); 
+?>
+
+<div class="deal_block">
+<form id="product_addtocart_form" method="post" action="<?php echo $_atcUrl ?>">
+
+<input type="hidden" name="product" value="<?php echo $_product->getId() ?>" />
+		
+<?php 
+if(!empty($_freeShippingBanner))
+echo $this->getLayout()->createBlock('cms/block')->setBlockId('free_shipping_banner')->toHtml(); 
+?>
+
+<div class="d_head">
+<a href="<?php echo $_weeklyDealUrl ?>" title="<?php echo $_product->getName() ?>" class="product-image">
+<img title="<?php echo $this->__('Weekly wine deal') ?>" title="<?php echo $this->__('Weekly wine deal') ?>" src="<?php echo $this->getSkinUrl('images/d_wd.png') ?>" />
+</a>
+</div>
+
+<div class="d_content">
+
+<div class="d_left_block">
+<a href="<?php echo $_weeklyDealUrl ?>" title="<?php echo $_product->getName() ?>" style="display: block;">
+<?php /*<img src="<?php echo $this->helper('catalog/image')->init($_product, 'small_image')->resize(170,260); ?>" width="170" height="260" alt="<?php echo $_productName ?>" />*/ ?>
+<img src="<?php echo $this->helper('catalog/image')->init($_product, 'small_image'); ?>" height="260" alt="<?php echo $_productName ?>" />
+</a>
+
+<?php if(!empty($_limitText)): ?>
+<span><?php echo $_limitText; ?> </span>
+<?php endif; ?>
+
+</div>
+
+
+
+
+
+<div class="d_right_block">
+
+<h3 style="font-size:1.55em;"><a href="<?php echo $_weeklyDealUrl ?>" title="<?php echo $_product->getName() ?>" class="">
+<?php echo $_productName ?></a></h3>
+
+<div class="d_des">
+<?php echo $_shortDescription; ?>
+</div>
+
+<?php if($_specialPrice) { ?>
+<div class="regular_price">
+<strong><?php echo $this->helper('core')->currency($_product->getPrice(),true,false); ?></strong>
+</div>
+<?php } ?>
+
+<div class="atc_wrapper">
+<div class="price"><?php echo $this->helper('core')->currency($_finalPrice,true,false); ?></div>
+<button class="button btn-cart" onclick="setLocation('<?php echo $this->helper('checkout/cart')->getAddUrl($_product) ?>')" title="Add to Cart" type="button"></button>
+</div>
+
+<a href="<?php echo $_weeklyDealUrl ?>" title="<?php echo $_product->getName() ?>" class="right">
+<img title="<?php echo $this->__('This week only!') ?>" alt="<?php echo $this->__('This week only!') ?>" src="<?php echo $this->getSkinUrl('images/two_bg.png') ?>" class="two_bg right"  />
+</a>
+
+</div><!-- end d_right_block -->
+
+
+</div> <!-- end d_content -->
+
+
+</form>
+</div> <!-- end deal_block -->
+
+
+<?php endif; ?>
+

@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Bcs_Dailyfeature>
+            <version>0.1.0</version>
+        </Bcs_Dailyfeature>
+    </modules>
+    <frontend>
+        <routers>
+            <dailyfeature>
+                <use>standard</use>
+                <args>
+                    <module>Bcs_Dailyfeature</module>
+                    <frontName>product-of-the-month</frontName>
+                </args>
+            </dailyfeature>
+        </routers>
+        <layout>
+            <updates>
+                <dailyfeature>
+                    <file>dailyfeature.xml</file>
+                </dailyfeature>
+            </updates>
+        </layout>
+    </frontend>
+    <admin>
+        <routers>
+			<dailyfeature>
+				<use>admin</use>
+				<args>
+					<module>Bcs_Dailyfeature</module>
+					<frontName>dailyfeature</frontName>
+				</args>
+			</dailyfeature>
+        </routers>
+    </admin>
+    <adminhtml>
+		<menu>
+			<catalog translate="title" module="catalog">
+				<children>
+					<dailyfeature module="dailyfeature">
+						<title>Monthly Featured Product</title>
+						<sort_order>1</sort_order> 
+						<action>dailyfeature/adminhtml_dailyfeature</action>              
+						<!--<children>
+							<items module="dailyfeature">
+								<title>Manage Items</title>
+								<sort_order>0</sort_order>
+								<action>dailyfeature/adminhtml_dailyfeature</action>
+							</items>
+						</children>-->
+					</dailyfeature>
+				</children>	
+			</catalog>	
+		</menu>
+		<acl>
+			<resources>
+				<all>
+					<title>Allow Everything</title>
+				</all>
+				<admin>
+					<children>
+						<dailyfeature>
+							<title>Monthly Featured Product</title>
+							<sort_order>10</sort_order>
+<children>
+                                    <items>
+                                        <title>Manage Items</title>
+                                    </items>					
+
+</children>
+
+	</dailyfeature>
+					</children>
+
+
+				</admin>
+			</resources>
+		</acl>
+		<layout>
+			<updates>
+				<dailyfeature>
+					<file>dailyfeature.xml</file>
+				</dailyfeature>
+			</updates>
+		</layout>
+    </adminhtml>   
+    <global>
+        <models>
+            <dailyfeature>
+                <class>Bcs_Dailyfeature_Model</class>
+                <resourceModel>dailyfeature_mysql4</resourceModel>
+            </dailyfeature>
+            <dailyfeature_mysql4>
+                <class>Bcs_Dailyfeature_Model_Mysql4</class>
+                <entities>
+                    <dailyfeature>
+                        <table>dailyfeature</table>
+                    </dailyfeature>
+                </entities>
+            </dailyfeature_mysql4>
+        </models>
+        <resources>
+            <dailyfeature_setup>
+                <setup>
+                    <module>Bcs_Dailyfeature</module>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </dailyfeature_setup>
+            <dailyfeature_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </dailyfeature_write>
+            <dailyfeature_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </dailyfeature_read>
+        </resources>
+        <blocks>
+            <dailyfeature>
+                <class>Bcs_Dailyfeature_Block</class>
+            </dailyfeature>
+        </blocks>
+        <helpers>
+            <dailyfeature>
+                <class>Bcs_Dailyfeature_Helper</class>
+            </dailyfeature>
+        </helpers>
+    </global>
+</config>

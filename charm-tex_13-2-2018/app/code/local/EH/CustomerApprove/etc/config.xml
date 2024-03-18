@@ -1,0 +1,208 @@
+<?xml version="1.0"?>
+<!--
+/*////////////////////////////////////////////////////////////////////////////////
+ \\\\\\\\\\\\\\\\\\\\\\\\\  Customer Approve/Disapprove  \\\\\\\\\\\\\\\\\\\\\\\\\
+ /////////////////////////////////////////////////////////////////////////////////
+ \\\\\\\\\\\\\\\\\\\\\\\\\ NOTICE OF LICENSE\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+ ///////                                                                   ///////
+ \\\\\\\ This source file is subject to the Open Software License (OSL 3.0)\\\\\\\
+ ///////   that is bundled with this package in the file LICENSE.txt.      ///////
+ \\\\\\\   It is also available through the world-wide-web at this URL:    \\\\\\\
+ ///////          http://opensource.org/licenses/osl-3.0.php               ///////
+ \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+ ///////                      * @category   EH                            ///////
+ \\\\\\\                      * @package    EH_CustomerApprove            \\\\\\\
+ ///////    * @author     ExtensionHut <info@extensionhut.com>              ///////
+ \\\\\\\                                                                   \\\\\\\
+ /////////////////////////////////////////////////////////////////////////////////
+ \\\\\\* @copyright  Copyright 2015 © www.extensionhut.com All right reserved\\\\\
+ /////////////////////////////////////////////////////////////////////////////////
+ */
+-->
+<config>
+    <modules>
+        <EH_CustomerApprove>
+            <version>1.1.2</version>
+        </EH_CustomerApprove>
+    </modules>
+    
+    <global>
+        <models>
+            <customerapprove>
+                <class>EH_CustomerApprove_Model</class>
+            </customerapprove>
+			<customer>
+				<rewrite>
+					<customer>EH_CustomerApprove_Model_Customer</customer>
+				</rewrite>
+			</customer>
+			<customer_resource>
+				<rewrite>
+					<customer>EH_CustomerApprove_Model_Customer_Entity_Customer</customer>
+				</rewrite>
+			</customer_resource>
+        </models>
+		<blocks>
+			<customerapprove>
+				<class>EH_CustomerApprove_Block</class>
+			</customerapprove>
+			<adminhtml>
+				<rewrite>
+					<customer_grid>EH_CustomerApprove_Block_Adminhtml_Customer_Grid</customer_grid>
+					<customer_edit>EH_CustomerApprove_Block_Adminhtml_Customer_Edit</customer_edit>
+				</rewrite>
+			</adminhtml>
+		</blocks>
+        <helpers>
+        	<customerapprove>
+        		<class>EH_CustomerApprove_Helper</class>
+        	</customerapprove>
+        </helpers>
+		<template>
+            <email>
+                <customerapprove_email_template translate="label" module="customerapprove">
+                    <label>Customer Account Approved</label>
+                    <file>eh/customerapprove/account_approved.html</file>
+                    <type>html</type>
+                </customerapprove_email_template>
+				<customerapprove_admin_notification_template translate="label" module="customerapprove">
+					<label>Account Creation Notification</label>
+					<file>eh/customerapprove/admin/account_notification.html</file>
+					<type>html</type>
+				</customerapprove_admin_notification_template>
+            </email>
+        </template>
+        <resources>
+            <customerapprove_setup>
+                <setup>
+                    <module>EH_CustomerApprove</module>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </customerapprove_setup>
+            <customerapprove_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </customerapprove_write>
+            <customerapprove_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </customerapprove_read>
+        </resources>
+    </global>
+    
+	<adminhtml>
+    	<acl>
+            <resources>
+                <admin>
+                    <children>
+						<customer>
+							<children>
+								<approve translate="title">
+									<title>Approve / Disapprove Customers</title>
+									<sort_order>999</sort_order>
+								</approve>
+							</children>
+						</customer>
+                        <system>
+                            <children>
+                            	<config>
+                            		<children>
+		                                <customerapprove>
+		                                    <title>EH - Customer Approve Section</title>
+		                                    <sort_order>900</sort_order>
+		                                </customerapprove>
+		                    		</children>
+		                    	</config>
+                            </children>
+                        </system>
+                    </children>
+                </admin>
+            </resources>
+        </acl>
+
+		<translate>
+            <modules>
+                <EH_CustomerApprove>
+                    <files>
+                        <default>EH_CustomerApprove.csv</default>
+                    </files>
+                </EH_CustomerApprove>
+            </modules>
+        </translate>
+	</adminhtml>
+    
+    <frontend>
+    	<events>
+			<customer_login>
+				<observers>
+					<eh_customerapprove_observer>
+						<type>singleton</type>
+						<class>EH_CustomerApprove_Model_Observer</class>
+						<method>checkApproveStatus</method>
+					</eh_customerapprove_observer>
+				</observers>
+			</customer_login>
+			<customer_register_success>
+				<observers>
+					<eh_customerapprove_observer>
+						<type>singleton</type>
+						<class>EH_CustomerApprove_Model_Observer</class>
+						<method>setNewCustomerStatus</method>
+					</eh_customerapprove_observer>
+				</observers>
+			</customer_register_success>
+			<customer_new_account_email_sent>
+				<observers>
+					<eh_customerapprove_observer>
+						<type>singleton</type>
+						<class>EH_CustomerApprove_Model_Observer</class>
+						<method>customerNewAccountCompleted</method>
+					</eh_customerapprove_observer>
+				</observers>
+			</customer_new_account_email_sent>
+		</events>
+    </frontend>
+
+	<admin>
+    	<routers>
+    		<customerapprove>
+    			<use>admin</use>
+    			<args>
+    				<module>EH_CustomerApprove</module>
+    				<frontName>customerapprove</frontName>
+    			</args>
+    		</customerapprove>
+    	</routers>
+    </admin>
+
+    <default>
+		<customerapprove>
+			<general>
+				<enabled>0</enabled>
+				<welcome_email>1</welcome_email>
+			</general>
+			<redirect>
+				<enabled>1</enabled>
+				<cms_page>account-awaiting-approval</cms_page>
+			</redirect>
+			<error_msg>
+				<enabled>0</enabled>
+				<text>Your account needs to be approved before you can access this part of the site!</text>
+			</error_msg>
+			<email>
+				<enabled>1</enabled>
+				<identity>general</identity>
+                <template>customerapprove_email_template</template>
+			</email>
+			<admin_notification>
+				<enabled>1</enabled>
+				<identity>general</identity>
+				<template>customerapprove_admin_notification_template</template>
+			</admin_notification>
+	    </customerapprove>
+    </default>
+</config>

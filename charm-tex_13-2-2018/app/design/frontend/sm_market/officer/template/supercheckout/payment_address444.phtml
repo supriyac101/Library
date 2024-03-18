@@ -1,0 +1,267 @@
+<?php 
+//$mage_ver = Mage::helper('onepagecheckout')->getMagentoVersion();
+$logged		= $this->isCustomerLoggedIn();
+$has_addr	= $this->customerHasAddresses();
+//var_dump($has_addr);
+$settings = Mage::getSingleton('supercheckout/supercheckout')->getData('settings');
+$default_bill_address_id = Mage::getSingleton('supercheckout/supercheckout')->getData('default_bill_address_id');
+        $default_ship_address_id = Mage::getSingleton('supercheckout/supercheckout')->getData('default_ship_address_id');
+        
+if($settings['general']['layout']=='3-Column'){
+            $layout_name='three-column';
+        }elseif($settings['general']['layout']=='2-Column'){
+            $layout_name='two-column';
+        }elseif($settings['general']['layout']=='1-Column'){
+            $layout_name='one-column';
+        }
+//        var_dump($settings);
+?>
+<script>
+app.controller('billing_address',function($scope,$rootScope,$http){
+    
+    
+    
+    
+})
+</script>
+<!--<div >
+    <div >
+        
+        <input type="text" name="{{field.name}}" value="{{field.value}}" >
+    </div>
+</div>-->
+<div id="supercheckoutBillingBlock"  class="supercheckout-blocks"  data-column="<?php echo $settings['step']['payment_address'][$layout_name]['column']; ?>" data-row="<?php echo $settings['step']['payment_address'][$layout_name]['row']; ?>" data-column-inside="<?php echo $settings['step']['payment_address'][$layout_name]['column-inside']; ?>">
+                <ul>
+                    <li>
+                        <span class="supercheckout-numbers fontss icon-dynnamitt_home"></span>
+                        <span class="heading_style_icon"><?php echo $this->__('Billing Address'); ?></span>
+                    </li>
+                </ul>
+    <?php if($has_addr){ ?>
+                <div class="supercheckout-extra-wrap" ng-init="data.paymentAddressRadio = 'existing'">
+                    <input ng-click="refresh_supercheckout_Billaddress()" ng-model="data.paymentAddressRadio" type="radio" name="payment_address" value="existing" id="payment-address-existing" class="payment-address-existing" checked="checked" />
+                    <label for="payment-address-existing"><?php echo $this->__('I want to use an existing address'); ?></label>
+                </div>    
+                <div ng-show="data.paymentAddressRadio == 'existing'" id="payment-existing">                    
+                    <select onchange="updateBilling(this.value)" ng-change="refresh_supercheckout()" id="payment_address_select_box" ng-init="data.billing_address_id = <?php echo $default_bill_address_id ; ?>" ng-model="data.billing_address_id" ng-change="setExistingAddress()" style="width:97%;">
+                        <option ng-repeat="option in payment_address_select_option" ng-selected="payment_address_selected == {{option.value}}"  value="{{option.value}}">{{option.label}}</option>    
+                    </select>
+                </div>
+                
+                 <div class="supercheckout-extra-wrap billing_edit_form">    
+                         
+                </div>
+                
+        <div class="supercheckout-extra-wrap billing_edit_form_loader" style="display:none;"><img src="/images/loading12.gif"> </div>
+                
+                          
+        <div class="supercheckout-extra-wrap msg_con" style="display:none; color:#060;"></div>
+                
+                <div class="supercheckout-extra-wrap">
+                    <p>
+                        <input ng-click="refresh_supercheckout_Billaddress()" ng-model="data.paymentAddressRadio" type="radio" name="payment_address" value="new" id="payment-address-new" class="payment-address-new" />
+                        <label for="payment-address-new"><?php echo $this->__('I want to use a new address'); ?></label>
+                    </p>
+                </div>
+    <?php } ?>
+    <div >        
+    </div>
+                <div id="payment-new" <?php echo $has_addr?'ng-show="data.paymentAddressRadio == \'new\'"':'';?> >
+                        <table id="payment_address_table" class="supercheckout-form">                            
+                            <tr ng-show="payment_firstname_show== 1"  class="sort_data"  sort-data="<?php echo $settings['step']['payment_address']['fields']['firstname']['sort_order'] ?>" >
+                                <td><?php echo $this->__('Firstname'); ?><span ng-show="payment_firstname_require== 1" class="supercheckout-required">*</span>
+                                    <input ng-init="data.billing.firstname = null" ng-model="data.billing.firstname" type="text" class="supercheckout-large-field" />
+                                    <span ng-show="billing_firstname_error" class="errorsmall">{{billing_firstname_error_msg}}</span>
+                                    </td>
+                            </tr>
+                            <tr ng-show="payment_lastname_show== 1" class="sort_data"   sort-data="<?php echo $settings['step']['payment_address']['fields']['lastname']['sort_order'] ?>" >
+                                <td><?php echo $this->__('Lastname'); ?> <span ng-show="payment_lastname_require== 1"  class="supercheckout-required">*</span>
+                                    <input ng-init="data.billing.lastname = null" ng-model="data.billing.lastname" type="text" class="supercheckout-large-field" />
+                                    <span ng-show="billing_lastname_error" class="errorsmall">{{billing_lastname_error_msg}}</span>
+                                    </td>
+                            </tr>
+                            <tr ng-show="payment_address_1_show== 1" class="sort_data"   sort-data="<?php echo $settings['step']['payment_address']['fields']['address_1']['sort_order'] ?>" >
+                                <td><?php echo $this->__('Address Line 1'); ?> <span ng-show="payment_address_1_require== 1"  class="supercheckout-required">*</span>
+                                    <input ng-init="data.billing.address_1 = null" ng-model="data.billing.address_1" type="text" class="supercheckout-large-field" />
+                                    <span ng-show="billing_address_1_error" class="errorsmall">{{billing_address_1_error_msg}}</span>
+                                </td>
+                            </tr>
+                            <tr ng-show="payment_address_2_show== 1" class="sort_data"   sort-data="<?php echo $settings['step']['payment_address']['fields']['address_2']['sort_order'] ?>" >
+                                <td><?php echo $this->__('Address Line 2'); ?> <span ng-show="payment_address_2_require== 1"  class="supercheckout-required">*</span>
+                                    <input ng-init="data.billing.address_2 = null" ng-model="data.billing.address_2" type="text" class="supercheckout-large-field" />
+                                    <span ng-show="billing_address_2_error" class="errorsmall">{{billing_address_2_error_msg}}</span>
+                                </td>
+                            </tr>
+                            <tr ng-show="payment_city_show== 1" class="sort_data"   sort-data="<?php echo $settings['step']['payment_address']['fields']['city']['sort_order'] ?>" >
+                                <td><?php echo $this->__('City'); ?> <span  ng-show="payment_city_require== 1"  class="supercheckout-required">*</span>
+                                    <input ng-init="data.billing.city = null" ng-model="data.billing.city" type="text" class="supercheckout-large-field" />
+                                    <span ng-show="billing_city_error" class="errorsmall">{{billing_city_error_msg}}</span>
+                                </td>
+                            </tr>
+                            <tr ng-show="payment_postcode_show== 1" class="sort_data"   sort-data="<?php echo $settings['step']['payment_address']['fields']['postcode']['sort_order'] ?>" >
+                                <td><?php echo $this->__('Zip Code'); ?> <span ng-show="payment_postcode_require== 1"  class="supercheckout-required">*</span>
+                                    <input ng-init="data.billing.postcode = null" ng-model="data.billing.postcode" ng-blur="refresh_supercheckout()" type="text" class="supercheckout-large-field" />
+                                    <span ng-show="billing_zip_error" class="errorsmall">{{billing_zip_error_msg}}</span>
+                                </td>
+                            </tr>
+                            <tr ng-show="payment_company_show== 1" class="sort_data"   sort-data="<?php echo $settings['step']['payment_address']['fields']['company']['sort_order'] ?>" >
+                                <td><?php echo $this->__('Facility'); ?> <span ng-show="payment_company_require== 1"  class="supercheckout-required">*</span>
+                                    <input ng-init="data.billing.company = null" ng-model="data.billing.company" type="text" class="supercheckout-large-field" />
+                                    <span ng-show="billing_company_error" class="errorsmall">{{billing_company_error_msg}}</span>
+                                </td>
+                            </tr>
+                            <tr ng-show="payment_telephone_show== 1" class="sort_data"   sort-data="<?php echo $settings['step']['payment_address']['fields']['telephone']['sort_order'] ?>" >
+                                <td><?php echo $this->__('Telephone'); ?> <span ng-show="payment_telephone_require== 1"  class="supercheckout-required">*</span>
+                                    <input ng-init="data.billing.telephone = null" ng-model="data.billing.telephone" type="text" class="supercheckout-large-field" />
+                                    <span ng-show="billing_phone_error" class="errorsmall">{{billing_phone_error_msg}}</span>
+                                </td>
+                            </tr>
+                            <tr ng-show="payment_fax_show== 1" class="sort_data"   sort-data="<?php echo $settings['step']['payment_address']['fields']['fax']['sort_order'] ?>" >
+                                <td><?php echo $this->__('Fax'); ?> <span ng-show="payment_fax_require== 1"  class="supercheckout-required">*</span>
+                                    <input ng-init="data.billing.fax = null" ng-model="data.billing.fax" type="text" class="supercheckout-large-field" />
+                                    <span ng-show="billing_fax_error" class="errorsmall">{{billing_fax_error_msg}}</span>
+                                </td>
+                            </tr>
+                            <tr ng-show="payment_country_show== 1" class="sort_data"  sort-data="<?php echo $settings['step']['payment_address']['fields']['country_id']['sort_order'] ?>" >
+                                <td> <?php echo $this->__('Country'); ?><span ng-show="payment_country_require== 1"  class="supercheckout-required">*</span>
+                                    <select ng-init="data.billing.country_id = select_bill_country_id " ng-model="data.billing.country_id" ng-change="payment_country_selected(data.billing.country_id)" style="width:98%;">
+                                        <!--<option value="">Please Select</option>-->
+                                        <option ng-repeat="ctr in payment_countries" ng-selected="select_bill_country_id == '{{ctr.country_id}}'"  value="{{ctr.country_id}}">{{ctr.name}}</option>
+                                    </select>
+                                    <span ng-show="billing_country_error" class="errorsmall">{{billing_country_error_msg}}</span>
+                                </td>
+                            </tr>
+                            <tr ng-show="payment_region_show== 1" class="sort_data"  sort-data="<?php echo $settings['step']['payment_address']['fields']['zone_id']['sort_order'] ?>" >
+                                <td> <?php echo $this->__('Region/State'); ?><span ng-show="payment_region_require== 1"  class="supercheckout-required">*</span>
+                                    <select ng-init="data.billing.region_id = ''" ng-show="no_region_payment==false" ng-change="refresh_supercheckout()" ng-model="data.billing.region_id" style="width:98%;">
+                                        <option value="">Please Select</option>
+                                        <option ng-repeat="regn in payment_regions" value="{{regn.region_id}}">{{regn.name}}</option>
+                                    </select>
+                                    <input ng-model="data.billing.region" ng-show="no_region_payment==true" type="text"/>
+                                    <span ng-show="billing_state_error" class="errorsmall">{{billing_state_error_msg}}</span>
+                                </td>
+                            </tr>
+                
+                        </table>
+
+                </div>
+                <ul>
+                    <input ng-init="data.billing.save_in_address_book = 1" ng-model="data.billing.save_in_address_book" type="hidden"  />                    
+                    <li ng-hide="all_virtual == 0"><!--Code Modified By Raghubendra Singh on 05-Jan-2015 to show shipping address block only if all the products in the cart are not virtual or downloadable-->
+                        <div class="input-box input-different-shipping" style="display:<?php // if(!$logged){  if($settings['option']['guest']['payment_address']['fields']['shipping']['display']){echo 'block';}else{echo 'none';}}?>;">
+                            <input ng-model="data.billing.use_for_shipping" ng-change="showShippingAddress()"  id="shipping_use"  checked="checked" type="checkbox">
+                            <label for="shipping_use"><b><?php echo $this->__('Shipping Address same as Billing Address'); ?></b></label>
+                        </div>
+                    </li>
+                </ul>
+    </div>
+
+<?php if($has_addr){ ?>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        
+        var sel = document.getElementById("payment_address_select_box");        
+        
+            sel.removeChild(sel.firstChild);
+        
+    });
+    
+    
+
+</script>
+
+<?php } ?>
+
+
+<script>
+
+
+function change_country(country_id)
+{
+	
+  jQuery.ajax({
+	  type: "POST",
+	  url: '/change-country.php',
+	  data:{country_id:country_id,formName:'billing'},
+	  dataType: 'html',
+	  beforeSend:function(){
+		 //jQuery(".billing_edit_form").html('<img src="/images/loading12.gif">');
+	   },
+	  success:function(html){
+		  jQuery(".billing_edit_form .select_state").html(html);
+	  }
+	});
+	
+}
+
+
+
+function updateBilling(billingAdressId){
+  
+  jQuery.ajax({
+	  type: "POST",
+	  url: '/ajax-form.php',
+	  data:{address_id:billingAdressId,formName:'billing'},
+	  dataType: 'html',
+	  beforeSend:function(){
+		 jQuery(".billing_edit_form").html('<img src="/images/loading12.gif">');
+	   },
+	  success:function(html){
+		  jQuery(".billing_edit_form").html(html);
+	  }
+	});
+	
+}
+
+
+
+function saveBillingChange()
+{
+	jQuery(".msg_con").css('display','block').html('');
+  jQuery.ajax({
+	  type: "POST",
+	  url: '/save-shipping.php',
+	  data:jQuery(".billing_edit_form input,select" ).serialize(),
+	  dataType: 'json',
+	  beforeSend:function(){
+		 jQuery(".billing_edit_form_loader").css('display','block');
+	   },
+	  success:function(response){
+		
+		   jQuery(".msg_con").html(response['msg']);
+		   jQuery(".billing_edit_form_loader").css('display','none');
+	  }
+	});
+	
+}
+
+jQuery( document ).ready(function() {
+  updateBilling(document.getElementById('payment_address_select_box').value);
+
+  //document.getElementById("shipping_use").checked = false;
+   jQuery('#shipping_use').trigger('click');
+  
+  updateShipping(document.getElementById('shipping_address_select_box').value);
+  
+  
+jQuery( ".payment-address-new" ).click(function() {
+
+  jQuery(".billing_edit_form").css('display','none');
+    
+});
+
+jQuery( ".payment-address-existing" ).click(function() {
+
+  jQuery(".billing_edit_form").css('display','block');
+  
+});
+ 
+  
+  
+});
+
+
+
+
+</script>

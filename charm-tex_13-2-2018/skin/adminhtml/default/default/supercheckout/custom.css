@@ -1,0 +1,187 @@
+/* 
+    Document   : custom
+    Created on : Mar 19, 2014, 1:26:42 PM
+    Author     : byadav
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/* 
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+body {
+    font-size: 12px;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+/* BOC - Css for radio buttons */
+label{
+    margin-right: 12px;
+}
+input[type="radio"] {
+    opacity: 0;
+    position:absolute;
+}
+input[type="radio"] + label:before,
+input[type="radio"] + .custom-tick:before {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+
+    margin: 0 5px 5px 0;
+
+    line-height: 14px;
+    content: "";
+    vertical-align: middle;
+
+    background-image: url('../images/supercheckout/custom_radio-grey.png');
+    background-repeat: no-repeat;
+    background-position: 0 -14px;
+}
+input[type="radio"] + .custom-tick:before {
+    margin-right:4px;
+}
+input[type="radio"]:disabled + label,
+input[type="radio"]:disabled + .custom-tick{
+    opacity: 0.5;
+    cursor: default;
+}
+input[type="radio"]:disabled:not(:checked) + label:before {
+    background-position: 0 -42px;
+}
+input[type="radio"]:checked:disabled + label:before {
+    background-position: 0 -56px;
+}
+input[type="radio"]:not(:checked):not(:disabled):hover + label:before,
+input[type="radio"]:not(:checked):not(:disabled):hover + .custom-tick:before {
+    background-position: 0 -28px;
+}
+input[type="radio"]:checked + label:before,
+input[type="radio"]:checked + .custom-tick:before {
+    background-position: 0 0;
+}
+
+/* EOC - Css for radio buttons */
+
+/* BOC - Checkbox CSS */	
+.checkbox {
+    opacity: 0;
+    position:absolute;
+}
+.checkbox + label:before,
+.checkbox + .custom-tick:before {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+
+    margin: 0 5px 5px 0;
+
+    line-height: 14px;
+    content: "";
+    vertical-align: middle;
+
+    background-image: url(../images/supercheckout/custom_checkbox-grey.png);
+    background-repeat: no-repeat;
+    background-position: 0 -14px;
+}
+.checkbox + .custom-tick:before {
+    margin-right:4px;
+}
+.checkbox:disabled + label,
+.checkbox:disabled + .custom-tick{
+    opacity: 0.5;
+    cursor: default;
+}
+.checkbox:disabled:not(:checked) + label:before {
+    background-position: 0 -42px;
+}
+.checkbox:checked:disabled + label:before {
+    background-position: 0 -56px;
+}
+.checkbox:not(:checked):not(:disabled):hover + label:before,
+.checkbox:not(:checked):not(:disabled):hover + .custom-tick:before {
+    background-position: 0 -28px;
+}
+.checkbox:checked + label:before,
+.checkbox:checked + .custom-tick:before {
+    background-position: 0 0;
+}
+
+/* EOC - Checkbox CSS */
+
+/* BOC - Tooltips CSS definitions */	
+
+.tooltip {
+    position: absolute!important;
+    overflow:hidden;
+    font-size: 12px;
+    z-index: 10000!important;
+}
+.tooltip .xtop, .tooltip .xbottom { display: block; background: transparent; font-size: 1px; }
+.tooltip .xb1, .tooltip .xb2, .tooltip .xb3, .tooltip .xb4 { display: block; overflow: hidden; }
+.tooltip .xb1, .tooltip .xb2, .tooltip .xb3 { height: 1px; }
+.tooltip .xb2, .tooltip .xb3, .tooltip .xb4 { background: #666; border-left: 1px solid #333; border-right: 1px solid #333; }
+.tooltip .xbottom .xb2, .tooltip .xbottom .xb3, .tooltip .xbottom .xb4 { background: #666; }
+.tooltip .xb1 { margin: 0 5px; background: #333; }
+.tooltip .xb2 { margin: 0 3px; border-width: 0 2px; }
+.tooltip .xb3 { margin: 0 2px; }
+.tooltip .xb4 { height: 2px; margin: 0 1px; }
+
+.tooltip .xboxcontent {
+    padding: 0 .5em;
+    margin: 0;
+    color: #000;
+    text-align: left;
+    
+    word-wrap:break-word;
+    border: 1px solid #333;
+    border-width: 0px 1px 0 1px;
+    background-color: #666;
+}
+
+/*.topbuttons{
+    margin-right: 19px;
+    width: 680px;
+    padding-top: 7px;
+}
+.topbuttons label{
+    color: #fff;
+}*/
+/* EOC - Tooltips CSS definitions */
+
+ul, ol {
+    margin-bottom: 0px;
+}
+legend{
+    margin-bottom: 0px;
+    height: 1px;
+}
+.separator{
+    display: inline-block;
+    padding: 0 6px;
+}
+.navbar.main .appbrand{
+    margin-left: 0px;
+}
+.label{
+    font-size: 100%;
+}
+.box, .entry-edit fieldset, .entry-edit .fieldset{
+    background: #fff;
+}
+.middle{
+    padding: 0px;
+}
+#tab_general_settings table.form > tbody > tr > td {
+    padding: 10px;
+    color: #000000;
+}
+#tab_general_settings table{
+    width: 100%;
+}
+#themer .wrapper{
+    min-width: 210px !important;
+    max-width: 210px !important;
+}

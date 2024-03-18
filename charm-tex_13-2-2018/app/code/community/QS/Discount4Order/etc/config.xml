@@ -1,0 +1,157 @@
+<?xml version="1.0"?>
+<!-- 
+/**
+ * Discount For Order Extension
+ *
+ * @category   QS
+ * @package    QS_Discount4Order
+ * @author     Quart-soft Magento Team <magento@quart-soft.com> 
+ * @copyright  Copyright (c) 2010 Quart-soft Ltd http://quart-soft.com
+ */
+-->
+<config>
+    <modules>
+        <QS_Discount4Order>
+            <version>1.5.0</version>
+        </QS_Discount4Order>
+    </modules>
+    <adminhtml>
+        <translate>
+            <modules>
+                <QS_Discount4Order>
+                    <files>
+                        <default>QS_Discount4Order.csv</default>
+                    </files>
+                </QS_Discount4Order>
+            </modules>
+        </translate>
+        <acl>
+            <resources>
+                <all>
+                    <title>Allow Everything</title>
+                </all>
+                <admin>
+                    <children>
+                        <system>
+                            <children>
+                                <config>
+                                    <children>
+                                        <discount_for_order>
+                                            <title>Discount For Order</title>
+                                        </discount_for_order>
+                                    </children>
+                                </config>
+                            </children>
+                        </system>
+                    </children>
+                </admin>
+            </resources>
+        </acl>
+    </adminhtml>
+    <global>
+        <events>
+			<sales_order_place_after>			
+				<observers>
+					<QS_Discount4Order_review_observer>
+						<type>singleton</type>
+						<class>discount4order/observer</class>
+						<method>catchPlaceOrder</method>
+					</QS_Discount4Order_review_observer>			
+				</observers>
+			</sales_order_place_after>
+			<sales_order_shipment_save_after>			
+				<observers>
+					<QS_Discount4Order_review_observer>
+						<type>singleton</type>
+						<class>discount4order/observer</class>
+						<method>catchSaveShipment</method>
+					</QS_Discount4Order_review_observer>			
+				</observers>
+			</sales_order_shipment_save_after>
+			<sales_order_invoice_pay>			
+				<observers>
+					<QS_Discount4Order_review_observer>
+						<type>singleton</type>
+						<class>discount4order/observer</class>
+						<method>catchPayInvoice</method>
+					</QS_Discount4Order_review_observer>			
+				</observers>
+			</sales_order_invoice_pay>
+        </events>				
+        <models>
+            <discount4order>
+                <class>QS_Discount4Order_Model</class>
+                <resourceModel>discount4order_mysql4</resourceModel>
+            </discount4order>
+            <discount4order_mysql4>
+                <class>QS_Discount4Order_Model_Mysql4</class>
+                <entities>
+                    <customers>
+                        <table>d4o_customers</table>
+                    </customers>
+                </entities>
+            </discount4order_mysql4>
+        </models>
+        <resources>
+            <discount4order_setup>
+                <setup>
+                    <module>QS_Discount4Order</module>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </discount4order_setup>
+            <discount4order_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </discount4order_write>
+            <discount4order_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </discount4order_read>
+        </resources>
+        <helpers>
+            <discount4order>
+                <class>QS_Discount4Order_Helper</class>
+            </discount4order>
+        </helpers>
+        <blocks>
+            <discount4order>
+                <class>QS_Discount4Order_Block</class>
+            </discount4order>
+        </blocks>
+        <template>
+            <email>
+                <discount_for_order_discount_for_order_email_template_final translate="label" module="customer">
+                    <label>Discount For Order Get Discount Email</label>
+                    <file>discount4order_get_discount.html</file>
+                    <type>html</type>
+                </discount_for_order_discount_for_order_email_template_final>
+			</email>
+		</template>
+    </global>
+	<default>
+		<discount_for_order>
+			<discount_for_order>
+				<enabled>1</enabled>
+				<minimal_order_amount>0</minimal_order_amount>
+				<categories_all>1</categories_all>
+				<categories_all>1</categories_all>
+				<customer_group_all>1</customer_group_all>
+				<rule_name>Discount for order</rule_name>
+				<uses_per_code>1</uses_per_code>
+				<uses_per_customer>1</uses_per_customer>
+				<discount_type>by_percent</discount_type>
+				<discount_amount>10</discount_amount>
+				<discount_length>8</discount_length>
+				<discount_period>30</discount_period>
+				<website_ids>1</website_ids>
+				<email_send_event>sales_order_invoice_pay</email_send_event>
+				<email_identity>general</email_identity>
+				<email_template_final>discount_for_order_discount_for_order_email_template_final</email_template_final>
+			</discount_for_order>
+		</discount_for_order>
+	</default>
+</config>

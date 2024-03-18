@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:typens="urn:{{var wsdl.name}}" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns="http://schemas.xmlsoap.org/wsdl/" name="{{var wsdl.name}}" targetNamespace="urn:{{var wsdl.name}}">
+    <types>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:Magento">
+            <import namespace="http://schemas.xmlsoap.org/soap/encoding/" schemaLocation="http://schemas.xmlsoap.org/soap/encoding/" />
+            <complexType name="listingEntityItem">
+                <all>
+                    <element name="price_id" type="xsd:int" minOccurs="0" />
+                    <element name="price_customer_id" type="xsd:int" minOccurs="0" />
+                    <element name="price_product_id" type="xsd:int" minOccurs="0" />
+                    <element name="price_type" type="xsd:int" minOccurs="0" />
+                    <element name="price" type="xsd:double" minOccurs="0" />
+                    <element name="price_discount" type="xsd:double" minOccurs="0" />
+                    <element name="firstname" type="xsd:string" minOccurs="0" />
+                    <element name="lastname" type="xsd:string" minOccurs="0" />
+                    <element name="price_tier_quantity" type="xsd:int" minOccurs="0" />
+                    <element name="price_valid_from" type="xsd:string" minOccurs="0" />
+                    <element name="price_valid_to" type="xsd:int" minOccurs="0" />
+                    <element name="price_apply_further" type="xsd:int" minOccurs="0" />
+                    <element name="price_category_id" type="typens:ArrayOfString" minOccurs="0"/>
+                </all>
+        	</complexType>
+        	<complexType name="listingEntityArray">
+                <complexContent>
+                    <restriction base="soapenc:Array">
+                        <attribute ref="soapenc:arrayType" wsdl:arrayType="typens:listingEntityItem[]"/>
+                    </restriction>
+                </complexContent>
+            </complexType>
+            <complexType name="discountEntityItem">
+                <all>
+                    <element name="price_global_id" type="xsd:int" minOccurs="0" />
+                    <element name="price_global_customer_id" type="xsd:int" minOccurs="0" />
+                    <element name="price_global_discount" type="xsd:float" minOccurs="0" />
+                    <element name="price_global_valid_from" type="xsd:string" minOccurs="0" />
+                    <element name="price_global_valid_to" type="xsd:string" minOccurs="0" />
+                </all>
+        	</complexType>
+        </schema>
+    </types>
+    <message name="apiCreatePriceRequest">
+        <part name="sessionId" type="xsd:string"/>
+        <part name="price_customer_id" type="xsd:int" />
+        <part name="price_product_id" type="xsd:int" />
+        <part name="price_type" type="xsd:int" />
+        <part name="price" type="xsd:double" />
+        <part name="price_discount" type="xsd:double" />
+        <part name="price_category_id" type="typens:ArrayOfString"/>
+    	<part name="price_tier_quantity" type="xsd:int" />
+        <part name="price_valid_from" type="xsd:string"/>
+        <part name="price_valid_to" type="xsd:string"/>
+        <part name="price_apply_further" type="xsd:int" />
+    </message>
+    <message name="apiCreatePriceResponse">
+        <part name="result" type="xsd:int" />
+    </message>
+    <message name="apiDeletePriceRequest">
+        <part name="sessionId" type="xsd:string"/>
+        <part name="price_customer_id" type="xsd:int" />
+        <part name="price_product_id" type="xsd:int" />
+        <part name="price_id" type="xsd:int" />
+    </message>
+    <message name="apiDeletePriceResponse">
+        <part name="result" type="xsd:boolean" />
+    </message>
+    <message name="apiGetPricesRequest">
+        <part name="sessionId" type="xsd:string" />
+        <part name="customerId" type="xsd:int" />
+    </message>
+    <message name="apiGetPricesResponse">
+        <part name="result" type="typens:listingEntityArray" />
+    </message>
+    <message name="apiCreateDiscountRequest">
+        <part name="sessionId" type="xsd:string"/>
+        <part name="price_global_customer_id" type="xsd:int" />
+        <part name="price_global_discount" type="xsd:float" />
+        <part name="price_global_valid_from" type="xsd:string" />
+        <part name="price_global_valid_to" type="xsd:string" />
+    </message>
+    <message name="apiCreateDiscountResponse">
+        <part name="result" type="xsd:int" />
+    </message>
+    <message name="apiDeleteDiscountRequest">
+        <part name="sessionId" type="xsd:string"/>
+        <part name="price_global_customer_id" type="xsd:int" />
+    </message>
+    <message name="apiDeleteDiscountResponse">
+        <part name="result" type="xsd:int" />
+    </message>
+    
+    <message name="apiGetDiscountRequest">
+        <part name="sessionId" type="xsd:string"/>
+        <part name="price_global_customer_id" type="xsd:int" />
+    </message>
+    <message name="apiGetDiscountResponse">
+        <part name="result" type="typens:discountEntityItem" />
+    </message>
+    
+    <portType name="{{var wsdl.handler}}PortType">
+        <operation name="apiCreatePrice">
+            <documentation>Create price per customer</documentation>
+            <input message="typens:apiCreatePriceRequest" />
+            <output message="typens:apiCreatePriceResponse" />
+        </operation>
+        <operation name="apiDeletePrice">
+            <documentation>Delete price per customer</documentation>
+            <input message="typens:apiDeletePriceRequest" />
+            <output message="typens:apiDeletePriceResponse" />
+        </operation>
+        <operation name="apiGetPrices">
+            <documentation>Get price list</documentation>
+            <input message="typens:apiGetPricesRequest" />
+            <output message="typens:apiGetPricesResponse" />
+        </operation>
+        <operation name="apiCreateDiscount">
+            <documentation>Create global discount</documentation>
+            <input message="typens:apiCreateDiscountRequest" />
+            <output message="typens:apiCreateDiscountResponse" />
+        </operation>
+        <operation name="apiDeleteDiscount">
+            <documentation>Create global discount</documentation>
+            <input message="typens:apiDeleteDiscountRequest" />
+            <output message="typens:apiDeleteDiscountResponse" />
+        </operation>
+        <operation name="apiGetDiscount">
+            <documentation>Get customer global discount</documentation>
+            <input message="typens:apiGetDiscountRequest" />
+            <output message="typens:apiGetDiscountResponse" />
+        </operation>
+    </portType>
+    <binding name="{{var wsdl.handler}}Binding" type="typens:{{var wsdl.handler}}PortType">
+        <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http" />
+        <operation name="apiCreatePrice">
+            <soap:operation soapAction="urn:{{var wsdl.handler}}Action" />
+            <input>
+                <soap:body namespace="urn:{{var wsdl.name}}" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+            </input>
+            <output>
+                <soap:body namespace="urn:{{var wsdl.name}}" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+            </output>
+        </operation>
+        <operation name="apiDeletePrice">
+            <soap:operation soapAction="urn:{{var wsdl.handler}}Action" />
+            <input>
+                <soap:body namespace="urn:{{var wsdl.name}}" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+            </input>
+            <output>
+                <soap:body namespace="urn:{{var wsdl.name}}" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+            </output>
+        </operation>
+        <operation name="apiGetPrices">
+            <soap:operation soapAction="urn:{{var wsdl.handler}}Action" />
+            <input>
+                <soap:body namespace="urn:{{var wsdl.name}}" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+            </input>
+            <output>
+                <soap:body namespace="urn:{{var wsdl.name}}" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+            </output>
+        </operation>
+        <operation name="apiCreateDiscount">
+            <soap:operation soapAction="urn:{{var wsdl.handler}}Action" />
+            <input>
+                <soap:body namespace="urn:{{var wsdl.name}}" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+            </input>
+            <output>
+                <soap:body namespace="urn:{{var wsdl.name}}" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+            </output>
+        </operation>
+        <operation name="apiDeleteDiscount">
+            <soap:operation soapAction="urn:{{var wsdl.handler}}Action" />
+            <input>
+                <soap:body namespace="urn:{{var wsdl.name}}" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+            </input>
+            <output>
+                <soap:body namespace="urn:{{var wsdl.name}}" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+            </output>
+        </operation>
+        <operation name="apiGetDiscount">
+            <soap:operation soapAction="urn:{{var wsdl.handler}}Action" />
+            <input>
+                <soap:body namespace="urn:{{var wsdl.name}}" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+            </input>
+            <output>
+                <soap:body namespace="urn:{{var wsdl.name}}" use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+            </output>
+        </operation>
+    </binding>
+</definitions>

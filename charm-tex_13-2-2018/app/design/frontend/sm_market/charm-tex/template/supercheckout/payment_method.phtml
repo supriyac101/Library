@@ -1,0 +1,41 @@
+<?php 
+$settings = Mage::getSingleton('supercheckout/supercheckout')->getData('settings');
+$payment_method_details = Mage::getSingleton('supercheckout/supercheckout')->getData('payment_method_details');
+        
+if($settings['general']['layout']=='3-Column'){
+            $layout_name='three-column';
+        }elseif($settings['general']['layout']=='2-Column'){
+            $layout_name='two-column';
+        }elseif($settings['general']['layout']=='1-Column'){
+            $layout_name='one-column';
+        }
+?>
+<script>
+app.controller('paymentMethodController',function($scope,$http){
+    
+});
+</script>
+<div id="supercheckoutPaymentBlock" ng-show="payment_method_block" ng-controller="paymentMethodController" class="supercheckout-blocks" data-column="<?php echo $settings['step']['payment_method'][$layout_name]['column']; ?>" data-row="<?php echo $settings['step']['payment_method'][$layout_name]['row']; ?>" data-column-inside="<?php echo $settings['step']['payment_method'][$layout_name]['column-inside']; ?>" >
+                
+                <ul>
+                    <li>
+                        <span class="supercheckout-numbers fontss icon-px-dollar_sign_in_circle-svg_-_Copy"></span>
+                            <span class="heading_style_icon"><?php echo $this->__('Payment Method'); ?></span>
+                        <div ng-show="displayLoader == 'showPaymentMethodLoader'" class="loader" id="paymentMethodLoader"></div>
+                    </li>                
+                </ul>           
+                <div class="supercheckout-checkout-content" style="display: block;">
+                        <div ng-show="payment_method_error != null" class="warning">{{payment_method_error_msg}}</div>                        
+                </div>
+                <div id="payment-method">
+                    
+                    <table class="radio">
+                        <tr ng-repeat="item in payment_methods" class="highlight">
+                                <td>
+                                    <input ng-init="data.payment.method = selected_temp_value_payment" ng-model="data.payment.method" ng-click="payment_method_click($event)" type="radio" name="payment_method" value="{{item.code}}" id="p_method_{{item.code}}"  />
+                                </td>
+                                <td><label for="p_method_{{item.code}}">{{item.title}}</label></td>
+                            </tr>
+                    </table>                 
+                </div>
+</div>

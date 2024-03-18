@@ -1,0 +1,16 @@
+<script>
+	<?php
+	/**
+	 * Override changePrice() method
+	 * 
+	 * @return void
+	 */
+	?>
+	if ('undefined' !== Product.OptionsPrice)
+	{
+		Product.OptionsPrice.prototype.changePrice = Product.OptionsPrice.prototype.changePrice.wrap(function(parentMethod, key, price) 
+		{
+			parentMethod(key, price);
+		});
+	}
+</script>

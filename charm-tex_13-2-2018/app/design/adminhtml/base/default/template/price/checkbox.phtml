@@ -1,0 +1,59 @@
+<p class="nm"><small>If checked, the discount will be further applied to fixed price.</small></p>
+<script>
+	if ('undefined' !== typeof jQuery)
+	{
+		(function($)
+		{
+			var element = $('[name=price_apply_further]');
+
+			var render = function()
+			{
+				var fields = $('[name=price_discount]');
+				
+				if (element.prop('checked'))
+				{
+					fields.each(function()
+					{
+						$(this).prop('disabled',false).parents('tr:first').show();
+					});
+				}
+				else 
+				{
+					if (1 == $('[name=price_type]').val())
+					{
+						fields.each(function()
+						{
+							$(this).parents('tr:first').hide();
+						});
+					}
+				}
+			};
+
+			/**
+			 * Bind element
+			 */
+			element.on(
+			{
+				click:render
+			});
+
+			$('[name=price_type]').on(
+			{
+				change: function()
+				{
+					element.prop('checked', false);
+				}
+			});
+
+			/**
+			 * Execute render on load
+			 */
+			$(window).load(render);
+			
+		})(jQuery);
+	}
+	else
+	{
+		console.log('Price per Customer requires jQuery 1.9.x or higher.');
+	}
+</script>

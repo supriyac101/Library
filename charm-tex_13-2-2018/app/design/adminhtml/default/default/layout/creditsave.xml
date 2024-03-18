@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <creditsave_adminhtml_creditsave_index>
+        <reference name="content">
+            <block type="creditsave/adminhtml_creditsave" name="creditsave" />
+        </reference>
+    </creditsave_adminhtml_creditsave_index>
+</layout>

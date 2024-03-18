@@ -1,0 +1,167 @@
+<?php
+	$locale = Mage::app()->getLocale()->getLocaleCode();
+	$enabled	=	 Mage::getStoreConfig('imageslider/general/enabled');
+	$style	=	 Mage::getStoreConfig('imageslider/general/style'); 
+	$imagewidth	=	 Mage::getStoreConfig('imageslider/general/imagewidth');
+	$imageheight	=	 Mage::getStoreConfig('imageslider/general/imageheight');
+	$description	=	 Mage::getStoreConfig('imageslider/general/description');
+	
+	$slidingtime	=	 Mage::getStoreConfig('imageslider/general/slidingtime');
+	$slidingtime = ($slidingtime*1000);
+	$slidingeffecttime	=	 Mage::getStoreConfig('imageslider/general/slidingeffecttime');
+	$slidingeffecttime = ($slidingeffecttime*1000);
+	
+	$loader	=	 Mage::getStoreConfig('imageslider/general/loader');
+	$navigation	=	 Mage::getStoreConfig('imageslider/general/navigation');
+	
+	$thumbnails	=	 Mage::getStoreConfig('imageslider/general/thumbnails');
+	if($thumbnails=='thumbnail'){ $thumbsts = 'true'; $pagests = 'false'; }
+	elseif($thumbnails=='pagination'){ $thumbsts = 'true'; $pagests = 'true';}
+	else{ $thumbsts = 'false'; $pagests = 'false';}
+	
+	
+		
+	// Get IMAGE COLLECTION
+	$imageCollection = $this->getImageCollection();	
+	
+		
+?>
+<script type="text/javascript" src="/js/jssor.js"></script>
+<script type="text/javascript" src="/js/jssor.slider.js"></script>
+<script>
+        jssor_slider1_starter = function (containerId) {
+            var options = {
+                $AutoPlay: true,                                    //[Optional] Whether to auto play, to enable slideshow, this option must be set to true, default value is false
+                $AutoPlaySteps: 1,                                  //[Optional] Steps to go for each navigation request (this options applys only when slideshow disabled), the default value is 1
+                $AutoPlayInterval: 4000,                            //[Optional] Interval (in milliseconds) to go for next slide since the previous stopped if the slider is auto playing, default value is 3000
+                $PauseOnHover: 0,                               //[Optional] Whether to pause when mouse over if a slider is auto playing, 0 no pause, 1 pause for desktop, 2 pause for touch device, 3 pause for desktop and touch device, 4 freeze for desktop, 8 freeze for touch device, 12 freeze for desktop and touch device, default value is 1
+                $Loop: 1,                                       //[Optional] Enable loop(circular) of carousel or not, 0: stop, 1: loop, 2 rewind, default value is 1
+
+                $ArrowKeyNavigation: true,   			            //[Optional] Allows keyboard (arrow key) navigation or not, default value is false
+                $SlideDuration: 500,                                //[Optional] Specifies default duration (swipe) for slide in milliseconds, default value is 500
+                $MinDragOffsetToSlide: 20,                          //[Optional] Minimum drag offset to trigger slide , default value is 20
+                //$SlideWidth: 600,                                 //[Optional] Width of every slide in pixels, default value is width of 'slides' container
+                //$SlideHeight: 300,                                //[Optional] Height of every slide in pixels, default value is height of 'slides' container
+                $SlideSpacing: 5, 					                //[Optional] Space between each slide in pixels, default value is 0
+                $DisplayPieces: 1,                                  //[Optional] Number of pieces to display (the slideshow would be disabled if the value is set to greater than 1), the default value is 1
+                $ParkingPosition: 0,                                //[Optional] The offset position to park slide (this options applys only when slideshow disabled), default value is 0.
+                $UISearchMode: 1,                                   //[Optional] The way (0 parellel, 1 recursive, default value is 1) to search UI components (slides container, loading screen, navigator container, arrow navigator container, thumbnail navigator container etc).
+                $PlayOrientation: 1,                                //[Optional] Orientation to play slide (for auto play, navigation), 1 horizental, 2 vertical, 5 horizental reverse, 6 vertical reverse, default value is 1
+                $DragOrientation: 3,                                //[Optional] Orientation to drag slide, 0 no drag, 1 horizental, 2 vertical, 3 either, default value is 1 (Note that the $DragOrientation should be the same as $PlayOrientation when $DisplayPieces is greater than 1, or parking position is not 0)
+
+                $ThumbnailNavigatorOptions: {
+                    $Class: $JssorThumbnailNavigator$,              //[Required] Class to create thumbnail navigator instance
+                    $ChanceToShow: 2,                               //[Required] 0 Never, 1 Mouse Over, 2 Always
+
+                    $Loop: 1,                                       //[Optional] Enable loop(circular) of carousel or not, 0: stop, 1: loop, 2 rewind, default value is 1
+                    $AutoCenter: 3,                                 //[Optional] Auto center thumbnail items in the thumbnail navigator container, 0 None, 1 Horizontal, 2 Vertical, 3 Both, default value is 3
+                    $Lanes: 1,                                      //[Optional] Specify lanes to arrange thumbnails, default value is 1
+                    $SpacingX: 4,                                   //[Optional] Horizontal space between each thumbnail in pixel, default value is 0
+                    $SpacingY: 4,                                   //[Optional] Vertical space between each thumbnail in pixel, default value is 0
+                    $DisplayPieces: 4,                              //[Optional] Number of pieces to display, default value is 1
+                    $ParkingPosition: 0,                            //[Optional] The offset position to park thumbnail
+                    $Orientation: 2,                                //[Optional] Orientation to arrange thumbnails, 1 horizental, 2 vertical, default value is 1
+                    $DisableDrag: false                             //[Optional] Disable drag or not, default value is false
+                }
+            };
+
+            var jssor_slider1 = new $JssorSlider$(containerId, options);
+
+            //responsive code begin
+            //you can remove responsive code if you don't want the slider scales while window resizes
+            function ScaleSlider() {
+                var parentWidth = jssor_slider1.$Elmt.parentNode.clientWidth;
+                if (parentWidth) {
+                    var sliderWidth = parentWidth;
+
+                    //keep the slider width no more than 810
+                    sliderWidth = Math.min(sliderWidth, 810);
+
+                    jssor_slider1.$ScaleWidth(sliderWidth);
+                }
+                else
+                    $Jssor$.$Delay(ScaleSlider, 30);
+            }
+
+            ScaleSlider();
+            $Jssor$.$AddEvent(window, "load", ScaleSlider);
+
+            $Jssor$.$AddEvent(window, "resize", $Jssor$.$WindowResizeFilter(window, ScaleSlider));
+            $Jssor$.$AddEvent(window, "orientationchange", ScaleSlider);
+            //responsive code end
+        };
+    </script>
+
+<div id="slider1_container"> 
+  
+  <!-- Loading Screen -->
+  <div class="slidsinner1" u="loading" style="position: absolute; top: 0px; left: 0px;">
+    <div class="slidsinner" style="filter: alpha(opacity=70); opacity:0.7; position: absolute; display: block;
+                background-color: #000000; top: 0px; left: 0px;width: 100%;height:100%;"> </div>
+    <div class="slidsinner2" style="position: absolute; display: block; background: url(../img/loading.gif) no-repeat center center; top: 0px; left: 0px;width: 100%;height:100%;"> </div>
+  </div>
+  
+  <!-- Slides Container -->
+  <div class="slidstab" u="slides">
+    <?php if($enabled){?>
+    <?php foreach ($imageCollection as $banner): ?>
+    <div class="tabactive" >
+    <?php if(isset($banner['weblink'])){?> <a href="<?php echo $banner['weblink']; ?>"> <?php } ?>
+   ===========> <?php echo $banner['weblink']; ?> <img u="image" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA)."bsimages/".$banner['filename']?>" />
+    <?php if(isset($banner['weblink'])){?> </a> <?php } ?>
+      <div u="thumb"> <img class="i" src="  <?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA)."bsimages/thumbs/".$banner['filename']?>" />
+        <div class="t"><?php echo $banner['content']; $description?></div>
+      </div>
+    </div>
+    <?php endforeach; ?>
+  </div>
+  <?php }?>
+  <!-- ThumbnailNavigator Skin Begin -->
+  <div u="thumbnavigator" class="jssort11"> 
+    <!-- Thumbnail Item Skin Begin -->
+<style>
+/* jssor slider thumbnail navigator skin 11 css */
+/*
+.jssort11 .p            (normal)
+.jssort11 .p:hover      (normal mouseover)
+.jssort11 .pav          (active)
+.jssort11 .pav:hover    (active mouseover)
+.jssort11 .pdn          (mousedown)
+*/
+.jssort11{font-family: Arial, Helvetica, sans-serif;}
+.jssort11 .i, .jssort11 .pav:hover .i{position: absolute;top:3px;	left:3px;WIDTH: 60px;HEIGHT: 30px;	border: white 1px dashed;}
+* html .jssort11 .i{WIDTH /**/: 62px;	HEIGHT /**/: 32px;}
+.jssort11 .pav .i{border: white 1px solid;}
+.jssort11 .t, .jssort11 .pav:hover .t{position: absolute; text-align: center; font-size:13px;}
+.jssort11 .pav .t, .jssort11 .phv .t, .jssort11 .p:hover .t{color:#575757;}
+.jssort11 .c, .jssort11 .pav:hover .c{position: absolute; /*overflow: hidden;*/}
+.jssort11 .pav .c, .jssort11 .phv .c, .jssort11 .p:hover .c{color:#fc9835;}
+.jssort11 .t, .jssort11 .c{	transition: color 2s;	-moz-transition: color 2s;	-webkit-transition: color 2s;
+	-o-transition: color 2s;}
+.jssort11 .p:hover .t, .jssort11 .phv .t, .jssort11 .pav:hover .t, .jssort11 .p:hover .c, .jssort11 .phv .c, .jssort11 .pav:hover .c{transition: none;	-moz-transition: none;	-webkit-transition: none;	-o-transition: none;}
+.jssort11 .p{	/*background:#fff;*/}
+.jssort11 .pav, .jssort11 .pdn{	background:#462300;}
+.jssort11 .p:hover, .jssort11 .phv, .jssort11 .pav:hover{/*background:#333;*/}
+
+
+</style>
+    <div class="tablinksmain" u="slides" >
+      <div u="prototype" class="p tablinksbg"> <div class="tabarrow"></div>
+      	
+        <div class="tabactive" u="thumbnailtemplate" style=" width: 100%; height: 100%; border: none;position:absolute; top: 0; left: 0;">
+        
+                
+        </div>
+      </div>
+    </div>
+    <!-- Thumbnail Item Skin End --> 
+  </div>
+  <!-- ThumbnailNavigator Skin End --> 
+  
+  <!-- Trigger --> 
+  <script>
+            jssor_slider1_starter('slider1_container');
+        </script> 
+</div>
+
+<?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('home_banner')->toHtml(); ?>

@@ -1,0 +1,133 @@
+<h4><?php echo $this->__('Order Grid') ?></h4>
+<div class="orger-tab">
+<form id="customform" name="customform" method="post" enctype="multipart/form-data" action="#" novalidate="novalidate">
+<?php
+    //echo "Hello";
+    $_productId = Mage::app()->getRequest()->getParam('product');
+    $_product = Mage::getModel('catalog/product')->load($_productId);
+    //echo "<pre>";
+    $_options = $_product->getOptions();
+    //print_r($_options);
+    
+    // set array
+    $x = array();
+    $y = array();
+    $_optId1 = "";
+    $_optId2 = "";
+    $_title = array();
+    
+    foreach($_options as $_option):
+        $optionType = $_option->getType();
+        $_title[] = $_option->getTitle();
+        $_values = $_option->getValues();
+        if($_option->getSortOrder() != 2){
+            $_optId1 = $_option->getId();
+            foreach($_values as $_value):
+                $x[] = array($_value->getTitle(),$_value->getId(),$_value->getPrice());
+            endforeach;
+        }elseif($_option->getSortOrder() == 2){
+            $_optId2 = $_option->getId();
+            foreach($_values as $_value):
+                $y[] = array($_value->getTitle(),$_value->getId(),$_value->getPrice());
+            endforeach;
+        }
+        //echo count($_values);
+    endforeach;
+    /*echo "<pre>";
+    print_r($x);
+    exit;*/
+    $table = "";
+    // display table
+    $table .= '<table class="matrix">';
+    $counttoken = count($x);
+    $countY = count($y);
+    $rowspan = $counttoken+1;
+    $k=0;
+    
+    $table .= '<thead><tr><td colspan="2"></td><td colspan="'.$countY.'"><h4>'.$_title[1].'</h4></td></tr></thead>';
+    $table .= '<tr><td rowspan="'.$rowspan.'"><h4>'.$_title[0].'</h4></td></tr>';
+    
+    foreach($x as $key=>$value){
+        $table .= '<tr><td>'.$value[0].'</td>';
+        foreach($y as $key1=>$value1):
+            $k++;
+            $_xId = $value[1];
+            $_yId = $value1[1];
+            $_sizePrice = $value1[2];
+            $formattedPrice = Mage::helper('core')->currency($_sizePrice, true, false);
+            if($formattedPrice == "$0.00"){
+                $formattedPrice = "";
+            }else{
+                $formattedPrice = '+ '.$formattedPrice;
+            }
+            $table .= '<td>' .$value1[0]. '<br>
+            
+            <input type="hidden" class="optionstype" name="optionstype[]" collvalue="'.$_optId1.'" value="'.$_optId1.'"  />
+            <input type="hidden" class="optionsvalue" name="optionsvalue[]" collvalue="'.$_xId.'" value="'.$_xId.'"  />
+            <input type="hidden" class="optionstype2" name="optionstype2[]" collvalue="'.$_optId2.'" value="'.$_optId2.'" />
+            <input type="hidden" class="optionsvalue2" name="optionsvalue2[]" collvalue="'.$_yId.'" value="'.$_yId.'" />
+            <input type="text" class="qtybox" name="qty[]" size="3" value="" /><br>
+            <span class="opt-price">'.$formattedPrice.'</span></td>';
+            if($k == $countY){ $table .= '</tr>'; }
+        endforeach;
+        //$table .= '<tr>';
+    }
+    $table .= '</table>';
+    //Mage::register('option', $table);
+    
+    //$response['table'] = $table;
+    echo $table;
+    echo '<input type="hidden" name="proid" value="'.$_productId.'" />';
+    echo '<button type="button" title="Add to Cart" class="button btn-cart"><span><span>Add Items To Cart</span></span></button>';
+?>
+</form>
+</div>
+
+<script type="text/javascript">
+    jQuery(document).ready(function(){
+        jQuery('.btn-cart').click(function(){
+            //var sum = 0;
+            jQuery('.qtybox').each(function(){
+                var qty = jQuery(this).val();
+                if (qty != "" && qty != 0) {
+                    //alert(qty);
+                    var proid = jQuery('input[name=proid]').val();
+                    var optionstype = jQuery(this).siblings('input[class=optionstype]').val();
+                    var ooptionsvalueId = jQuery(this).siblings('input[class=optionsvalue]').val();
+                    var optionstypeId2 = jQuery(this).siblings('input[class=optionstype2]').val();
+                    var optionsvalueId2 = jQuery(this).siblings('input[class=optionsvalue2]').val();
+                    //alert(optionstype);
+                    
+                    try{
+                        jQuery("#loadderimage").show();
+                        jQuery.ajax({
+                            url : '<?php echo $this->getUrl()."ordergrid/index/addtocart/";?>',
+                            dataType : 'json',
+                            type : 'POST',
+                            //data: jQuery('#customform').serialize(),
+                            data: {proid:proid, optionstype:optionstype, ooptionsvalueId:ooptionsvalueId, optionstypeId2:optionstypeId2, optionsvalueId2:optionsvalueId2, qty:qty},
+                            success : function(data){
+                                jQuery("#loadderimage").hide();
+                                //sum += +data.count;
+                                //alert(sum);
+                                //alert(jQuery('.header-minicart').find('.aftlog2 > .count').html());
+                                //window.location.href = '<?php echo $this->getUrl()."checkout/cart";?>';
+                                
+                                /*jQuery('.header-minicart').find( "a:nth-child(2)" ).children(".text2").css('display','block'); 
+                                jQuery('.header-minicart').find("a:nth-child(2)" ).children(".text2").css('display','block');
+                                jQuery('.header-minicart').find("a:nth-child(2)" ).children(".text2").html(sum);*/
+                                //jQuery('#cboxClose').trigger("click");
+                                /*jQuery('.mlscmsg').hide();
+                                setTimeout(function () {
+                                    jQuery('#cboxClose').trigger('click');
+                                }, 3000);*/
+                                //jQuery("html, body").animate({ scrollTop: 0 }, "slow");
+                            },
+                        });
+                    }catch(e){}
+                }
+            });
+            alert("Product(s) added to cart");
+        });
+    });
+</script>

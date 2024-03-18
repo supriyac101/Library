@@ -1,0 +1,242 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Discount For Order Extension
+ *
+ * @category   QS
+ * @package    QS_Discount4Order
+ * @author     Quart-soft Magento Team <magento@quart-soft.com> 
+ * @copyright  Copyright (c) 2010 Quart-soft Ltd http://quart-soft.com
+ */
+-->
+<config>
+    <tabs>
+        <qsmodul translate="label">
+            <label>QS Modules</label>
+            <sort_order>250</sort_order>
+        </qsmodul>
+    </tabs>
+    <sections>
+        <discount_for_order translate="label" module="discount4order">
+            <label>Discount For Order</label>
+            <frontend_type>text</frontend_type>
+            <tab>qsmodul</tab>
+            <sort_order>300</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <discount_for_order translate="label">
+                    <label>Discount For Order</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>3</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <enabled translate="label">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>0</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </enabled>
+						<minimal_order_amount translate="label">
+                            <label>Minimal Order Subtotal Amount</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </minimal_order_amount>
+						<categories_all translate="label">
+                            <label>Allow all categories</label>
+							<comment></comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </categories_all>
+						<categories_exclude translate="label">
+                            <label>Exclude Categories</label>
+							<comment>Exclude categories from discount </comment>
+                            <frontend_type>multiselect</frontend_type>
+                            <source_model>discount4order/source_discount_category</source_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+							<depends><categories_all>0</categories_all></depends>
+                        </categories_exclude>
+						<consider_only_all_allowed translate="label">
+                            <label>Consider order only if all products from allowed categories</label>
+							<comment>If Yes all products have to be from allowed categories. If No at less one product have to be from allowed categories. </comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+							<depends><categories_all>0</categories_all></depends>
+                        </consider_only_all_allowed>
+						<customer_group_all translate="label">
+                            <label>Enable discount email for all customers</label>
+							<comment></comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>44</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </customer_group_all>
+						<customer_group_allowed translate="label">
+                            <label>Enable for Customer in Group</label>
+							<comment>Enable discount email for orders of customer at least from one group of selected. </comment>
+                            <frontend_type>multiselect</frontend_type>
+                            <source_model>adminhtml/system_config_source_customer_group</source_model>
+                            <sort_order>45</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+							<depends><customer_group_all>0</customer_group_all></depends>
+                        </customer_group_allowed>
+                        <rule_name translate="label">
+                            <label>Rule Name</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </rule_name>
+                        <uses_per_code translate="label">
+                            <label>Uses per Code</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </uses_per_code>
+                        <uses_per_customer translate="label">
+                            <label>Uses per Cusomer</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </uses_per_customer>
+                        <discount_type translate="label">
+                            <label>Discount Type</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>discount4order/source_discount_type</source_model>
+                            <sort_order>80</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </discount_type>
+                        <discount_amount translate="label">
+                            <label>Discount Amount</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>90</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </discount_amount>
+                        <purchases_type translate="label">
+                            <label>Type of purchases to next discount</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>discount4order/source_discount_amount</source_model>
+                            <sort_order>91</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </purchases_type>
+                        <cumulative_discount translate="label">
+                            <label>Accumulative discount</label>
+                            <frontend_model>discount4order/system_config_method</frontend_model>
+                            <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+                            <sort_order>92</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </cumulative_discount>
+                        <reset_date>
+                            <label>Reset date</label>
+                            <comment>Initial date for calculate accumulative discount.</comment>
+                            <frontend_type>date</frontend_type>
+                            <frontend_model>discount4order/system_config_date</frontend_model>
+                            <sort_order>93</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </reset_date>
+                        <discount_length translate="label">
+                            <label>Discount Code Length</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </discount_length>
+                        <discount_period translate="label">
+                            <label>Discount Period (days)</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>110</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </discount_period>
+			<rule_stop_rules_processing translate="label">
+                            <label>Stop Further Rules Processing</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>111</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </rule_stop_rules_processing>
+                        <website_ids translate="label">
+                            <label>Websites shopping cart rules will be applied to</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <source_model>adminhtml/system_config_source_website</source_model>
+                            <sort_order>120</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </website_ids>
+                        <email_send_event translate="label">
+                            <label>Event to send email</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>discount4order/source_discount_event</source_model>
+                            <sort_order>130</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </email_send_event>						
+                        <email_identity translate="label">
+                            <label>Email Sender</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_email_identity</source_model>
+                            <sort_order>140</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </email_identity>
+                        <email_template_final translate="label">
+                            <label>Email Template for Mail with Discount Code</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_email_template</source_model>
+                            <sort_order>150</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </email_template_final>
+                    </fields>
+                </discount_for_order>
+            </groups>
+        </discount_for_order>
+    </sections>
+</config>

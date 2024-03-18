@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Robeka_Ordergrid>
+            <active>true</active>
+            <codePool>local</codePool>
+        </Robeka_Ordergrid>
+    </modules>
+</config> 

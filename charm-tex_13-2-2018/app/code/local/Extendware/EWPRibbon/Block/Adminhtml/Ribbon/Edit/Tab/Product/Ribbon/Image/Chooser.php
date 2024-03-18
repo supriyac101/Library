@@ -1,0 +1,5 @@
+<?php
+class Extendware_EWPRibbon_Block_Adminhtml_Ribbon_Edit_Tab_Product_Ribbon_Image_Chooser extends Extendware_EWPRibbon_Block_Adminhtml_Ribbon_Edit_Tab_Category_Ribbon_Image_Chooser
+{
+    
+}

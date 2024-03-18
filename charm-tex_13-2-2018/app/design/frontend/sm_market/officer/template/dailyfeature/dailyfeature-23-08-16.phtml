@@ -1,0 +1,78 @@
+<?php
+$todaysDeal = Mage::getModel('dailyfeature/dailyfeature')->getTodaysDeal();
+$_helper = $this->helper('catalog/output');
+?>
+
+<?php if($todaysDeal->getProduct()): ?>
+
+<?php
+
+$_product = Mage::getModel('catalog/product')->load($todaysDeal->getProduct());
+$_productName=$_helper->productAttribute($_product, $_product->getName(), 'name');
+$_shortDescription = $_helper->productAttribute($_product, nl2br($_product->getDescription()), 'description');
+if(strlen($_shortDescription) > 160 )
+$_shortDescription=substr($_shortDescription,0,160).'....';
+$_specialPrice=$_product->getSpecialPrice();
+$_finalPrice=$_product->getFinalPrice();
+$_limitText=$todaysDeal->getLimittext();
+$_freeShippingBanner=$todaysDeal->getBanner();
+$_atcUrl=$this->getUrl('checkout/cart/add/');
+$_weeklyDealUrl=$this->getUrl('weekly-deal');
+
+?>
+
+<div class="deal-banner">
+        <div class="deal-img">
+            <img src="<?php echo $this->helper('catalog/image')->init($_product, 'small_image'); ?>" alt="<?php echo $_productName ?>" />
+        
+            <?php if(!empty($_limitText)): ?>
+                <span><?php echo $_limitText; ?> </span>
+            <?php endif; ?>
+        
+        </div>
+ 
+        <div class="deal-container">
+        
+            <div class="deal-product-name">
+                <h2>
+                   <?php echo $_productName ?>
+                </h2>
+            </div>
+            <div class="deal-product-rating">
+                <img src="<?php echo $this->getSkinUrl();?>images/star-icon.png" alt="" />
+            </div>
+            <div class="deal-product-dtails">
+                <div class="deal-product-desc">
+                    <?php echo $_product->getDescription(); ?>
+                </div>     
+            
+            
+                
+                <div class="deal-product-price">
+                    <?php if($_specialPrice) { ?>
+                        <div class="regular-price">
+                        <?php echo $this->__('Regular:') ?> <span><?php echo $this->helper('core')->currency($_product->getPrice()); ?></span>
+                        </div>
+                    <?php } ?>
+                    <div class="sale-price">
+                    <?php echo $this->__('SALE:') ?> <span><?php echo $this->helper('core')->currency($_finalPrice,true,false); ?></span>
+                    </div>
+            
+                </div>
+            
+            
+                <div class="deal-product-shop">
+                
+                    <a href="<?php echo $_product->getProductUrl(); ?>"><?php echo $this->__('Shop this deal') ?></a>
+                </div>
+            </div>
+        
+        
+        </div><!-- end d_right_block -->
+    
+<?php //exit; ?>
+</div> <!-- end deal_block -->
+
+
+<?php endif; ?>
+

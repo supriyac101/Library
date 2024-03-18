@@ -1,0 +1,1624 @@
+
+<?php $settings = Mage::getSingleton('supercheckout/supercheckout')->getData('settings');
+$sort_block = array();
+foreach ($settings['step'] as $key => $step) {
+    if($key == 'html' || $key == 'html_value'){
+           $sort_block[$key] = $step;
+    }
+}        
+        $loggedIN = Mage::getSingleton('customer/session')->isLoggedIn();
+        $cart = Mage::getSingleton('supercheckout/supercheckout')->getData('cart');
+        $shipping_method_details = Mage::getSingleton('supercheckout/supercheckout')->getData('shipping_method_details');
+        $payment_method_details = Mage::getSingleton('supercheckout/supercheckout')->getData('payment_method_details');
+        $countries_details = Mage::getSingleton('supercheckout/supercheckout')->getData('countries_details');
+        $default_country = Mage::getSingleton('supercheckout/supercheckout')->getData('default_country');
+        $default_regions = Mage::getSingleton('supercheckout/supercheckout')->getData('default_regions');
+        $billing_address_session = Mage::getSingleton('supercheckout/supercheckout')->getData('billing_address_session');
+        $shipping_method_session = Mage::getSingleton('supercheckout/supercheckout')->getData('shipping_method_session');
+        $payment_method_session = Mage::getSingleton('supercheckout/supercheckout')->getData('payment_method_session');
+        $payment_address_select_option = Mage::getSingleton('supercheckout/supercheckout')->getData('payment_address_select_option');
+        $default_bill_address_id = Mage::getSingleton('supercheckout/supercheckout')->getData('default_bill_address_id');
+        $default_ship_address_id = Mage::getSingleton('supercheckout/supercheckout')->getData('default_ship_address_id');
+        $agreement_array = Mage::getSingleton('supercheckout/supercheckout')->getData('agreement_array');
+        $selected_shipping_method = Mage::helper('supercheckout')->getSelectedShippingMethod();
+        $account = Mage::getSingleton('supercheckout/supercheckout')->getData('account');
+        
+        if((!$settings['step']['login']['option']['guest']['display'] && $account == 'guest') || (!$settings['general']['guest_manual'] && $account == 'register_manual')){
+            $account = 'register';
+        }
+        $session_country_shipping = Mage::getSingleton('checkout/session')->getQuote()->getShippingAddress()->getCountryId();
+        $session_country_billing = Mage::getSingleton('checkout/session')->getQuote()->getBillingAddress()->getCountryId();
+        
+        
+if($settings['general']['layout']=='3-Column'){
+            $layout_name='three-column';
+            $multiplier=0.895;
+        }elseif($settings['general']['layout']=='2-Column'){
+            $layout_name='two-column';
+            $multiplier=0.947;
+        }elseif($settings['general']['layout']=='1-Column'){
+            $layout_name='one-column';
+            $multiplier=1;
+        }?>
+<script type="text/javascript">var app = angular.module('supercheckout', ['ngRoute','ngResource','ui.bootstrap','ngSanitize']);</script>
+<script type="text/javascript">
+app.controller('supercheckoutMainController',function($q,$scope,$http,$timeout,$rootScope){        
+    $scope.data = {};
+    $scope.all_virtual = <?php echo $cart['show_shipping']; ?>;             //Code Added by Raghubendra Singh on 05-Jan-2015 to set value of scope variable to display or hide shipping blocks
+    $scope.agreement_data = <?php echo json_encode($agreement_array); ?>;
+    
+    $scope.show_cart_model = '<?php echo $loggedIN ? $settings['option']['logged']['cart']['display'] : $settings['option']['guest']['cart']['display']; ?>';
+    $scope.show_cart_product_name_model = '<?php echo $loggedIN ? $settings['option']['logged']['cart']['columns']['name'] : $settings['option']['guest']['cart']['columns']['name']; ?>';
+    $scope.show_cart_sku_model = '<?php echo $loggedIN ? $settings['option']['logged']['cart']['columns']['model'] : $settings['option']['guest']['cart']['columns']['model']; ?>';
+    $scope.show_cart_unit_price_model = '<?php echo $loggedIN ? $settings['option']['logged']['cart']['columns']['price'] : $settings['option']['guest']['cart']['columns']['price']; ?>';
+    $scope.show_cart_quantity_model = '<?php echo $loggedIN ? $settings['option']['logged']['cart']['columns']['quantity'] : $settings['option']['guest']['cart']['columns']['quantity']; ?>';
+    $scope.show_cart_total_model = '<?php echo $loggedIN ? $settings['option']['logged']['cart']['columns']['total'] : $settings['option']['guest']['cart']['columns']['total']; ?>';
+    $scope.show_cart_coupon_model = '<?php echo $loggedIN ? $settings['option']['logged']['cart']['columns']['coupon'] : $settings['option']['guest']['cart']['columns']['coupon']; ?>';
+    $scope.show_cart_popup_model = '<?php echo $loggedIN ? $settings['option']['logged']['cart']['columns']['image'] : $settings['option']['guest']['cart']['columns']['image']; ?>';
+    $scope.show_cart_comment_model = '<?php echo $loggedIN ? $settings['option']['logged']['confirm']['fields']['comment']['display'] : $settings['option']['guest']['confirm']['fields']['comment']['display']; ?>';
+    <?php  // SAURABH BOC DATE: April,03 2015 to hide shipping methods if hidden by admin control regardless type of product in cart. ?>
+    //$scope.show_shipping_method_block = '<?php //echo $settings['step']['shipping_method']['display_options']; ?>';
+   if($scope.all_virtual==0){
+    $scope.show_shipping_method_block = '0';
+    }
+    else{
+    $scope.show_shipping_method_block = '<?php echo $settings['step']['shipping_method']['display_options']; ?>';
+    }
+<?php  // SAURABH EOC DATE: April,03 2015 to hide shipping methods if hidden by admin control regardless type of product in cart. ?>
+    
+    $scope.selected_temp_value = '<?php echo $selected_shipping_method; ?>';
+    $scope.selected_temp_value_payment = '<?php echo $settings['step']['payment_method']['default_option']; ?>';
+    
+    
+    $scope.payment_firstname_show = '<?php echo $loggedIN ? $settings['step']['payment_address']['fields']['firstname']['display']['login']:$settings['step']['payment_address']['fields']['firstname']['display']['guest']; ?>';
+    $scope.payment_lastname_show =  '<?php echo $loggedIN ? $settings['step']['payment_address']['fields']['lastname']['display']['login']:$settings['step']['payment_address']['fields']['lastname']['display']['guest']; ?>';
+    $scope.payment_address_1_show = '<?php echo $loggedIN ? $settings['step']['payment_address']['fields']['address_1']['display']['login']:$settings['step']['payment_address']['fields']['address_1']['display']['guest']; ?>';
+    $scope.payment_address_2_show = '<?php echo $loggedIN ? $settings['step']['payment_address']['fields']['address_2']['display']['login']:$settings['step']['payment_address']['fields']['address_2']['display']['guest']; ?>';
+    $scope.payment_city_show =      '<?php echo $loggedIN ? $settings['step']['payment_address']['fields']['city']['display']['login']:$settings['step']['payment_address']['fields']['city']['display']['guest']; ?>';
+    $scope.payment_postcode_show =  '<?php echo $loggedIN ? $settings['step']['payment_address']['fields']['postcode']['display']['login']:$settings['step']['payment_address']['fields']['postcode']['display']['guest']; ?>';
+    $scope.payment_company_show =   '<?php echo $loggedIN ? $settings['step']['payment_address']['fields']['company']['display']['login']:$settings['step']['payment_address']['fields']['company']['display']['guest']; ?>';
+    $scope.payment_telephone_show = '<?php echo $loggedIN ? $settings['step']['payment_address']['fields']['telephone']['display']['login']:$settings['step']['payment_address']['fields']['telephone']['display']['guest']; ?>';
+    $scope.payment_fax_show =       '<?php echo $loggedIN ? $settings['step']['payment_address']['fields']['fax']['display']['login']:$settings['step']['payment_address']['fields']['fax']['display']['guest']; ?>';
+    $scope.payment_country_show =   '<?php echo $loggedIN ? $settings['step']['payment_address']['fields']['country_id']['display']['login']:$settings['step']['payment_address']['fields']['country_id']['display']['guest']; ?>';
+    $scope.payment_region_show =    '<?php echo $loggedIN ? $settings['step']['payment_address']['fields']['zone_id']['display']['login']:$settings['step']['payment_address']['fields']['zone_id']['display']['guest']; ?>';
+    
+    $scope.payment_firstname_require = '<?php echo $loggedIN ? $settings['step']['payment_address']['fields']['firstname']['require']['login']:$settings['step']['payment_address']['fields']['firstname']['require']['guest']; ?>';
+    $scope.payment_lastname_require =  '<?php echo $loggedIN ? $settings['step']['payment_address']['fields']['lastname']['require']['login']:$settings['step']['payment_address']['fields']['lastname']['require']['guest']; ?>';
+    $scope.payment_address_1_require = '<?php echo $loggedIN ? $settings['step']['payment_address']['fields']['address_1']['require']['login']:$settings['step']['payment_address']['fields']['address_1']['require']['guest']; ?>';
+    $scope.payment_address_2_require = '<?php echo $loggedIN ? $settings['step']['payment_address']['fields']['address_2']['require']['login']:$settings['step']['payment_address']['fields']['address_2']['require']['guest']; ?>';
+    $scope.payment_city_require =      '<?php echo $loggedIN ? $settings['step']['payment_address']['fields']['city']['require']['login']:$settings['step']['payment_address']['fields']['city']['require']['guest']; ?>';
+    $scope.payment_postcode_require =  '<?php echo $loggedIN ? $settings['step']['payment_address']['fields']['postcode']['require']['login']:$settings['step']['payment_address']['fields']['postcode']['require']['guest']; ?>';
+    $scope.payment_company_require =   '<?php echo $loggedIN ? $settings['step']['payment_address']['fields']['company']['require']['login']:$settings['step']['payment_address']['fields']['company']['require']['guest']; ?>';
+    $scope.payment_telephone_require = '<?php echo $loggedIN ? $settings['step']['payment_address']['fields']['telephone']['require']['login']:$settings['step']['payment_address']['fields']['telephone']['require']['guest']; ?>';
+    $scope.payment_fax_require =       '<?php echo $loggedIN ? $settings['step']['payment_address']['fields']['fax']['require']['login']:$settings['step']['payment_address']['fields']['fax']['require']['guest']; ?>';
+    $scope.payment_country_require =   '<?php echo $loggedIN ? $settings['step']['payment_address']['fields']['country_id']['require']['login']:$settings['step']['payment_address']['fields']['country_id']['require']['guest']; ?>';
+    $scope.payment_region_require =    '<?php echo $loggedIN ? $settings['step']['payment_address']['fields']['zone_id']['require']['login']:$settings['step']['payment_address']['fields']['zone_id']['require']['guest']; ?>';
+    
+    $scope.shipping_firstname_show ='<?php echo $loggedIN ? $settings['step']['shipping_address']['fields']['firstname']['display']['login']:$settings['step']['shipping_address']['fields']['firstname']['display']['guest']; ?>';
+    $scope.shipping_lastname_show = '<?php echo $loggedIN ? $settings['step']['shipping_address']['fields']['lastname']['display']['login']:$settings['step']['shipping_address']['fields']['lastname']['display']['guest']; ?>';
+    $scope.shipping_address_1_show ='<?php echo $loggedIN ? $settings['step']['shipping_address']['fields']['address_1']['display']['login']:$settings['step']['shipping_address']['fields']['address_1']['display']['guest']; ?>';
+    $scope.shipping_address_2_show ='<?php echo $loggedIN ? $settings['step']['shipping_address']['fields']['address_2']['display']['login']:$settings['step']['shipping_address']['fields']['address_2']['display']['guest']; ?>';
+    $scope.shipping_city_show =     '<?php echo $loggedIN ? $settings['step']['shipping_address']['fields']['city']['display']['login']:$settings['step']['shipping_address']['fields']['city']['display']['guest']; ?>';
+    $scope.shipping_postcode_show = '<?php echo $loggedIN ? $settings['step']['shipping_address']['fields']['postcode']['display']['login']:$settings['step']['shipping_address']['fields']['postcode']['display']['guest']; ?>';
+    //$scope.shipping_company_show =  '<?php // echo $loggedIN ? $settings['step']['shipping_address']['fields']['company']['display']['login']:$settings['step']['shipping_address']['fields']['company']['display']['guest']; ?>';
+//    $scope.shipping_telephone_show ='<?php // echo $loggedIN ? $settings['step']['shipping_address']['fields']['telephone']['display']['login']:$settings['step']['shipping_address']['fields']['telephone']['display']['guest']; ?>';
+//    $scope.shipping_fax_show =      '<?php // echo $loggedIN ? $settings['step']['shipping_address']['fields']['fax']['display']['login']:$settings['step']['shipping_address']['fields']['fax']['display']['guest']; ?>';
+    $scope.shipping_country_show =  '<?php echo $loggedIN ? $settings['step']['shipping_address']['fields']['country_id']['display']['login']:$settings['step']['shipping_address']['fields']['country_id']['display']['guest']; ?>';
+    $scope.shipping_region_show =   '<?php echo $loggedIN ? $settings['step']['shipping_address']['fields']['zone_id']['display']['login']:$settings['step']['shipping_address']['fields']['zone_id']['display']['guest']; ?>';
+    
+    $scope.shipping_firstname_require ='<?php echo $loggedIN ? $settings['step']['shipping_address']['fields']['firstname']['require']['login']:$settings['step']['shipping_address']['fields']['firstname']['require']['guest']; ?>';
+    $scope.shipping_lastname_require = '<?php echo $loggedIN ? $settings['step']['shipping_address']['fields']['lastname']['require']['login']:$settings['step']['shipping_address']['fields']['lastname']['require']['guest']; ?>';
+    $scope.shipping_address_1_require ='<?php echo $loggedIN ? $settings['step']['shipping_address']['fields']['address_1']['require']['login']:$settings['step']['shipping_address']['fields']['address_1']['require']['guest']; ?>';
+    $scope.shipping_address_2_require ='<?php echo $loggedIN ? $settings['step']['shipping_address']['fields']['address_2']['require']['login']:$settings['step']['shipping_address']['fields']['address_2']['require']['guest']; ?>';
+    $scope.shipping_city_require =     '<?php echo $loggedIN ? $settings['step']['shipping_address']['fields']['city']['require']['login']:$settings['step']['shipping_address']['fields']['city']['require']['guest']; ?>';
+    $scope.shipping_postcode_require = '<?php echo $loggedIN ? $settings['step']['shipping_address']['fields']['postcode']['require']['login']:$settings['step']['shipping_address']['fields']['postcode']['require']['guest']; ?>';
+//    $scope.shipping_company_require =  '<?php // echo $loggedIN ? $settings['step']['shipping_address']['fields']['company']['require']['login']:$settings['step']['shipping_address']['fields']['company']['require']['guest']; ?>';
+//    $scope.shipping_telephone_require ='<?php // echo $loggedIN ? $settings['step']['shipping_address']['fields']['telephone']['require']['login']:$settings['step']['shipping_address']['fields']['telephone']['require']['guest']; ?>';
+//    $scope.shipping_fax_require =      '<?php // echo $loggedIN ? $settings['step']['shipping_address']['fields']['fax']['require']['login']:$settings['step']['shipping_address']['fields']['fax']['require']['guest']; ?>';
+    $scope.shipping_country_require =  '<?php echo $loggedIN ? $settings['step']['shipping_address']['fields']['country_id']['require']['login']:$settings['step']['shipping_address']['fields']['country_id']['require']['guest']; ?>';
+    $scope.shipping_region_require =   '<?php echo $loggedIN ? $settings['step']['shipping_address']['fields']['zone_id']['require']['login']:$settings['step']['shipping_address']['fields']['zone_id']['require']['guest']; ?>';
+    
+    $scope.disable_placeorder = false;
+    $scope.save_order_click = false;
+    $scope.select_bill_country_id = '<?php echo isset($session_country_billing)?$session_country_billing:$default_country; ?>';
+    
+    $scope.select_ship_country_id = '<?php echo isset($session_country_shipping)?$session_country_shipping:$default_country; ?>';
+            $scope.loginRadio = '<?php echo $account; ?>';
+            $scope.$watch('loginRadio', function(mVal){
+              if (angular.isUndefined($scope.loginRadio)) return; 
+
+              if(mVal === 'register_manual'){
+                 $scope.register_account_value = 1;
+              }else if(mVal == 'guest'){
+                  <?php if($settings['general']['guestenable']){ ?>
+                      $scope.auto_register = 'register';
+                      $scope.getRegisterAccountFlag = 1;
+                      $scope.randomSequence = '<?php echo substr(md5(uniqid(rand(), true)), 0, 9);?>';
+                  <?php }else{ ?>
+                      $scope.getRegisterAccountFlag = 0;
+                      $scope.auto_register = 'dontregister';
+                  <?php } ?>
+                  $scope.register_account_value = 0;
+              }else{
+                  $scope.register_account_value = 0;
+              }
+            });
+            $scope.flag = false;
+            $scope.onKeyPress = function($event) {
+                    if($event.keyCode == 13){                        
+                        if($scope.loginRadio == "register"){
+                            $scope.buttonClicked();
+                        }
+                    }
+            }
+            $scope.loginRadio = "<?php echo $account; ?>";
+            $scope.buttonClicked = function() {
+                $scope.flag = true;
+                $scope.displayLoader = "showLoginLoader";
+                var email_js = document.getElementById('email').value;
+                var password_js = document.getElementById('password').value;
+                var email = "";
+                var password = "";
+                if(!angular.isDefined($scope.data.billing.email) || !angular.isDefined($scope.password)){
+                    email = email_js;
+                    password = password_js;
+                }else{                    
+                    email = $scope.data.billing.email;
+                    password = $scope.password;
+                }
+                $http({
+                    method: 'POST',
+                    url: '<?php echo $this->getUrl('supercheckout/index/login'); ?>',
+                    data:{'email':email,'password':password,'ajax':'login'}
+                }).
+                success(function(response_login, status, headers, config) {
+                    if(response_login==="success"){
+                        window.location = '<?php $this->getUrl('supercheckout/index/login'); ?>';
+                    }
+                    $scope.login_error = false;
+                    if(response_login==="wronglogin"){
+                        
+                        $scope.login_error = true;
+                        $scope.login_error_msg = '<?php echo $this->__('Email and Password Mismatch'); ?>';
+                    }
+                    if(response_login==="wrongemail"){
+                        
+                        $scope.login_error = true;
+                        $scope.login_error_msg = '<?php echo $this->__('Invalid Email'); ?>';
+                    }    
+                    $scope.flag = false;
+                    $scope.displayLoader = "hide";
+                }).
+                error(function(data, status, headers, config) {
+                    $scope.flag = false;
+                    $scope.displayLoader = "hide";
+                });
+            }
+            
+            <?php if (!Mage::getSingleton('customer/session')->isLoggedIn()){ ?>
+                var facebookEnable="<?php echo $settings['step']['facebook_login']['display']; ?>";
+                if('<?php echo ''; // echo $logged; ?>'=='' && facebookEnable==1){ 
+                    var button;
+                    var userInfo;
+                    window.fbAsyncInit = function() {
+                        FB.init({
+                            appId: '<?php echo $settings['step']['facebook_login']['app_id']; ?>', //change the appId to your appId
+                            status: true,
+                            cookie: true,
+                            xfbml: true,
+                            oauth: true
+                        });
+                        function updateButton(response) {
+                            button       =   document.getElementById('fb-auth');
+                            userInfo     =   document.getElementById('user-info');
+                            if (response.authResponse) {
+                                button.onclick = function() {
+                                    FB.logout(function(response) {
+                                        logout(response);
+                                        FB.login(function(response) {
+                                            if (response.authResponse) {
+                                                FB.api('/me', function(info) {
+                                                    login(response, info);
+                                                });
+                                            } else {
+                                            }
+                                        }, {
+                                            scope:'email,user_birthday,user_about_me'
+                                        });
+                                    });
+                                };
+                            } else {
+                                button.innerHTML = '';
+                                button.onclick = function() {
+                                    FB.login(function(response) {
+                                        if (response.authResponse) {
+                                            FB.api('/me', function(info) {
+                                                login(response, info);
+                                            });
+                                        } else {
+                                        }
+                                    }, {
+                                        scope:'email,user_birthday,user_about_me'
+                                    });
+                                }
+                            }
+                        }
+
+                        FB.getLoginStatus(updateButton);
+                        FB.Event.subscribe('auth.statusChange', updateButton);
+                    };
+                    (function() {
+                        var e = document.createElement('script');
+                        e.async = true;
+                        e.src = document.location.protocol
+                            + '//connect.facebook.net/en_US/all.js';
+                        document.getElementById('fb-root').appendChild(e);
+                    }());
+                    function login(response, info){
+                        if (response.authResponse) {
+                                fqlQuery();
+                        }
+                    }
+                    function logout(response){
+                    }
+                    function fqlQuery(){
+                        $scope.displayLoader = "showLoginLoader";
+                        FB.api('/me', function(response) {
+                            var query       =  FB.Data.query('select name,first_name,last_name,email, profile_url, sex, pic_small,contact_email from user where uid={0}', response.id);
+//                            query.wait(function(rows) {
+
+                                $http({
+                                    method: 'GET',
+                                    url: '<?php echo $this->getUrl('supercheckout/index/checkuser'); ?>'+'email/'+response.email,
+                                    data:{'email':response.email}
+                                }).
+                                success(function(response2, status, headers, config) {
+                                    if(response2=="registered"){
+                                        $http({
+                                            method: 'GET',
+                                            url: '<?php echo $this->getUrl('supercheckout/index/dologin'); ?>'+'emailLogin/'+response.email
+                                        }).
+                                        success(function(response3, status, headers, config) {
+                                            $scope.displayLoader = "hide";
+                                            if(response3 == 'supercheckout'){
+                                                window.location='<?php echo $this->getUrl('supercheckout/index'); ?>'
+                                            }else{
+                                            }
+                                        })
+
+                                    }else{
+                                        $http({
+                                                method: 'GET',
+                                                url: '<?php echo $this->getUrl('supercheckout/index/getvalue'); ?>'+'firstname/'+response.first_name+'/last_name/'+response.last_name+'/useremail/'+response.email
+                                            }).
+                                            success(function(response4, status, headers, config) {
+                                                $scope.displayLoader = "hide";
+                                                if(response4 == 'supercheckout'){
+                                                    window.location='<?php echo $this->getUrl('supercheckout/index'); ?>'
+                                                }else{
+                                                }
+
+                                            })                                
+                                        }    
+                                })
+//                            });
+                        });
+                    }
+
+                }
+                <?php } ?>
+    
+    <?php foreach ($payment_method_details as $paymthd){ ?>
+            $scope.payment_form_<?php echo $paymthd['code']; ?> = 'hide';
+    <?php } ?>
+    $scope.data = {};
+    $scope.data = {"billing":<?php echo json_encode($billing_address_session); ?>};
+    
+    
+    $scope.getregion = function(){
+        $http({
+            method:'GET',
+            url:'<?php echo $this->getUrl('supercheckout/index/getDefaultZone'); ?>'+'country_id/'+$scope.monitorRegion
+        }).success(function(response, status, headers, config){
+            var myEl = angular.element( document.querySelector( '#paymentaddressRegions' ) );
+            myEl.html(response);
+        })
+    };
+    $scope.data = {billing:{use_for_shipping:true}}; 
+    $scope.show_shipping_address = true;
+    $scope.showShippingAddress = function(){
+        $scope.show_shipping_address = $scope.show_shipping_address === true ? false : true;
+        $scope.data.billing.use_for_shipping = $scope.data.billing.use_for_shipping === true ? true : false;
+        $scope.refresh_supercheckout();
+    };
+    $scope.shipping_method = <?php echo json_encode($shipping_method_details); ?>;
+    <?php if(empty($shipping_method_details) && $settings['step']['shipping_method']['display_options']){ ?>
+        $scope.shipping_method_error = true;
+        $scope.shipping_method_error_msg = '<?php echo $this->__('No Shipping Method Available. Please Choose a diffrent Shipping Address'); ?>';
+    <?php } ?>
+    
+    
+    $scope.shipping_method_click = function(event){
+        $scope.disable_placeorder = true;
+        var shipping_code = event.target.value;
+        $scope.selected_temp_value = shipping_code;
+        $scope.displayLoader = "showShippingMethodLoader";
+        
+        //hiding shipping method error
+        
+        $scope.shipping_method_error = null;
+        
+        $http({
+            method:'GET',
+            url:'<?php echo $this->getUrl('supercheckout/index/shippingMethodClick')?>'+'shipping_method/'+shipping_code 
+        }).
+            success(function(response, status, headers, config) {                
+//                $scope.shipping_method = response;
+                    $scope.displayLoader = "showCartLoader";
+                        $http({
+                            method:'GET',
+                            url:'<?php echo $this->getUrl('supercheckout/index/cartRefresh')?>'
+                        }).
+                            success(function(response2, status, headers, config) {
+                                $scope.disable_placeorder = false;
+                                if($scope.save_order_click===true){
+                                    $scope.save_order();
+                                }
+                                $scope.items = response2;
+                                $scope.displayLoader = "hide";
+
+
+                        }) 
+
+        })  
+    };
+    $scope.payment_methods = <?php echo json_encode($payment_method_details); ?>;
+    
+    
+    //*******////////////////////////////////////// for setting payment method on page load /////////////////////////////////////
+    var payment_methods = $scope.payment_methods;
+    $scope.payment_method_block = '<?php echo $settings['step']['payment_method']['display_options']; ?>';
+    //$scope.payment_form_show = '<?php echo  $settings['step']['payment_method']['default_option']; ?>';
+    
+    var incr_check = 0;
+    for(incr_check=0; incr_check < payment_methods.length; incr_check++){
+        if(payment_methods[incr_check].code == $scope.selected_temp_value_payment){
+            break;
+        }
+    }
+    if(incr_check == payment_methods.length){
+        var incr_check_re = 0;
+        for(incr_check_re=0; incr_check_re < payment_methods.length; incr_check_re++){
+            if(payment_methods[incr_check_re].code == '<?php echo  $settings['step']['payment_method']['default_option']; ?>'){
+                break;
+            }
+        }
+        if(incr_check_re == payment_methods.length){
+            $scope.selected_temp_value_payment = payment_methods[0].code;
+            $scope.payment_form_show = payment_methods[0].code;
+        }else{
+            $scope.selected_temp_value_payment = '<?php echo  $settings['step']['payment_method']['default_option']; ?>';
+            $scope.payment_form_show = '<?php echo  $settings['step']['payment_method']['default_option']; ?>';
+        }
+
+    }else{
+        $scope.payment_form_show = $scope.selected_temp_value_payment;
+    }
+    
+    //////////////////////////////////////// for setting payment method on page load /////////////////////////////////////*********/
+    
+    
+    <?php if(empty($payment_method_details) && $settings['step']['payment_method']['display_options']){ ?>
+        $scope.payment_method_error = true;
+        $scope.payment_method_error_msg = '<?php echo $this->__('No Payment Method Available. Please Choose a diffrent Billing Address'); ?>';
+        $scope.payment_form_show = 'Sorry Man!';
+    <?php } ?>
+    $scope.payment_method_click = function(event){
+        $scope.disable_placeorder = true;
+        var payment_code = event.target.value;
+        $scope.selected_temp_value_payment = payment_code;
+        $scope.displayLoader = "showPaymentMethodLoader";
+        
+        $scope.payment_form_show = payment_code;
+        
+        
+        //hiding payment method errors
+        $scope.payment_method_error = null;
+        
+        //$scope.paymentmethod_selected = payment_code;
+        
+        
+        $http({
+            method:'GET',
+            url:'<?php echo $this->getUrl('supercheckout/index/paymentMethodClick')?>'+'payment_method/'+payment_code
+        }).
+            success(function(response, status, headers, config) {
+                    $scope.displayLoader = "showCartLoader";
+                        $http({
+                            method:'GET',
+                            url:'<?php echo $this->getUrl('supercheckout/index/cartRefresh')?>'
+                        }).
+                            success(function(response2, status, headers, config) {
+                                $scope.disable_placeorder = false;
+                                if($scope.save_order_click===true){
+                                    $scope.save_order();
+                                }
+                                $scope.items = response2;
+                                $scope.displayLoader = "hide";
+                        }) 
+
+        })  
+    };
+    $scope.items = <?php echo json_encode($cart); ?>;
+    $scope.updateQuantity = function(event){
+        var item_id = event.target.id;
+        var qtyBoxID = '#qty'+item_id ;
+        var qty  = angular.element( document.querySelector( qtyBoxID  ) ).val();
+        $scope.displayLoader = "showCartLoader";
+        $scope.disable_placeorder = true;
+        $http({
+            method:'GET',
+            url:'<?php echo $this->getUrl('supercheckout/index/updatecart')?>'+'item_id/'+item_id +'/qty/'+ qty
+        }).
+            success(function(response, status, headers, config) {
+                if(response.redirect){
+                    window.location = '<?php echo $this->getUrl('checkout/cart')?>';
+                }
+                $scope.disable_placeorder = false;                
+                $scope.alerts.push({type:'success', msg: "<?php echo $this->__('Success: You have successfully modified your cart!');?>"});
+                $scope.items = response;
+                $scope.all_virtual = response.show_shipping;            // Code Added by Raghubendra Singh on 06-Jan-2015 to change value of scope variable to display or hide shipping blocks
+                <?php  // SAURABH BOC DATE: April,03 2015 to hide shipping methods if hidden by admin control regardless type of product in cart. ?>
+    //$scope.show_shipping_method_block = '<?php //echo $settings['step']['shipping_method']['display_options']; ?>';
+   if($scope.all_virtual==0){
+    $scope.show_shipping_method_block = '0';
+    }
+    else{
+    $scope.show_shipping_method_block = '<?php echo $settings['step']['shipping_method']['display_options']; ?>';
+    }
+<?php  // SAURABH EOC DATE: April,03 2015 to hide shipping methods if hidden by admin control regardless type of product in cart. ?>
+		$scope.displayLoader = "hide";
+                $scope.refreshAll();
+                
+
+        })     
+        
+    }
+    $scope.removeProduct = function(event){
+        var item_id = event.target.id;
+        
+        $scope.displayLoader = "showCartLoader";
+        $scope.disable_placeorder = true;
+        $http({
+            method:'GET',
+            url:'<?php echo $this->getUrl('supercheckout/index/deleteitem')?>'+'item_id/'+item_id 
+        }).
+            success(function(response, status, headers, config) {
+                $scope.alerts.push({type:'success', msg: "<?php echo $this->__('Success: You have successfully modified your cart!'); ?>"});
+                if(response.redirect){
+                    window.location = '<?php echo $this->getUrl('checkout/cart')?>';
+                }
+                $scope.disable_placeorder = false;
+                if($scope.save_order_click===true){
+                        $scope.save_order();
+                }
+                $scope.items = response;
+                $scope.all_virtual = response.show_shipping;            // Code Added by Raghubendra Singh on 06-Jan-2015 to change value of scope variable to display or hide shipping blocks
+		<?php  // SAURABH BOC DATE: April,03 2015 to hide shipping methods if hidden by admin control regardless type of product in cart. ?>
+    //$scope.show_shipping_method_block = '<?php //echo $settings['step']['shipping_method']['display_options']; ?>';
+   if($scope.all_virtual==0){
+    $scope.show_shipping_method_block = '0';
+    }
+    else{
+    $scope.show_shipping_method_block = '<?php echo $settings['step']['shipping_method']['display_options']; ?>';
+    }
+<?php  // SAURABH EOC DATE: April,03 2015 to hide shipping methods if hidden by admin control regardless type of product in cart. ?>                
+		$scope.displayLoader = "hide";
+   <?php  // SAURABH BOC DATE: 9APRIL2015 to refesh cart after delete. ?>   
+    $scope.refreshAll();
+<?php  // SAURABH EOC DATE: 9APRIL2015 DATE: 9APRIL2015 to refesh cart after delete. ?>   
+        })  
+    }
+    
+    $scope.callCoupon = function(event){
+        $scope.displayLoader = "showCartLoader";
+        var coupon_code  = angular.element( document.querySelector( '#coupon_code'  ) ).val();
+        $scope.disable_placeorder = true;
+        $http({
+            method:'GET',
+            url:'<?php echo $this->getUrl('supercheckout/index/addcoupon')?>'+'coupon_code/'+coupon_code 
+        }).
+            success(function(response, status, headers, config) {
+                if(typeof response.success !== "undefined"){
+                    $scope.alerts.push({type:'success', msg: response.success});
+                    $http({
+                            method:'GET',
+                            url:'<?php echo $this->getUrl('supercheckout/index/cartRefresh')?>'
+                        }).
+                            success(function(response2, status, headers, config) {
+                                
+                                $scope.items = response2;
+                                $scope.all_virtual = response2.show_shipping;            // Code Added by Raghubendra Singh on 06-Jan-2015 to change value of scope variable to display or hide shipping blocks
+                                <?php  // SAURABH BOC DATE: April,03 2015 to hide shipping methods if hidden by admin control regardless type of product in cart. ?>
+    //$scope.show_shipping_method_block = '<?php //echo $settings['step']['shipping_method']['display_options']; ?>';
+   if($scope.all_virtual==0){
+    $scope.show_shipping_method_block = '0';
+    }
+    else{
+    $scope.show_shipping_method_block = '<?php echo $settings['step']['shipping_method']['display_options']; ?>';
+    }
+<?php  // SAURABH EOC DATE: April,03 2015 to hide shipping methods if hidden by admin control regardless type of product in cart. ?>
+				$scope.displayLoader = "hide";
+                                $scope.refreshAll();
+
+                        }); 
+                }else{
+                    $scope.alerts.push({type:'success', msg: response.error});
+                    $http({
+                            method:'GET',
+                            url:'<?php echo $this->getUrl('supercheckout/index/cartRefresh')?>'
+                        }).
+                            success(function(response2, status, headers, config) {
+                                
+                                $scope.items = response2;
+                                $scope.all_virtual = response2.show_shipping;            // Code Added by Raghubendra Singh on 06-Jan-2015 to change value of scope variable to display or hide shipping blocks
+				<?php  // SAURABH BOC DATE: April,03 2015 to hide shipping methods if hidden by admin control regardless type of product in cart. ?>
+    //$scope.show_shipping_method_block = '<?php //echo $settings['step']['shipping_method']['display_options']; ?>';
+   if($scope.all_virtual==0){
+    $scope.show_shipping_method_block = '0';
+    }
+    else{
+    $scope.show_shipping_method_block = '<?php echo $settings['step']['shipping_method']['display_options']; ?>';
+    }
+<?php  // SAURABH EOC DATE: April,03 2015 to hide shipping methods if hidden by admin control regardless type of product in cart. ?>                                
+				$scope.displayLoader = "hide";
+                                $scope.refreshAll();
+
+
+                        }); 
+                }
+
+
+        })  
+    }
+    
+    $scope.removeCoupon = function(event){
+        
+        
+        $scope.displayLoader = "showCartLoader";
+        $scope.disable_placeorder = true;
+        $http({
+            method:'GET',
+            url:'<?php echo $this->getUrl('supercheckout/index/removecoupon')?>'
+        }).
+            success(function(response, status, headers, config) {
+                $scope.alerts.push({type:'success', msg: "<?php echo $this->__('Success:Your coupon has been removed successfully!'); ?>"});
+                    $scope.disable_placeorder = false;
+                    if($scope.save_order_click===true){
+                        $scope.save_order();
+                    }
+                    $scope.items = response;
+                    $scope.all_virtual = response.show_shipping;            // Code Added by Raghubendra Singh on 06-Jan-2015 to change value of scope variable to display or hide shipping blocks
+                    <?php  // SAURABH BOC DATE: April,03 2015 to hide shipping methods if hidden by admin control regardless type of product in cart. ?>
+    //$scope.show_shipping_method_block = '<?php //echo $settings['step']['shipping_method']['display_options']; ?>';
+   if($scope.all_virtual==0){
+    $scope.show_shipping_method_block = '0';
+    }
+    else{
+    $scope.show_shipping_method_block = '<?php echo $settings['step']['shipping_method']['display_options']; ?>';
+    }
+<?php  // SAURABH EOC DATE: April,03 2015 to hide shipping methods if hidden by admin control regardless type of product in cart. ?>
+		    $scope.displayLoader = "hide";
+        })  
+    };
+    $scope.hidePlaceOrderLoader = 'hidePlaceOrderLoader';
+    $scope.payment_address_selected = <?php if(isset($default_bill_address_id) && $default_bill_address_id != ""){ echo $default_bill_address_id;} else{echo "''";} ?>;
+    $scope.shipping_address_selected = <?php if(isset($default_bill_address_id) && $default_bill_address_id != ""){  echo $default_ship_address_id;} else{echo "''";} ?>;
+    $scope.payment_address_select_option = <?php echo json_encode($payment_address_select_option); ?>;
+    $scope.payment_address_validation = [];
+    $scope.save_order = function(){
+		if(document.getElementById('mmsg').value=='')
+		{
+			document.getElementById('msg_error').style.display='block';
+			return false;
+		
+		}
+		else
+		{
+			document.getElementById('msg_error').style.display='none';
+		}
+		
+        if($scope.disable_placeorder === true){
+            $scope.save_order_click = true;
+            $scope.displayLoaderPlaceOrder = 'showPlaceOrderLoader';
+        }else{
+        $scope.disable_placeorder = true;
+        $scope.displayLoaderPlaceOrder = 'showPlaceOrderLoader';
+        $http({
+            method:'POST',
+            url:'<?php echo $this->getUrl('supercheckout/index/saveOrder')?>',
+            data:$scope.data
+        }).
+            success(function(response, status, headers, config) {
+            $scope.disable_placeorder = false;
+            $scope.save_order_click = false;
+                if(response.error == true){
+                    if(typeof response.message !== "undefined"){
+                        $scope.displayLoaderPlaceOrder = 'hidePlaceOrderLoader';
+                        $scope.payment_address_validation = [response.message];
+                        $scope.login_error = false;
+                        $scope.billing_firstname_error = false;
+                    }else{
+                        response.message = {};
+                        if(typeof response.error_messages !== "undefined"){
+                            $scope.alerts.push({type:'success', msg: response.error_messages});
+                        }
+                    }
+                    if(typeof response.message.billing !== "undefined"){
+                        scroll('supercheckoutBillingBlock');
+                        
+                        if(response.message.billing.firstname != ""){
+                            $scope.billing_firstname_error = true;
+                            $scope.billing_firstname_error_msg = response.message.billing.firstname;
+                        }else{
+                            $scope.billing_firstname_error = false;
+                        }
+                        if(response.message.billing.lastname != ""){
+                            $scope.billing_lastname_error = true;
+                            $scope.billing_lastname_error_msg = response.message.billing.lastname;
+                        }else{
+                            $scope.billing_lastname_error = false;
+                        }                        
+                        if(response.message.billing.company != ""){
+                            $scope.billing_company_error = true;
+                            $scope.billing_company_error_msg = response.message.billing.company;
+                        }else{
+                            $scope.billing_company_error = false;
+                        }
+                        if(response.message.billing.state != ""){
+                            $scope.billing_state_error = true;
+                            $scope.billing_state_error_msg = response.message.billing.state;
+                        }else{
+                            $scope.billing_state_error = false;
+                        }
+                        if(response.message.billing.address_1 != ""){
+                            $scope.billing_address_1_error = true;
+                            $scope.billing_address_1_error_msg = response.message.billing.address_1;
+                        }else{
+                            $scope.billing_address_1_error = false;
+                        }
+                        if(response.message.billing.address_2 != ""){
+                            $scope.billing_address_2_error = true;
+                            $scope.billing_address_2_error_msg = response.message.billing.address_2;
+                        }else{
+                            $scope.billing_address_2_error = false;
+                        }
+                        if(response.message.billing.city != ""){
+                            $scope.billing_city_error = true;
+                            $scope.billing_city_error_msg = response.message.billing.city;
+                        }else{
+                            $scope.billing_city_error = false;
+                        }
+                        if(response.message.billing.zip != ""){
+                            $scope.billing_zip_error = true;
+                            $scope.billing_zip_error_msg = response.message.billing.zip;
+                        }else{
+                            $scope.billing_zip_error = false;
+                        }
+                        if(response.message.billing.phone != ""){
+                            $scope.billing_phone_error = true;
+                            $scope.billing_phone_error_msg = response.message.billing.phone;
+                        }else{
+                            $scope.billing_phone_error = false;
+                        }
+                        if(response.message.billing.fax != ""){
+                            $scope.billing_fax_error = true;
+                            $scope.billing_fax_error_msg = response.message.billing.fax;
+                        }else{
+                            $scope.billing_fax_error = false;
+                        }
+                        if(response.message.billing.country != ""){
+                            $scope.billing_country_error = true;
+                            $scope.billing_country_error_msg = response.message.billing.country;
+                        }else{
+                            $scope.billing_country_error = false;
+                        }
+                    }else{
+                        $scope.billing_firstname_error = false;
+                        $scope.billing_lastname_error = false;
+                        $scope.billing_company_error = false;
+                        $scope.billing_state_error = false;
+                        $scope.billing_address_1_error = false;
+                        $scope.billing_address_2_error = false;
+                        $scope.billing_city_error = false;
+                        $scope.billing_zip_error = false;
+                        $scope.billing_phone_error = false;
+                        $scope.billing_fax_error = false;
+                        $scope.billing_country_error = false;
+                    }
+                    if(typeof response.message.shipping !== "undefined"){
+                        scroll('supercheckoutShippingAddressBlock');
+                        if(response.message.shipping.firstname != ""){
+                            $scope.shipping_firstname_error = true;
+                            $scope.shipping_firstname_error_msg = response.message.shipping.firstname;
+                        }else{
+                            $scope.shipping_firstname_error = false;
+                        }
+                        if(response.message.shipping.lastname != ""){
+                            $scope.shipping_lastname_error = true;
+                            $scope.shipping_lastname_error_msg = response.message.shipping.lastname;
+                        }else{
+                            $scope.shipping_lastname_error = false;
+                        }
+                        if(response.message.shipping.company != ""){
+                            $scope.shipping_company_error = true;
+                            $scope.shipping_company_error_msg = response.message.shipping.company;
+                        }else{
+                            $scope.shipping_company_error = false;
+                        }
+                        if(response.message.shipping.state != ""){
+                            $scope.shipping_state_error = true;
+                            $scope.shipping_state_error_msg = response.message.shipping.state;
+                        }else{
+                            $scope.shipping_state_error = false;
+                        }
+                        if(response.message.shipping.address_1 != ""){
+                            $scope.shipping_address_1_error = true;
+                            $scope.shipping_address_1_error_msg = response.message.shipping.address_1;
+                        }else{
+                            $scope.shipping_address_1_error = false;
+                        }
+                        if(response.message.shipping.address_2 != ""){
+                            $scope.shipping_address_2_error = true;
+                            $scope.shipping_address_2_error_msg = response.message.shipping.address_2;
+                        }else{
+                            $scope.shipping_address_2_error = false;
+                        }
+                        if(response.message.shipping.city != ""){
+                            $scope.shipping_city_error = true;
+                            $scope.shipping_city_error_msg = response.message.shipping.city;
+                        }else{
+                            $scope.shipping_city_error = false;
+                        }
+                        if(response.message.shipping.zip != ""){
+                            $scope.shipping_zip_error = true;
+                            $scope.shipping_zip_error_msg = response.message.shipping.zip;
+                        }else{
+                            $scope.shipping_zip_error = false;
+                        }
+                        if(response.message.shipping.phone != ""){
+                            $scope.shipping_phone_error = true;
+                            $scope.shipping_phone_error_msg = response.message.shipping.phone;
+                        }else{
+                            $scope.shipping_phone_error = false;
+                        }
+                        if(response.message.shipping.fax != ""){
+                            $scope.shipping_fax_error = true;
+                            $scope.shipping_fax_error_msg = response.message.shipping.fax;
+                        }else{
+                            $scope.shipping_fax_error = false;
+                        }
+                        if(response.message.shipping.country != ""){
+                            $scope.shipping_country_error = true;
+                            $scope.shipping_country_error_msg = response.message.shipping.country;
+                        }else{
+                            $scope.shipping_country_error = false;
+                        }
+                    }else{
+                        $scope.shipping_firstname_error = false;
+                        $scope.shipping_lastname_error = false;
+                        $scope.shipping_company_error = false;
+                        $scope.shipping_state_error = false;
+                        $scope.shipping_address_1_error = false;
+                        $scope.shipping_address_2_error = false;
+                        $scope.shipping_city_error = false;
+                        $scope.shipping_zip_error = false;
+                        $scope.shipping_phone_error = false;
+                        $scope.shipping_fax_error = false;
+                        $scope.shipping_country_error = false;
+                    }
+                    
+                    if(typeof response.message.payment_method_error !== "undefined"){
+                        $scope.payment_method_error = true;
+                        $scope.payment_method_error_msg = response.message.payment_method_error;
+                        scroll('supercheckoutPaymentBlock');
+                    }
+                    if(typeof response.message.agree_to_terms !== "undefined"){
+                        $scope.agree_to_terms_error = true;
+                        $scope.agree_to_terms_error_msg = response.message.agree_to_terms;
+                        scroll('supercheckoutConfirmBlock');                        
+                    }
+                    else{
+                        $scope.agree_to_terms_error = null;
+                    }
+                    if(typeof response.message.shipping_method_required_error !== "undefined"){
+                        $scope.shipping_method_error = true;
+                        $scope.shipping_method_error_msg = response.message.shipping_method_required_error;
+                        scroll('shippingMethodBlock');
+                    }
+                    else if(typeof response.message.invalid_shipmethod !== 'undefined'){
+                        $scope.shipping_method_error = true;
+                        $scope.shipping_method_error_msg = response.message.invalid_shipmethod
+                        scroll('shippingMethodBlock');
+                    }
+                    else{
+                        $scope.shipping_method_error = null;
+                    }
+                    if(typeof response.message.invalid_email !== "undefined"){
+                        $scope.login_error = true;
+                        $scope.login_error_msg = response.message.invalid_email;
+                        scroll('supercheckoutLoginBlock');
+                    }else if(typeof response.message.match_password !== "undefined"){
+                        $scope.login_error = true;
+                        $scope.login_error_msg = response.message.match_password;
+                        scroll('supercheckoutLoginBlock');
+                    }else if(typeof response.message.password_length !== "undefined"){
+                        $scope.login_error = true;
+                        $scope.login_error_msg = response.message.password_length;
+                        scroll('supercheckoutLoginBlock');
+                    }else if(typeof response.message.empty_password !== "undefined"){
+                        $scope.login_error = true;
+                        $scope.login_error_msg = response.message.empty_password;
+                        scroll('supercheckoutLoginBlock');
+                    }else if(typeof response.message.dob_required !== "undefined"){ //Start Code Added By Raghubendra Singh On 05-Jan-2015 to add validations for new fields added for guest and new user
+                        $scope.login_error = true;
+                        $scope.login_error_msg = response.message.dob_required;
+                        scroll('supercheckoutLoginBlock');
+                    }else if(typeof response.message.tax_required !== "undefined"){
+                        $scope.login_error = true;
+                        $scope.login_error_msg = response.message.tax_required;
+                        scroll('supercheckoutLoginBlock');
+                    }else if(typeof response.message.gender_required !== "undefined"){
+                        $scope.login_error = true;
+                        $scope.login_error_msg = response.message.gender_required;
+                        scroll('supercheckoutLoginBlock');
+                    }
+                    else if(typeof response.message.customer_login_first !== "undefined"){
+                        $scope.login_error = true;
+                        $scope.login_error_msg = response.message.customer_login_first;
+                        scroll('supercheckoutLoginBlock');
+                    }                           //End Code Added By Raghubendra Singh On 05-Jan-2015 to add validations for new fields added for guest and new user
+                    else if(typeof response.message.invalid_guest_checkout !== "undefined"){
+                        $scope.login_error = true;
+                        $scope.login_error_msg = response.message.invalid_guest_checkout;
+                        scroll('supercheckoutLoginBlock');
+                    }
+                    else if(typeof response.message.already_registered !== "undefined"){
+                        $scope.login_error = true;
+                        $scope.login_error_msg = response.message.already_registered;
+                        scroll('supercheckoutLoginBlock');
+                    }else{
+                        $scope.login_error = false;
+                    }
+                    $scope.hidePlaceOrderLoader = 'hidePlaceOrderLoader';
+                }
+                if(response.error === false){
+                    $scope.hidePlaceOrderLoader = 'hidePlaceOrderLoader';
+                    if(response.success === true){
+                        if(response.order_created = true){
+                            location.href = '<?php echo $this->getUrl('supercheckout/index/success')?>';
+                        }
+                    }
+                }
+                if(response.redirect){
+                    location.href = (response.redirect);
+                }
+        });
+      }
+    }
+    $scope.check_secure_url= function(url) {
+	if(url != '')
+	{
+	    if (http_type == 'https') {
+	        var u1 = url.substr(0, 5);
+	        if (u1 != 'https') {
+	            if (u1 == 'http:') url = 'https:' + url.substr(5);
+	            else url = 'https://' + url;
+	        }
+	    }
+	}
+    return url;
+    };
+    $scope.no_region_payment = true;
+    $scope.payment_countries = <?php echo json_encode($countries_details); ?>;
+    $scope.payment_regions = <?php if(!empty($default_regions)){ echo json_encode($default_regions); }else{echo '{}';}; ?>;
+    <?php if(!empty($default_regions)){ ?>
+        $scope.no_region_payment=false;
+    <?php } ?>
+    $scope.payment_country_selected = function(event){
+        var country_id = event;
+        $scope.disable_placeorder = true;
+        $http({
+            method:'GET',
+            url:'<?php echo $this->getUrl('supercheckout/index/getRegions')?>'+'country_id/'+country_id,            
+        }).
+            success(function(response, status, headers, config) {
+                
+                if(response == ""){
+                    $scope.no_region_payment = true;
+                }else{
+                    $scope.payment_regions = response;
+                    $scope.no_region_payment = false;
+                }
+                $http({
+                    method:'POST',
+                    url:'<?php echo $this->getUrl('supercheckout/index/updateSupercheckout')?>',            
+                    data:$scope.data
+                }).success(function(){
+                    $scope.disable_placeorder = false;
+                    $scope.refreshAll();
+                })
+        }) 
+    };
+    $scope.no_region_shipping = true;
+    $scope.shipping_countries = <?php echo json_encode($countries_details); ?>;
+    $scope.shipping_regions = <?php if(!empty($default_regions)){ echo json_encode($default_regions); }else{echo '{}';}; ?>;
+    <?php if(!empty($default_regions)){ ?>
+
+        $scope.no_region_shipping=false;
+    <?php } ?>
+    $scope.shipping_country_selected = function(event){
+        $scope.disable_placeorder = true;
+        var country_id = event;
+        $http({
+            method:'GET',
+            url:'<?php echo $this->getUrl('supercheckout/index/getRegions')?>'+'country_id/'+country_id,            
+        }).
+            success(function(response, status, headers, config) {
+                
+                if(response == ""){
+                    $scope.no_region_shipping = true;
+                }else{
+                    $scope.shipping_regions = response;
+                    $scope.no_region_shipping = false;
+                }
+                $http({
+                    method:'POST',
+                    url:'<?php echo $this->getUrl('supercheckout/index/updateSupercheckout')?>',            
+                    data:$scope.data
+                }).success(function(){
+                    $scope.disable_placeorder = false;
+                    $scope.refreshAll();
+                })
+        }) 
+    }
+    $scope.Isempty = function(obj){
+          return obj && obj !== "null" && obj!== "undefined";
+    }
+    $scope.shippingAddressRadio = 'existing';
+    var canceler = {};
+    $scope.cancelPost = function() {
+      canceler.resolve(); 
+    }
+    $scope.refreshAll = function(){
+        $scope.payment_method_error = null;
+        $scope.shipping_method_error = null;
+        <?php if($settings['general']['layout']=='3-Column'){ ?>
+    var column1_height = document.getElementById('columnleft-1').offsetHeight;
+    var column3_height = document.getElementById('columnleft-3').offsetHeight;
+    if(column3_height > column1_height){
+        document.getElementById('columnleft-1').style.minHeight = column3_height + 'px';
+    }else if(column1_height > column3_height){
+        document.getElementById('columnleft-3').style.minHeight = column1_height + 'px';
+    }
+    
+    <?php }elseif($settings['general']['layout']=='2-Column'){ ?>
+    var column_1_inside_height = document.getElementById('column-1-inside').offsetHeight;
+    var column_2_inside_height = document.getElementById('column-2-inside').offsetHeight;
+     if(column_1_inside_height > column_2_inside_height){
+        document.getElementById('column-2-inside').style.minHeight = column_1_inside_height + 'px';
+    }else if(column_1_inside_height < column_2_inside_height){
+        document.getElementById('column-1-inside').style.minHeight = column_2_inside_height + 'px';
+    }
+    <?php } ?>
+        $scope.displayLoader = 'showShippingMethodLoader';
+        $scope.disable_placeorder = true;
+        if(JSON.stringify(canceler) != "{}"){ canceler.resolve() };
+        canceler = $q.defer();
+        $http({            
+            method: 'GET',
+            url: '<?php echo $this->getUrl('supercheckout/index/getShippingMethod'); ?>'+'refresh/1',
+            timeout: canceler.promise
+        }).
+        success(function(shippingMethodResponse, status, headers, config) {
+            if(shippingMethodResponse == ""){                
+                $scope.shipping_method_error = 'show';
+                $scope.shipping_method_error_msg = '<?php echo $this->__('No Shipping Method Available. Please Choose a diffrent Shipping Address'); ?>';
+                
+            }else{
+                $scope.shipping_method_error = null;            
+                $scope.shipping_method = shippingMethodResponse;
+                var incr_check_ship = 0;
+                for(incr_check_ship=0; incr_check_ship < shippingMethodResponse.length; incr_check_ship++){
+                    if(shippingMethodResponse[incr_check_ship].value == $scope.selected_temp_value){
+                        break;
+                    }
+                }
+                if(incr_check_ship == shippingMethodResponse.length){
+                    var incr_check_ship_re = 0;
+                    for(incr_check_ship_re =0; incr_check_ship_re < shippingMethodResponse.length; incr_check_ship_re++){
+                        if(shippingMethodResponse[incr_check_ship_re].value == '<?php echo $selected_shipping_method; ?>'){
+                            break;
+                        }
+                    }
+                    if(incr_check_ship_re == shippingMethodResponse.length){
+                        //here will be code for making first element as selected shipping method
+                        $scope.selected_temp_value = shippingMethodResponse[0].value;
+                        
+                    }else{
+                        $scope.selected_temp_value = '<?php echo $selected_shipping_method; ?>';
+                    }
+                }else{
+                
+                }
+            }
+            $scope.displayLoader = 'showPaymentMethodLoader';
+            $http({                
+                method: 'GET',
+                url: '<?php echo $this->getUrl('supercheckout/index/getPaymentMethodsSupercheckout'); ?>'+'refresh/2',
+                timeout: canceler.promise
+            }).
+            success(function(paymentMethodResponse, status, headers, config) {
+                $scope.payment_methods = paymentMethodResponse;
+                if(JSON.stringify(paymentMethodResponse) == '[]'){
+                    $scope.payment_method_error = true;
+                    $scope.payment_method_error_msg = '<?php echo $this->__('No Payment Method Available. Please Choose a diffrent Billing Address'); ?>';
+                    $scope.payment_form_show = 'Sorry Man!';
+                }else{                
+                    var incr_check = 0;
+                    for(incr_check=0; incr_check < paymentMethodResponse.length; incr_check++){
+                        if(paymentMethodResponse[incr_check].code == $scope.selected_temp_value_payment){
+                            break;
+                        }
+                    }
+                    if(incr_check == paymentMethodResponse.length){
+                        var incr_check_re = 0;
+                        for(incr_check_re=0; incr_check_re < paymentMethodResponse.length; incr_check_re++){
+                            if(paymentMethodResponse[incr_check_re].code == '<?php echo  $settings['step']['payment_method']['default_option']; ?>'){
+                                break;
+                            }
+                        }
+                        if(incr_check_re == paymentMethodResponse.length){
+                            $scope.selected_temp_value_payment = paymentMethodResponse[0].code;
+                            $scope.payment_form_show = paymentMethodResponse[0].code;
+                        }else{
+                            $scope.selected_temp_value_payment = '<?php echo  $settings['step']['payment_method']['default_option']; ?>';
+                            $scope.payment_form_show = '<?php echo  $settings['step']['payment_method']['default_option']; ?>';
+                        }
+
+                    }else{
+                        $scope.payment_form_show = $scope.selected_temp_value_payment;
+                    }
+                }
+                $scope.displayLoader = 'showCartLoader';
+                $http({
+                    
+                    method: 'GET',
+                    url: '<?php echo $this->getUrl('supercheckout/index/getitemdetails'); ?>'+'refresh/3',
+                    timeout: canceler.promise
+                }).
+                success(function(cartResponse, status, headers, config) {
+                    $scope.disable_placeorder = false;                    
+                    $scope.items = cartResponse;
+                    $scope.displayLoader = '';
+                    $scope.closeAlert();                    
+                    if($scope.save_order_click===true){
+                        $scope.save_order();
+                    }
+                })
+            })
+        })
+    };
+    $scope.refresh_supercheckout_Billaddress = function(){
+    
+    var timer=false;
+    $scope.$watch('data.paymentAddressRadio', function(val){
+      if(timer){
+          $timeout.cancel(timer)
+      }  
+      timer= $timeout(function(){
+          $scope.disable_placeorder = true;
+          $http({
+                    method:'POST',
+                    url:'<?php echo $this->getUrl('supercheckout/index/updateSupercheckout')?>',            
+                    data:$scope.data
+                }).success(function(){
+                    $scope.disable_placeorder = false;
+                    $scope.refreshAll();
+                })
+       },300)
+    });
+        
+    };
+    $scope.refresh_supercheckout_Shipaddress = function(){
+    
+    var timer=false;
+    $scope.$watch('data.shippingAddressRadio', function(val){
+      if(timer){
+          $timeout.cancel(timer)
+      }  
+      timer= $timeout(function(){
+          $http({
+                    method:'POST',
+                    url:'<?php echo $this->getUrl('supercheckout/index/updateSupercheckout')?>',            
+                    data:$scope.data
+                }).success(function(){
+                    $scope.refreshAll();
+                })
+       },300)
+    });
+        
+    };
+    $scope.refresh_supercheckout = function(){
+    
+    $scope.disable_placeorder = true;
+          $http({
+                    method:'POST',
+                    url:'<?php echo $this->getUrl('supercheckout/index/updateSupercheckout')?>',            
+                    data:$scope.data
+                }).success(function(){
+                    $scope.disable_placeorder = false;
+                    $scope.refreshAll();
+                })        
+    };
+    $scope.alerts = [];
+
+    $scope.addAlert = function(event) {
+        $scope.alerts.push({type:'success', msg: "Another alert!"});
+    };
+    $scope.close = function(){
+        $scope.alerts=[];
+    }
+    $scope.closeAlert = function(index) {        
+        $scope.alerts=[];
+    };
+    
+});
+app.directive('compile', function($compile) {
+// directive factory creates a link function
+        return function(scope, element, attrs) {
+        scope.$watch(
+        function(scope) {
+        // watch the 'compile' expression for changes
+        return scope.$eval(attrs.compile);
+        },
+        function(value) {
+        // when the 'compile' expression changes
+        // assign it into the current DOM
+        element.html(value);
+
+        // compile the new DOM and link it to the current
+        // scope.
+        // NOTE: we only compile .childNodes so that
+        // we don't get into infinite loop compiling ourselves
+        $compile(element.contents())(scope);
+        }
+        );
+        };
+        
+        
+})
+ app.directive('scrollPosition', function($window) {
+  return {
+    scope: {
+      scroll: '=scrollPosition'
+    },
+    link: function(scope, element, attrs) {
+      var windowEl = document.getElementById('supercheckout-fieldset');
+      var handler = function() {
+        scope.scroll = windowEl.scrollTop;
+      }
+      windowEl.on('scroll', scope.$apply.bind(scope, handler));
+      handler();
+    }
+  };
+});
+
+/*
+* 
+* Code Added By Raghubendra Singh on 18-Feb-2015 to add the controller for handling Terms and Conditions collapse box.
+* 
+*/
+angular.module('supercheckout').controller('TemrsConditionsCollapse', function ($scope) {
+  $scope.isCollapsed = true;
+});
+
+</script>               
+<fieldset ng-controller="supercheckoutMainController" data-ng-app="supercheckout" class="group-select" id="supercheckout-fieldset">
+    
+    <ng-form ng-submit="save_order()" ng-cloak id="sc_form" action="javascript:void(0)" method="POST" >
+        <alert  ng-repeat="alert in alerts" style="top:50px;" class="alert-success" close="closeAlert($index)">{{alert.msg}}</alert>
+
+
+            <?php if(isset($settings['step']['html_value']['value']['header']) && $settings['step']['html_value']['value']['header']!=""){ ?>
+                <div id="supercheckout_html_content_header">        
+                    <?php echo  html_entity_decode( $settings['step']['html_value']['value']['header']); ?>
+                </div>
+            <?php } ?>
+        <div sortblock class="supercheckout-threecolumns supercheckout-container supercheckout-skin-generic " id="supercheckout-columnleft">
+            
+            <div  class="supercheckout-column-left columnleftsort" id="columnleft-1" style="width:<?php $i= $settings['general']['column_width'][$layout_name][1]*$multiplier; echo $i; ?>%"> 
+                <?php echo $this->getChildHtml(); ?>
+                <?php foreach($sort_block['html'] as $key => $sort_html ){  ?>
+                    <div  class="supercheckout-blocks" data-column="<?php echo $sort_html[$layout_name]['column']; ?>" data-row="<?php echo $sort_html[$layout_name]['row']; ?>" data-column-inside="<?php echo $sort_html[$layout_name]['column-inside']; ?>">
+                        <?php if(isset($sort_block['html_value']['value'][$key])){ echo html_entity_decode($sort_block['html_value']['value'][$key] ); } ?>
+                    </div>
+                <?php } ?>
+            </div>
+            <div class="supercheckout-column-middle columnleftsort" id="columnleft-2"  style="width:<?php $i= $settings['general']['column_width'][$layout_name][2]*$multiplier; echo $i; ?>%;margin-right:0px;">
+                <div class="supercheckout-column-left columnleftsort" id="column-2-upper" style="width:97%;height:auto;"> 
+                    
+                </div>
+                <div class="supercheckout-column-left columnleftsort" id="column-1-inside" style="width:<?php $i= $settings['general']['column_width'][$layout_name]['inside'][1]*.914; echo $i; ?>%"> 
+                </div>
+                <div class="supercheckout-column-left columnleftsort" id="column-2-inside"  style="width:<?php $i= $settings['general']['column_width'][$layout_name]['inside'][2]*.914; echo $i; ?>%">
+
+                </div>
+                <div class="supercheckout-column-left columnleftsort" id="column-2-lower"  style="width:97%;height:auto;">
+
+                </div>
+            </div>
+            <?php if($layout_name == 'three-column'){ ?>
+            <div class="supercheckout-column-right columnleftsort" id="columnleft-3" style="width:<?php $i= $settings['general']['column_width'][$layout_name][3]*$multiplier; echo $i; ?>%">
+            </div> 
+            <?php } ?>
+            
+        </div>
+        <?php if(isset($settings['step']['html_value']['value']['footer']) && $settings['step']['html_value']['value']['footer']!=""){ ?>
+                <div id="supercheckout_html_content_header">        
+                    <?php echo  html_entity_decode( $settings['step']['html_value']['value']['footer']); ?>
+                </div>
+        <?php } ?>
+    </ng-form>
+</fieldset>
+
+<script type="text/javascript" >
+    
+if ( document.addEventListener && window.addEventListener ){
+document.addEventListener('DOMContentLoaded', function() {
+    <?php if($settings['general']['layout']=='3-Column'){ ?>
+            var column1 = document.getElementById('columnleft-1');
+            var column2 = document.getElementById('columnleft-2');
+            var column3 = document.getElementById('columnleft-3');
+            var look = document.getElementsByClassName('supercheckout-blocks');
+            var column1RowSort = [];
+            var column2RowSort = [];
+            var column3RowSort = [];
+            for(var i=0;i<look.length;i++){
+                var colData = look[i].getAttribute('data-column');
+                var rowData = look[i].getAttribute('data-row');
+                if(colData == 1){
+                    column1RowSort.push([ 1 * rowData , look[i] ]);
+                }
+                if(colData == 2){
+                    column2RowSort.push([ 1 * rowData , look[i] ]);
+                }
+                if(colData == 3){
+                    column3RowSort.push([ 1 * rowData , look[i] ]);
+                }
+            }
+            column1RowSort.sort(function(x, y) {
+                return x[0] - y[0];
+            });
+            column2RowSort.sort(function(x, y) {
+                return x[0] - y[0];
+            });
+            column3RowSort.sort(function(x, y) {
+                return x[0] - y[0];
+            });
+            for (var i=0; i<column1RowSort.length; i++) {
+                column1.appendChild(column1RowSort[i][1]);
+            }
+            for (var i=0; i<column2RowSort.length; i++) {
+                column2.appendChild(column2RowSort[i][1]);
+            }
+            for (var i=0; i<column3RowSort.length; i++) {
+                column3.appendChild(column3RowSort[i][1]);
+            }
+            <?php }elseif($settings['general']['layout']=='2-Column'){ ?>
+                var column1 = document.getElementById('columnleft-1');
+                var column_upper = document.getElementById('column-2-upper');
+                var column_1_inside = document.getElementById('column-1-inside');
+                var column_2_inside = document.getElementById('column-2-inside');
+                var column_lower = document.getElementById('column-2-lower');
+                 var look = document.getElementsByClassName('supercheckout-blocks');
+            var RowSort1 = [];
+            var RowSort2 = [];
+            var RowSort3 = [];
+            var RowSort4 = [];
+            var RowSort5 = [];
+            
+            for(var i=0;i<look.length;i++){
+                
+                var colData = look[i].getAttribute('data-column');
+                var rowData = look[i].getAttribute('data-row');
+                var colInsideData = look[i].getAttribute('data-column-inside');
+                if(colInsideData == 1){
+                    RowSort1.push([ 1 * rowData , look[i] ]);
+                }
+                if(colInsideData == 2){
+                    RowSort2.push([ 1 * rowData , look[i] ]);
+                }
+                if(colInsideData == 3){
+                        RowSort3.push([ 1 * rowData , look[i] ]);
+                }
+                if(colInsideData == 5){
+                    RowSort4.push([ 1 * rowData , look[i] ]);
+                }                
+                if(colInsideData == 4){
+                    RowSort5.push([ 1 * rowData , look[i] ]);
+                }                
+            }
+            
+            RowSort1.sort(function(x, y) {
+                return x[0] - y[0];
+            });
+            RowSort2.sort(function(x, y) {
+                return x[0] - y[0];
+            });
+            RowSort3.sort(function(x, y) {
+                return x[0] - y[0];
+            });
+            RowSort4.sort(function(x, y) {
+                return x[0] - y[0];
+            });
+            RowSort5.sort(function(x, y) {
+                return x[0] - y[0];
+            });
+            for (var i=0; i<RowSort1.length; i++) {
+                column1.appendChild(RowSort1[i][1]);
+            }
+            for (var i=0; i<RowSort2.length; i++) {
+                column_upper.appendChild(RowSort2[i][1]);
+            }
+            for (var i=0; i<RowSort3.length; i++) {
+                column_1_inside.appendChild(RowSort3[i][1]);
+            }
+            for (var i=0; i<RowSort4.length; i++) {
+                column_2_inside.appendChild(RowSort4[i][1]);
+            }
+            for (var i=0; i<RowSort5.length; i++) {
+                column_lower.appendChild(RowSort5[i][1]);
+            }
+            <?php } ?>
+});
+window.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('sc_form').removeAttribute('ng-cloak');
+});
+document.addEventListener('DOMContentLoaded', function() {
+    <?php if($settings['general']['layout']=='3-Column'){ ?>
+    var column1_height = document.getElementById('columnleft-1').offsetHeight;
+    var column3_height = document.getElementById('columnleft-3').offsetHeight;
+    if(column3_height > column1_height){
+        document.getElementById('columnleft-1').style.minHeight = column3_height + 'px';
+    }else if(column1_height > column3_height){
+        document.getElementById('columnleft-3').style.minHeight = column1_height + 'px';
+    }
+    
+    <?php }elseif($settings['general']['layout']=='2-Column'){ ?>
+    var column_1_inside_height = document.getElementById('column-1-inside').offsetHeight;
+    var column_2_inside_height = document.getElementById('column-2-inside').offsetHeight;
+     if(column_1_inside_height > column_2_inside_height){
+        document.getElementById('column-2-inside').style.minHeight = column_1_inside_height + 'px';
+    }else if(column_1_inside_height < column_2_inside_height){
+        document.getElementById('column-1-inside').style.minHeight = column_2_inside_height + 'px';
+    }
+    <?php } ?>
+    
+    
+   
+});
+document.addEventListener('DOMContentLoaded', function() {
+        var container = document.getElementById("payment_address_table");
+        
+        var tags = document.getElementById('payment_address_table').getElementsByTagName('tr');
+        var sortRows = [];
+        for (var i=0; i<tags.length; i++) {
+            var sortPart = tags[i].readAttribute('sort-data');
+            if (sortPart >= 1) {
+                sortRows.push([ 1 * sortPart , tags[i] ]);
+            }
+        }
+        sortRows.sort(function(x, y) {
+            return x[0] - y[0];
+        });
+        for (var i=0; i<sortRows.length; i++) {
+            container.appendChild(sortRows[i][1]);
+        }
+        var container = document.getElementById("shipping_address_table");
+        
+        var tags = document.getElementById('shipping_address_table').getElementsByTagName('tr');
+        var sortRows = [];
+        for (var i=0; i<tags.length; i++) {
+            var sortPart = tags[i].readAttribute('sort-data');
+            if (sortPart >= 1) {
+                sortRows.push([ 1 * sortPart , tags[i] ]);
+            }
+        }
+        sortRows.sort(function(x, y) {
+            return x[0] - y[0];
+        });
+        for (var i=0; i<sortRows.length; i++) {
+            container.appendChild(sortRows[i][1]);
+        }
+    });
+    }
+    else if ( document.attachEvent){
+document.attachEvent("onreadystatechange", function() {
+    <?php if($settings['general']['layout']=='3-Column'){ ?>
+            var column1 = document.getElementById('columnleft-1');
+            var column2 = document.getElementById('columnleft-2');
+            var column3 = document.getElementById('columnleft-3');
+            var look = document.getElementsByClassName('supercheckout-blocks');
+            var column1RowSort = [];
+            var column2RowSort = [];
+            var column3RowSort = [];
+            for(var i=0;i<look.length;i++){
+                var colData = look[i].getAttribute('data-column');
+                var rowData = look[i].getAttribute('data-row');
+                if(colData == 1){
+                    column1RowSort.push([ 1 * rowData , look[i] ]);
+                }
+                if(colData == 2){
+                    column2RowSort.push([ 1 * rowData , look[i] ]);
+                }
+                if(colData == 3){
+                    column3RowSort.push([ 1 * rowData , look[i] ]);
+                }
+            }
+            column1RowSort.sort(function(x, y) {
+                return x[0] - y[0];
+            });
+            column2RowSort.sort(function(x, y) {
+                return x[0] - y[0];
+            });
+            column3RowSort.sort(function(x, y) {
+                return x[0] - y[0];
+            });
+            for (var i=0; i<column1RowSort.length; i++) {
+                column1.appendChild(column1RowSort[i][1]);
+            }
+            for (var i=0; i<column2RowSort.length; i++) {
+                column2.appendChild(column2RowSort[i][1]);
+            }
+            for (var i=0; i<column3RowSort.length; i++) {
+                column3.appendChild(column3RowSort[i][1]);
+            }
+            <?php }elseif($settings['general']['layout']=='2-Column'){ ?>
+                var column1 = document.getElementById('columnleft-1');
+                var column_upper = document.getElementById('column-2-upper');
+                var column_1_inside = document.getElementById('column-1-inside');
+                var column_2_inside = document.getElementById('column-2-inside');
+                var column_lower = document.getElementById('column-2-lower');
+                 var look = document.getElementsByClassName('supercheckout-blocks');
+            var RowSort1 = [];
+            var RowSort2 = [];
+            var RowSort3 = [];
+            var RowSort4 = [];
+            var RowSort5 = [];
+            
+            for(var i=0;i<look.length;i++){
+                
+                var colData = look[i].getAttribute('data-column');
+                var rowData = look[i].getAttribute('data-row');
+                var colInsideData = look[i].getAttribute('data-column-inside');
+                if(colInsideData == 1){
+                    RowSort1.push([ 1 * rowData , look[i] ]);
+                }
+                if(colInsideData == 2){
+                    RowSort2.push([ 1 * rowData , look[i] ]);
+                }
+                if(colInsideData == 3){
+                        RowSort3.push([ 1 * rowData , look[i] ]);
+                }
+                if(colInsideData == 5){
+                    RowSort4.push([ 1 * rowData , look[i] ]);
+                }
+                if(colInsideData == 4){
+                    RowSort5.push([ 1 * rowData , look[i] ]);
+                }                
+            }
+            
+            RowSort1.sort(function(x, y) {
+                return x[0] - y[0];
+            });
+            RowSort2.sort(function(x, y) {
+                return x[0] - y[0];
+            });
+            RowSort3.sort(function(x, y) {
+                return x[0] - y[0];
+            });
+            RowSort4.sort(function(x, y) {
+                return x[0] - y[0];
+            });
+            RowSort5.sort(function(x, y) {
+                return x[0] - y[0];
+            });
+            for (var i=0; i<RowSort1.length; i++) {
+                column1.appendChild(RowSort1[i][1]);
+            }
+            for (var i=0; i<RowSort2.length; i++) {
+                column_upper.appendChild(RowSort2[i][1]);
+            }
+            for (var i=0; i<RowSort3.length; i++) {
+                column_1_inside.appendChild(RowSort3[i][1]);
+            }
+            for (var i=0; i<RowSort4.length; i++) {
+                column_2_inside.appendChild(RowSort4[i][1]);
+            }
+            for (var i=0; i<RowSort5.length; i++) {
+                column_lower.appendChild(RowSort5[i][1]);
+            }
+            <?php } ?>
+});
+document.attachEvent("onreadystatechange", function() {
+    document.getElementById('sc_form').removeAttribute('ng-cloak');
+});
+document.attachEvent("onreadystatechange", function() {
+    <?php if($settings['general']['layout']=='3-Column'){ ?>
+    var column1_height = document.getElementById('columnleft-1').offsetHeight;
+    var column3_height = document.getElementById('columnleft-3').offsetHeight;
+    if(column3_height > column1_height){
+        document.getElementById('columnleft-1').style.minHeight = column3_height + 'px';
+    }else if(column1_height > column3_height){
+        document.getElementById('columnleft-3').style.minHeight = column1_height + 'px';
+    }
+    
+    <?php }elseif($settings['general']['layout']=='2-Column'){ ?>
+    var column_1_inside_height = document.getElementById('column-1-inside').offsetHeight;
+    var column_2_inside_height = document.getElementById('column-2-inside').offsetHeight;
+     if(column_1_inside_height > column_2_inside_height){
+        document.getElementById('column-2-inside').style.minHeight = column_1_inside_height + 'px';
+    }else if(column_1_inside_height < column_2_inside_height){
+        document.getElementById('column-1-inside').style.minHeight = column_2_inside_height + 'px';
+    }
+    <?php } ?>
+    
+    
+   
+});
+document.attachEvent("onreadystatechange", function() {
+        var container = document.getElementById("payment_address_table");
+        
+        var tags = document.getElementById('payment_address_table').getElementsByTagName('tr');
+        var sortRows = [];
+        for (var i=0; i<tags.length; i++) {
+            var sortPart = tags[i].readAttribute('sort-data');
+            if (sortPart >= 1) {
+                sortRows.push([ 1 * sortPart , tags[i] ]);
+            }
+        }
+        sortRows.sort(function(x, y) {
+            return x[0] - y[0];
+        });
+        for (var i=0; i<sortRows.length; i++) {
+            container.appendChild(sortRows[i][1]);
+        }
+        var container = document.getElementById("shipping_address_table");
+        
+        var tags = document.getElementById('shipping_address_table').getElementsByTagName('tr');
+        var sortRows = [];
+        for (var i=0; i<tags.length; i++) {
+            var sortPart = tags[i].readAttribute('sort-data');
+            if (sortPart >= 1) {
+                sortRows.push([ 1 * sortPart , tags[i] ]);
+            }
+        }
+        sortRows.sort(function(x, y) {
+            return x[0] - y[0];
+        });
+        for (var i=0; i<sortRows.length; i++) {
+            container.appendChild(sortRows[i][1]);
+        }
+    });
+    }
+    function scroll(id) {   
+        var ele = document.getElementById(id);         
+        window.scrollTo(ele.offsetLeft,ele.offsetTop);
+    }
+        
+        // Code Added by Raghubendra Singh on 19-Jan-2015 to set Checkboxes for terms and conditon block selected on page load
+        angular.element(document).ready(function () {
+                jQuery('.already-checked').prop('checked', true);
+        });
+</script>

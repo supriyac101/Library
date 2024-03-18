@@ -1,0 +1,121 @@
+<?php
+	$todaysDeal = Mage::getModel('dailyfeature/dailyfeature')->getTodaysDeal();
+	$_helper = $this->helper('catalog/output');
+	//echo "<pre>";
+	//print_r($todaysDeal);
+?>
+	
+<?php if($todaysDeal->getProduct()): ?>
+
+<?php
+	$deal_content = $todaysDeal->getContent();
+	$_product = Mage::getModel('catalog/product')->load($todaysDeal->getProduct());
+	$_productName=$_helper->productAttribute($_product, $_product->getName(), 'name');
+	$_shortDescription = $_helper->productAttribute($_product, nl2br($_product->getShortDescription()), 'description');
+	if(strlen($_shortDescription) > 160 )
+	$_shortDescription=substr($_shortDescription,0,160).'....';
+	$_specialPrice=$_product->getSpecialPrice();
+	$_finalPrice=$_product->getFinalPrice();
+	$_limitText=$todaysDeal->getLimittext();
+	$_freeShippingBanner=$todaysDeal->getBanner();
+	$_atcUrl=$this->getUrl('checkout/cart/add/');
+	$_weeklyDealUrl=$this->getUrl('weekly-deal'); 
+?>
+
+<div class="deal_block clearfix">
+    <form id="product_addtocart_form" method="post" action="<?php echo $_atcUrl ?>">
+    
+        <input type="hidden" name="product" value="<?php echo $_product->getId() ?>" />
+        <?php /*
+        if(!empty($_freeShippingBanner))
+        echo $this->getLayout()->createBlock('cms/block')->setBlockId('free_shipping_banner')->toHtml(); 
+        */
+        ?>
+    
+        <div class="d_head">
+            <h2>ONLINE DEAL OF THE WEEK</h2>
+        </div>
+    
+        <div class="d_content">
+            <div class="d_left_block">
+                <a href="<?php /*echo $_weeklyDealUrl */ echo $_product->getProductUrl(); ?>" title="<?php echo $_product->getName() ?>" style="display: block;">
+                    <?php /*<img src="<?php echo $this->helper('catalog/image')->init($_product, 'small_image')->resize(170,260); ?>" width="170" height="260" alt="<?php echo $_productName ?>" /> ?>
+                    <img src="<?php echo $this->helper('catalog/image')->init($_product, 'small_image')->constrainOnly(TRUE)->resize(160,300); ?>" alt="<?php echo $_productName ?>" />*/ ?>
+					<img id="someImage" src="<?php echo $this->helper('catalog/image')->init($_product, 'small_image'); ?>" alt="<?php echo $_productName ?>" />
+                </a>
+                <?php if(!empty($_limitText)): ?>
+                <span><?php echo $_limitText; ?> </span>
+                <?php endif; ?>
+            </div>
+
+            <div class="d_right_block">
+                <h3><?php echo $_product->getName() ?></h3>
+                <div class="product-rating clearfix">
+                    <?php
+                    $summaryData = Mage::getModel('review/review_summary')
+					->setStoreId($storeId)
+					->load($_product->getId());
+ 
+                    if ($summaryData['rating_summary']):?>
+                        <div class="ratings clearfix">
+                            <div class="rating-box">
+                                <div class="rating" style="width:<?php echo $summaryData['rating_summary']; ?>%"></div>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                <div class="deal-details clearfix">
+                    <div class="d_des">
+						<p>Style Number: <?php echo $_product->getSku();?></p>
+						<div class="deal-des">
+							<?php if(strlen($deal_content) > 10){
+								echo $deal_content;
+							} else {
+								echo $_shortDescription;
+							} ?>
+						</div>
+                    </div>
+                    <div class="deal-price <?php if (! Mage::getSingleton('customer/session')->isLoggedIn()) : ?> home-deal <?php endif; ?>">
+						<?php //if (Mage::getSingleton('customer/session')->isLoggedIn()) : ?>
+							<?php if($_specialPrice) { ?>
+							<div class="regular_price">
+								<label>Regular:</label>
+								<span><?php echo $this->helper('core')->currency($_product->getPrice(),true,false); ?></span>
+							</div>
+							<?php } ?>
+							<div class="sale_price">
+								<label>Sale:</label>
+								<span><?php echo $this->helper('core')->currency($_finalPrice,true,false); ?></span>
+							</div>
+						<?php /*else: ?>
+							<div class="deal-priceLogin"><a href="<?php echo Mage::helper('customer')->getLoginUrl(); ?>">Log in</a> to see prices</div>
+						<?php endif; */?>
+                    </div>
+                </div>
+                <div class="deal-addtocart clearfix">
+                    <a href="<?php echo $_product->getProductUrl(); ?>"><?php echo $this->__('Shop this deal') ?></a>
+                </div>
+            </div><!-- end d_right_block -->
+        </div> <!-- end d_content -->
+    </form>
+</div> <!-- end deal_block -->
+
+
+<?php endif; ?>
+
+<script>
+	jQuery(document).ready(function(){
+		var img = jQuery("#someImage");
+		// Create dummy image to get real width and height
+		jQuery("<img>").attr("src", jQuery(img).attr("src")).load(function(){
+		    var realWidth = this.width;
+		    var realHeight = this.height;
+		    //alert("Original width=" + realWidth + ", " + "Original height=" + realHeight);
+		    if (realHeight > realWidth) {
+			jQuery("#someImage").attr("src","<?php echo $this->helper('catalog/image')->init($_product, 'small_image')->constrainOnly(TRUE)->resize(160,300); ?>");
+		    }else{
+			jQuery("#someImage").attr("src","<?php echo $this->helper('catalog/image')->init($_product, 'small_image')->constrainOnly(TRUE)->resize(300,300); ?>");
+		    }
+		});
+	})
+</script>

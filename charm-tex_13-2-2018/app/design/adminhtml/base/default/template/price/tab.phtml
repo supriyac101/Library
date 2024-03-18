@@ -1,0 +1,32 @@
+<?php
+/**
+* Customer price tab
+* 
+* @copyright Anowave
+* @author Angel Kostadinov
+*/
+?>
+<?php
+$form = new Anowave_Price_Block_Form();
+echo $form->_prepareForm()->getFormHtml();
+echo $form->getChildHtml('form_after');
+?>
+<div class="content-header">
+	<h3 class="icon-head head-customer">Current prices</h3>
+</div>
+<?php  echo $this->getLayout()->createBlock('price/grid')->getHtml() ?>
+<script type="text/javascript">
+
+	var Anowave = Anowave || {};
+	
+	Anowave.Config = 
+	{
+		url: 	"<?php echo $this->getUrl('adminhtml/price/choose') ?>",
+		save: 	"<?php echo $this->getUrl('adminhtml/price/save') ?>"
+	}
+
+	if ('undefined' !== typeof priceGridJsObject)
+	{
+		priceGridJsObject.resetFilter();
+	}
+</script>

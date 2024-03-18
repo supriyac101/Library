@@ -1,0 +1,17 @@
+/**
+* Anowave Price CSS
+* 
+* @copyright Anowave
+* @author Angel Kostadinov
+*/
+
+
+.columns table.form-list td.value { width:800px; border:1px solid #000; } 
+.columns table.form-list td.value th select { width: 50px; margin:0px; padding:0px; }
+
+.columns .fieldset-wide table.form-list .customer-pricing td.pager input.input-text { width: 2em !important; }
+.columns .fieldset-wide table.form-list .customer-pricing tr.filter .range input { width:50px !important; }
+
+
+.price-categories { margin:5px 0px 5px 0px; }
+.price-categories .price-category { padding:3px 0px 3px 20px; background:url(../../../default/default/images/fam_folder_database.gif) 0 3px no-repeat; }

@@ -1,0 +1,533 @@
+<?php 
+	$_product = $this->getProduct();
+	$_allChilds = $this->getAllChildProducts();
+	$_superAttr = $this->getSuperAttribute();
+	$_showPrices = $this->getMatrixHelper()->isShowProductPrice($_product);
+	$_showStock = $this->getMatrixHelper()->isShowStock($_product);
+	$_displyTab = $this->getMatrixHelper()->getDisplayTabs($_product);
+	$_isMultiple = $this->getMatrixHelper()->isTabMultiple($_product);
+	$_showOption = $this->getMatrixHelper()->getMultipleOption($_product);
+	$_isCptp = $this->getMatrixHelper()->isCptpEnable();
+	$_showTotalColumn = $this->getMatrixHelper()->isShowTotalColumn();
+	$_bodyTblCounter = 0;
+	$backorderClass = $this->getMatrixHelper()->getBackordersClass();
+	$matrixColumns = explode(',',$this->getMatrixHelper()->getMatrixColumns());
+	
+?>
+<?php if ($_product->isSaleable() && count($_allChilds)):?>
+
+<h2><?php echo $this->__('Order Multiple') ?></h2>
+
+<?php 
+	$productCounter = 0;
+
+	$productName[$productCounter] = $this->__('Product Name');
+	$sku[$productCounter] = $this->__('SKU');
+	$weight[$productCounter] = $this->__('Weight');
+	$_bodyTblCounter = 2;
+
+	foreach($_superAttr as $key => $attr)
+	{
+		${$attr['code']}[$productCounter] = $attr['label'];
+		$_bodyTblCounter++;
+	}
+
+	if($_showStock){
+		$stock[$productCounter] = $this->__('Stock');	
+		$_bodyTblCounter++;
+	}
+	
+	if($_showPrices){
+		$unitPrice[$productCounter] = $this->__('Price');	
+		$_bodyTblCounter++;
+	}
+	
+	if($_showTotalColumn){
+		$qtyBox[$productCounter] = $this->__('Total Quantity');
+	} else {
+		$qtyBox[$productCounter] = $this->__('Quantity');
+	}
+	$_bodyTblCounter++;
+
+	$rowTotals[$productCounter] = '<img width="20" src="'.$this->getJsUrl('fcpm/table_next.png').'" alt="'.$this->__('Next').'" id="tRight"/>';
+
+	$productCounter += 1;
+
+	foreach($_allChilds as $pid => $productData)
+	{
+		if($this->_showImage == 1)
+		{
+			$productImage[$productCounter] = ( $productData['has_img'] == 1 ? '<div style="cursor:pointer;" onclick="replaceSimpleMediaImages(\''.$pid.'\');">' : '').$productData['image'].( $productData['has_img'] == 1 ? '</div>' : '');
+		} else {
+			$productImage[$productCounter] = '&nbsp;';
+		}
+		
+		$productName[$productCounter] = $productData['name'];
+		
+		$sku[$productCounter] = $productData['sku'];
+		$weight[$productCounter] = $productData['weight'];
+		
+		if(Mage::getStoreConfig('cpbu/basic_options/update_fields',Mage::app()->getStore()) != ''){
+			$sku[$productCounter] .= '<input type="hidden" name="product_matrix['.$pid.'][customname]" value="'.$productData['name'].'" /><input type="hidden" name="product_matrix['.$pid.'][customthumb]" value="'.$productData['thumb'].'" />';
+		}
+		if($this->isSimple())
+		{
+			$sku[$productCounter] .= '<input type="hidden" id="customprice-tier-'.$pid.'" name="product_matrix['.$pid.'][customprice]" value="'.$productData['exTaxPrice'].'" />';
+		}
+
+		foreach($_superAttr as $key => $attr)
+		{
+			${$attr['code']}[$productCounter] = $productData[$attr['code']].'<input type="hidden" name="product_matrix['.$pid.'][super_attribute]['.$key.']" value="'.$productData[$attr['code'].'_value'].'" />';
+		}
+
+		if($_showStock)
+		{
+			$stock[$productCounter] = $productData['stock'];
+		}
+
+		if($_showPrices)
+		{
+			$unitPrice[$productCounter] = '<div id="tier-unit-price-'.$pid.'">'.$productData['fprice'].'</div>';
+		}
+
+		if($this->getMatrixHelper()->isOnlyCheckBox($_product))
+		{
+			$qtyBox[$productCounter] = '<input type="checkbox" class="input-checkbox matrix-qty" title="Qty" value="1" maxlength="12" name="product_matrix[qty]['.$pid.']" id="'.$pid.'" onclick="reloadMatrixPriceQtyCheckbox();"/>';
+		} else {
+			/*---------- changelog 29.12.15 ----------*/
+			$qtyBox[$productCounter] = '<input type="text" data-max-qty="'.$productData['maxQty'].'" class="'.$backorderClass.' fcpm-validate input-text qty matrix-qty" title="Qty" value="0" maxlength="12" name="product_matrix[qty]['.$pid.']" id="'.$pid.'" onkeyup="reloadMatrixPriceQty();"/>';
+			/*---------- changelog 29.12.15 ----------*/
+		}
+
+		if($this->getMatrixHelper()->isShowRowTotal($_product))
+		{
+			$rowTotals[$productCounter] = '<div id="matrix-price-'.$pid.'">'.Mage::helper('core')->currency(0,true).'</div>';
+		} elseif($this->getMatrixHelper()->isShowGrandTotal($_product)) {
+			$rowTotals[$productCounter] = '&nbsp;';
+		}
+        
+        $productCounter += 1;
+	}
+
+	if($this->_showImage) {
+		$productImage[$productCounter] = '&nbsp;';
+	}
+
+	$productName[$productCounter] = '&nbsp;';
+
+	$sku[$productCounter] = '&nbsp;';
+
+	$weight[$productCounter] = '&nbsp;';
+
+	foreach($_superAttr as $key => $attr)
+	{
+		${$attr['code']}[$productCounter] = '&nbsp;';
+	}
+
+	if($_showStock)
+	{
+		$stock[$productCounter] = '&nbsp;';
+	}
+
+	if($_showPrices){
+		$unitPrice[$productCounter] = $this->__('Total Quantity');	
+	}
+	
+	if($_showTotalColumn){
+		$qtyBox[$productCounter] = '<div class="matrix-total-qty dyn">0</div>';
+	} else {
+		$qtyBox[$productCounter] = '&nbsp;';
+	}
+
+	if($this->getMatrixHelper()->isShowGrandTotal($_product)){
+		$rowTotals[$productCounter] = '<div id="matrix-total-price">'.Mage::helper('core')->currency(0,true).'</div>';
+	} elseif($this->getMatrixHelper()->isShowRowTotal($_product)){
+		$rowTotals[$productCounter] = '&nbsp;';
+	}
+?>
+<!-- Matrix Start -->
+<div id="product-matrix-std">
+    <div id="product-matrix-fixedleft">
+        <ul>
+        	<li><img width="20" src="<?php echo $this->getJsUrl('fcpm/table_prev.png') ?>" alt="<?php echo $this->__('Previous')?>" id="tLeft"/></li>
+        	<li><?php echo implode('</li><li>', $productImage);?></li>
+        </ul>
+	</div>
+	<div id="product-matrix" class="product-matrix">
+		<?php if(in_array(1, $matrixColumns)):?>
+	        <div class="item">
+	            <ul><li><?php echo implode('</li><li>', $productName);?></li></ul>
+			</div>
+		<?php endif;?>
+		
+		<?php if(in_array(2, $matrixColumns)):?>
+			<div class="item">
+		        <ul><li><?php echo implode('</li><li>', $sku);?></li></ul>
+			</div>
+		<?php endif;?>
+
+		<?php foreach($_superAttr as $key => $attr):?>
+			<div class="item">
+            	<ul><li><?php echo implode('</li><li>', ${$attr['code']});?></li></ul>
+			</div>
+		<?php endforeach;?>
+
+		<?php if(in_array(3, $matrixColumns)):?>
+			<div class="item">
+		        <ul><li><?php echo implode('</li><li>', $weight);?></li></ul>
+			</div>
+		<?php endif;?>
+
+		<?php if($_showStock):?>
+			<div class="item">
+		        <ul><li><?php echo implode('</li><li>', $stock);?></li></ul>
+			</div>
+		<?php endif;?>
+		
+		<?php if($_showPrices):?>
+			<div class="item">
+		        <ul><li><?php echo implode('</li><li>', $unitPrice);?></li></ul>
+			</div>
+		<?php endif;?>
+
+		<?php //if($_showTotalColumn):?>
+			<div class="item">
+		        <ul><li><?php echo implode('</li><li>', $qtyBox);?></li></ul>
+			</div>
+		<?php //endif;?>
+	</div>
+
+	<?php if($this->getMatrixHelper()->isShowRowTotal($_product) || $this->getMatrixHelper()->isShowGrandTotal($_product)):?>
+		<div id="product-matrix-fixedright">
+	        <ul><li><?php echo implode('</li><li>', $rowTotals);?></li></ul>
+		</div>
+	<?php else:?>
+		<div id="product-matrix-fixedright">
+	        <ul><li><?php echo '<img width="20" src="'.$this->getJsUrl('fcpm/table_next.png').'" alt="'.$this->__('Next').'" id="tRight"/>';?></li></ul>
+		</div>
+	<?php endif;?>
+</div>
+<?php echo $this->getChildHtml('configurable_matrix_options');?>
+
+<!-- Matrix End -->
+
+<?php if(1*$_showOption == 0 || $_showOption > $_bodyTblCounter) $_showOption = $_bodyTblCounter;?>
+
+<script type="text/javascript">
+//<![CDATA[
+	var leftRightFixedOwl = 80;
+	jQuery('#product-matrix-fixedleft, #product-matrix-fixedright').width(leftRightFixedOwl);
+	jQuery('#product-matrix').css('margin','0 '+leftRightFixedOwl+'px');
+	
+	$$('#product-matrix-std ul').each(function(item){
+		decorateGeneric(item.select('li'), ['first','last']);
+	});
+
+	if(jQuery(window).width() < 640) leftRightFixedOwl = 60;
+    else  leftRightFixedOwl = 80;
+
+    jQuery(window).resize(function(event) {
+        if(jQuery(window).width() < 640) leftRightFixedOwl = 60;
+        else  leftRightFixedOwl = 80;
+    });
+
+	setUpMyUlSlider = function()
+	{
+		jQuery('#product-matrix-std li').removeAttr('style');
+        
+        var topBotHeightArr = [];
+        var centerHeightArr = [];
+        jQuery('#product-matrix-std ul').each(function(){
+            var thisObj = jQuery(this);
+            thisObj.find('li.first, li.last').each(function(){
+                topBotHeightArr.push(jQuery(this).height());
+            });
+
+            thisObj.find('li').not(thisObj.find('li.first, li.last')).each(function(){
+                centerHeightArr.push(jQuery(this).height());
+            });
+        });
+
+        var centerHeight = Math.max.apply(null, centerHeightArr);
+        centerHeight = (centerHeight <= 25) ? 25 : centerHeight;
+        
+        var tBheight = Math.max.apply(null, topBotHeightArr);
+        tBheight = (tBheight == 0 ? 25 : tBheight);
+
+        jQuery('#product-matrix-std ul').find('li.first, li.last').height(tBheight);
+
+        jQuery('#product-matrix-std li')
+            .not(jQuery('#product-matrix-std ul').find('li.first, li.last'))
+            .height(centerHeight);
+	}
+
+	var incrSoTbl = 1;
+    var lastResSetup = 0;
+    var showOptionTbl = 1*<?php echo $_showOption;?>;
+    var showOptionTbl0 = 1;
+	var showOptionTbl320 = (showOptionTbl < 2) ? showOptionTbl : 2;
+    var showOptionTbl480 = (showOptionTbl < 3) ? showOptionTbl : 3;
+    var showOptionTbl640 = (showOptionTbl < 4) ? showOptionTbl : 4;
+
+    <?php if(!$this->getMatrixHelper()->isShowStock($_product)):?>incrSoTbl = 1;<?php endif;?>
+    showOptionTbl += incrSoTbl;
+    showOptionTbl0 = incrSoTbl;
+    showOptionTbl320 += incrSoTbl;
+    showOptionTbl480 += incrSoTbl;
+    showOptionTbl640 += incrSoTbl;
+	
+	var owlFcpm = jQuery("#product-matrix").owlCarousel({
+		pagination: false,
+		navigation: false,
+		rewindNav: false,
+        mouseDrag : false,
+		responsiveBaseWidth: '#product-matrix-std',
+		itemsCustom : [[0, showOptionTbl0],[320, showOptionTbl320],[480, showOptionTbl480],[640, showOptionTbl640],[800, showOptionTbl]],
+		item : showOptionTbl,
+		afterInit : setUpMyUlSlider,
+		afterUpdate : setUpMyUlSlider,
+        beforeUpdate : function(){
+            jQuery('#product-matrix-std').removeAttr('style');
+        },
+        afterAction : function()
+        {
+            var thisOwl = this.owl;
+            jQuery('#tLeft,#tRight').removeClass('disabled');
+            if(thisOwl.userItems.size() <= thisOwl.visibleItems.size())
+            {
+                jQuery('#tLeft,#tRight').addClass('disabled');
+            }
+            else if(thisOwl.currentItem == 0)
+            {
+                jQuery('#tLeft').addClass('disabled');
+            }
+            else if(thisOwl.userItems.size() == thisOwl.currentItem+thisOwl.visibleItems.size())
+            {
+                jQuery('#tRight').addClass('disabled');
+            }
+            if(jQuery(window).width() > 640){
+                var origVidth = jQuery('#product-matrix').width();
+                var calcVidth = this.itemsAmount*this.itemWidth;
+                if(origVidth >= calcVidth){
+                    var finalCalcWidth = calcVidth+(2*leftRightFixedOwl);
+                    if(origVidth != 0) jQuery('#product-matrix-std').width(finalCalcWidth);
+                }
+            }
+        }
+	});
+
+	$('tLeft').addClassName('mnavs').observe('click',function(){
+		owlFcpm.trigger('owl.prev');
+	});
+
+	$('tRight').addClassName('mnavs').observe('click',function(){
+		owlFcpm.trigger('owl.next');
+	});
+
+
+	fMatrixChildProducts = <?php echo json_encode($_allChilds);?>;
+	optionMatrixPrice = <?php echo $this->getJsonConfig() ?>;
+	totalMatrixPrice = totalMatrixQty = 0;
+	reloadMatrixPriceQty = function(){
+		totalMatrixPrice = totalMatrixQty = 0;
+		$$('.matrix-qty').each(function(ele){
+			if(fMatrixChildProducts[ele.id])
+			{
+				var currentPrice = 0;
+				<?php if($_isCptp == 1):?>
+				currentPrice = returnPreparePriceOrTier(ele.id, fMatrixChildProducts[ele.id], (1*ele.value));
+				<?php else:?>
+				if(ele.value > 0) currentPrice = returnPreparePriceOrTier(ele.id, fMatrixChildProducts[ele.id], ele.value);
+				else if($('tier-unit-price-'+ele.id)) $('tier-unit-price-'+ele.id).down('.price').update(fMatrixChildProducts[ele.id].fprice);
+				<?php endif;?>
+				<?php if($this->getMatrixHelper()->isShowRowTotal($_product)):?>
+				$('matrix-price-'+ele.id).down('.price').update(matrixPriceFormate(currentPrice));
+				<?php endif;?>
+				totalMatrixPrice += currentPrice;
+				currentQty = isNaN(parseInt(ele.value)) ? 0 : (parseInt(ele.value) < 0 ? 0 : parseInt(ele.value));
+				totalMatrixQty += currentQty;
+			}
+		});
+		$$('.matrix-total-qty').each(function(item){ if(item.hasClassName('dyn')) item.update(totalMatrixQty); });
+		<?php if($this->getMatrixHelper()->isShowGrandTotal($_product)):?>
+		$('matrix-total-price').down('.price').update(matrixPriceFormate(totalMatrixPrice));
+		<?php endif;?>
+		<?php if($_isCptp == 1):?>
+		if($('cptp_qty')) $('cptp_qty').value = totalMatrixQty;
+		<?php endif;?>
+		if($$('.matrix_custom_options .matrix-custom-option').size()>0) changeAndUpdateOptionPrice();
+	}
+	
+	reloadMatrixPriceQtyCheckbox = function(){
+		totalMatrixPrice = totalMatrixQty = 0;
+		$$('.matrix-qty').each(function(ele){
+			if(fMatrixChildProducts[ele.id])
+			{
+				var currentPrice = currentQty = 0;
+				<?php if($_isCptp == 1):?>
+				currentPrice = returnPreparePriceOrTier(ele.id, fMatrixChildProducts[ele.id], (ele.checked ? ele.value : 0));
+				<?php else:?>
+				if(ele.checked) currentPrice = returnPreparePriceOrTier(ele.id, fMatrixChildProducts[ele.id], ele.value);
+				else if($('tier-unit-price-'+ele.id)) $('tier-unit-price-'+ele.id).down('.price').update(fMatrixChildProducts[ele.id].fprice);
+				<?php endif;?>
+				<?php if($this->getMatrixHelper()->isShowRowTotal($_product)):?>
+				$('matrix-price-'+ele.id).down('.price').update(matrixPriceFormate(currentPrice));
+				<?php endif;?>
+				totalMatrixPrice += currentPrice;
+				if(ele.checked) currentQty = isNaN(parseInt(ele.value)) ? 0 : (parseInt(ele.value) < 0 ? 0 : parseInt(ele.value));
+				totalMatrixQty += currentQty;
+			}
+		});
+		$$('.matrix-total-qty').each(function(item){ if(item.hasClassName('dyn')) item.update(totalMatrixQty); });
+		<?php if($this->getMatrixHelper()->isShowGrandTotal($_product)):?>
+		$('matrix-total-price').down('.price').update(matrixPriceFormate(totalMatrixPrice));
+		<?php endif;?>
+		<?php if($_isCptp == 1):?>
+		if($('cptp_qty')) $('cptp_qty').value = totalMatrixQty;
+		<?php endif;?>
+		if($$('.matrix_custom_options .matrix-custom-option').size()>0) changeAndUpdateOptionPrice();
+	}
+	
+	matrixPriceFormate = function (price){
+		return formatCurrency(price,optionMatrixPrice.priceFormat);
+	}
+	
+	returnPreparePriceOrTier = function(pid, product, qty){
+		var unitPriceTier = product.price, currentPriceTier;
+		var tierPriceMatrix = product.tier;
+		var tirQty = product.tier_qty;
+		var forCheckQty = qty;
+		<?php if($_isCptp == 1):?>
+		forCheckQty = getTotalQty();
+		<?php endif;?>
+			
+		if(product.tier_qty.length > 0){
+			tirQty = tirQty.sort(function(a, b){return b-a});
+			for(var i=0;i<tirQty.length;i++)
+			{
+				if(forCheckQty >= tirQty[i]){
+					unitPriceTier = tierPriceMatrix[tirQty[i]];
+					currentPriceTier = unitPriceTier*qty;
+					break;	
+				}
+			}
+		}
+		currentPriceTier = unitPriceTier*qty;
+		if($('tier-unit-price-'+pid)) $('tier-unit-price-'+pid).down('.price').update(matrixPriceFormate(unitPriceTier));
+		return currentPriceTier;
+	}
+	
+	getTotalQty = function(){
+		var qty = 0;
+		$$('.matrix-qty').each(function(ele){
+			if(ele.type == 'checkbox'){
+				if(ele.checked) qty++;
+			} else {
+				qty += (1*ele.value);
+			}
+		});
+		return qty;
+	}
+	
+	replaceSimpleMediaImages = function(direction){
+		var pid = direction.split('_');
+		pid = pid[0];
+		if(fMatrixChildProducts[pid]){
+			if(fMatrixChildProducts[pid]['has_img'] == 1 && fMatrixChildProducts[pid]['media']){
+				if(fMatrixChildProducts[pid]['media']){
+					$$('.product-img-box')[0].update(fMatrixChildProducts[pid]['media']);
+					setTimeout(function() { 
+					<?php if(version_compare(Mage::getVersion(), '1.9.0.1', '<')===true):?>
+						product_zoom = new Product.Zoom('image', 'track', 'handle', 'zoom_in', 'zoom_out', 'track_hint');
+					<?php else:?>
+						ProductMediaManager.init();
+					<?php endif;?>
+					}, 1000);
+				}
+			}
+		}
+	}
+	
+	setAddTocartUrlToBtn = function(){
+		$$('.add-to-cart .btn-cart').each(function(item){
+			item.setAttribute('onclick',"productAddToCartForm.submit(this,'<?php echo $this->getSubmitUrl($_product) ?>')");
+		});
+		<?php if($this->getMatrixHelper()->isRfqEnabled($_product)):?>
+		$$('.add-to-cart .btn-r4q').each(function(item){
+			item.setAttribute('onclick',"productAddToCartForm.submit(this,'<?php echo $this->getRequest4quoteUrl($_product, true) ?>')");
+		});
+		<?php endif;?>
+		if($('product_addtocart_form')) $('product_addtocart_form').action = '<?php echo $this->getSubmitUrl($_product) ?>';
+	}
+	
+	<?php if($_displyTab == 2):?>
+	document.observe('dom:loaded',setAddTocartUrlToBtn);
+	<?php elseif(1*$_displyTab == 0):?>
+		$('order_multiple').observe('click', setAddTocartUrlToBtn);
+		$('order_one').observe('click', function(){
+			$$('.add-to-cart .btn-cart').each(function(item){
+				item.setAttribute('onclick',"productAddToCartForm.submit(this);");
+			});
+			<?php if($this->getMatrixHelper()->isRfqEnabled($_product)):?>
+			$$('.add-to-cart .btn-r4q').each(function(item){
+				item.setAttribute('onclick',"productAddToCartForm.submit(this,'<?php echo $this->getRequest4quoteUrl($_product) ?>')");
+			});
+			<?php endif;?>
+			if($('product_addtocart_form')) $('product_addtocart_form').action = '<?php echo $this->getAddToCartUrl($_product) ?>';
+		});
+	<?php endif;?>
+	
+	<?php if(Mage::helper('core')->isModuleEnabled('Mage_ConfigurableSwatches')):?>
+	document.observe('dom:loaded', function() {
+		<?php if($this->getMatrixHelper()->isRfqEnabled($_product)):?>
+		$$('.add-to-cart .btn-r4q').invoke('observe','mouseenter',function(){
+			var thisForm = this.up('form');
+			<?php if($_displyTab == 0):?>
+				if($('order_one_content') && $('order_one_content').getStyle('display') != 'none')
+				{
+					thisForm.action = '<?php echo $this->getRequest4quoteUrl($_product); ?>';
+				}
+				else if($('order_multiple_content') && $('order_multiple_content').getStyle('display') != 'none')
+				{
+					thisForm.action = '<?php echo $this->getRequest4quoteUrl($_product, true); ?>';
+				}
+			<?php elseif($_displyTab == 1):?>
+				thisForm.action = '<?php echo $this->getRequest4quoteUrl($_product); ?>';
+			<?php elseif($_displyTab == 2):?>
+				thisForm.action = '<?php echo $this->getRequest4quoteUrl($_product, true); ?>';
+			<?php endif; ?>
+			this.setAttribute('onclick',"productAddToCartForm.submit(this);");
+		});
+		<?php endif;?>
+		$$('.add-to-cart .btn-cart').invoke('observe','mouseenter',function(){
+			var thisForm = this.up('form');
+			<?php if($_displyTab == 0):?>
+				if($('order_one_content') && $('order_one_content').getStyle('display') != 'none')
+				{
+					thisForm.action = '<?php echo $this->getAddToCartUrl($_product); ?>';
+				}
+				else if($('order_multiple_content') && $('order_multiple_content').getStyle('display') != 'none')
+				{
+					thisForm.action = '<?php echo $this->getSubmitUrl($_product); ?>';
+				}
+			<?php elseif($_displyTab == 1):?>
+				thisForm.action = '<?php echo $this->getAddToCartUrl($_product); ?>';
+			<?php elseif($_displyTab == 2):?>
+				thisForm.action = '<?php echo $this->getSubmitUrl($_product); ?>';
+			<?php endif; ?>
+			this.setAttribute('onclick',"productAddToCartForm.submit(this);");
+		});
+	});	
+	<?php endif;?>
+	<?php if($this->getMatrixHelper()->isApplyPriceColor($_product)): ?>
+	document.observe('dom:loaded', function() {
+        $$('.matrix-qty').each(function(el) {
+            if(fMatrixChildProducts[el.id] && fMatrixChildProducts[el.id].priceColor && fMatrixChildProducts[el.id].priceColor != '') {
+                $('tier-unit-price-'+el.id).setStyle({color:'#'+fMatrixChildProducts[el.id].priceColor});
+            }
+        });
+    });
+	<?php endif;?>
+//]]>
+</script>
+<?php endif;?>

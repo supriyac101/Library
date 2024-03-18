@@ -1,0 +1,18 @@
+<div style="padding:2px">
+	<?php if ($this->getRow()->getPriceProductId()) : ?>
+		<div>
+			<?php 
+				$product = Mage::getModel('catalog/product')->load((int) $this->getRow()->getData
+				(
+					$this->getColumn()->getIndex()
+				));
+			?>
+			<a style="text-decoration:none" href="<?php echo Mage::helper('adminhtml')->getUrl('adminhtml/catalog_product/edit', array
+			(
+				'id' => $product->getId())
+			)?>"><?php echo $product->getName() ?></a>
+		</div>
+	<?php else:?>
+		<div>No product selected</div>
+	<?php endif ?>
+</div>

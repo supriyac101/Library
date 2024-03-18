@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <dailyfeature_adminhtml_dailyfeature_index>
+        <reference name="content">
+            <block type="dailyfeature/adminhtml_dailyfeature" name="dailyfeature" />
+        </reference>
+    </dailyfeature_adminhtml_dailyfeature_index>
+</layout>

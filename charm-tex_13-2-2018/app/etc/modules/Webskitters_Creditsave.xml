@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Webskitters_Creditsave>
+            <active>true</active>
+            <codePool>local</codePool>
+        </Webskitters_Creditsave>
+    </modules>
+</config> 

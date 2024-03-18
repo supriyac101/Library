@@ -1,0 +1,227 @@
+<?php
+	$ribbon = $this->getRibbon();
+	$rows = $ribbon->getConditions();
+	$configRowCount = count($rows);
+?>
+<?php ob_start(); ?>
+<?php /* DEFINE CONFIG TEMPLATE */ ?>
+<div id="config-container-{{j}}">
+<div class="option-box">
+<table cellspacing="0" cellpadding="0" class="option-header">
+<thead>
+	<tr>
+		<th class="opt-order"><?php echo $this->__('Sort Order'); ?></th>
+		<th class="a-right"><button style="" onclick="removeConfigDynamicRow({{j}});" class="scalable delete delete-product-option " type="button"><span><?php echo $this->__('Delete Condition Collection'); ?></span></button></th>
+	</tr>
+</thead>
+<tbody>
+	<tr>
+		<td align="right">{{condition_sort_order_box}}</td>
+		<td>&nbsp;</td>
+	</tr>
+</tbody>
+</table>
+<div class="tier form-list">
+	<table cellspacing="0" cellpadding="0" style="width: 100%; border: 0;"><tr><td class="grid" style="padding: 0">
+	<table cellspacing="0" cellpadding="0" class="data border" style="width: 100%; border: 0;">
+		<thead>
+			<tr class="headings">
+				<th style="width: 25%"><?php echo $this->__('Attribute')?></th>
+				<th style="width: 25%"><?php echo $this->__('Condition')?></th>
+				<th><?php echo $this->__('Value')?></th>
+				<th style="width: 32px;"><?php echo $this->__('Action')?></th>
+			</tr>
+		</thead>
+		<tbody id="condition-table-body-{{j}}">
+			{{condition_table_body}}
+		</tbody>
+		<tfoot>
+            <tr>
+                <td class="a-right" colspan="4"><button onclick="addConditionDynamicRow({{j}});return false;" class="button"><span><span><?php echo $this->__('Add New Condition')?></span></span></button></td>
+	            </tr>
+	        </tfoot>
+		</table>
+		<p class="note"><?php echo $this->__('Any selected attribute must be available to the products on the pages that the ribbon displays. This usually means the attribute must be set to "Used in Product Listing" in Catalog -> Attributes.'); ?></p>
+	</td></tr></table>
+</div>
+</div>
+<div style="text-align: center; font-weight: bold;">------------------ OR ------------------</div>
+</div>
+<?php 
+$configTemplate = ob_get_contents();
+ob_end_clean();
+?>
+
+<?php ob_start(); ?>
+<?php /* DEFINE CONDITION TEMPLATE */ ?>
+<tr>
+	<td>{{attribute_select_box}}</td>
+	<td>{{condition_select_box}}</td>
+	<td>{{value_input_box}}</td>
+	<td style="text-align: center">
+		<button class="scalable delete icon-btn delete-product-option" onclick="removeConditionDynamicRow(this, {{j}});return false;"><span><?php echo $this->__('Remove'); ?></span></button>
+	</td>
+</tr>
+<?php 
+$conditionTemplate = ob_get_contents();
+ob_end_clean();
+?>
+
+<style>
+	.grid table td {vertical-align:middle;}
+</style>
+<div class="entry-edit custom-options">
+	<div class="entry-edit-head">
+		<h4 class="icon-head"><?php echo $this->escapeHtml($this->__('Conditions')) ?></h4>
+		<div class="right"><button onclick="addConfigDynamicRow();" class="scalable add" type="button"><span><?php echo $this->__('Add Condition Collection'); ?></span></button></div>
+	</div>
+	<div class="box">
+		<div id="config-container" class="hor-scroll">
+		<?php
+			$j = 0;
+			foreach ($rows as $row) {
+				$j++;
+				$searchReplace = array(
+					'{{condition_sort_order_box}}' => $this->mHelper('adminhtml')->getRibbonConditionSortOrderBox($row['sort_order']),
+					'{{j}}' => $j,
+				);
+				
+				$rowTemplate = str_replace(array_keys($searchReplace), array_values($searchReplace), $configTemplate);
+				
+				$i = 0;
+				$conditionsHtml = '';
+				foreach ($row['conditions'] as $condition) {
+					$i++;
+					$searchReplace = array(
+						'{{attribute_select_box}}' => $this->mHelper('adminhtml')->getRibbonConditionAttributeSelectBox($condition['attribute']),
+						'{{condition_select_box}}' => $this->mHelper('adminhtml')->getRibbonConditionConditionSelectBox($condition['condition']),
+						'{{value_input_box}}' => $this->mHelper('adminhtml')->getRibbonConditionValueInputBox($condition['attribute'], $condition['value'], $ribbon->getStoreId()),
+						'{{i}}' => $i,
+					);
+			
+					$conditionsHtml .= str_replace(array_keys($searchReplace), array_values($searchReplace), $conditionTemplate);
+				}
+				
+				$conditionsHtml = str_replace('{{j}}', $j, $conditionsHtml);
+				echo str_replace('{{condition_table_body}}', $conditionsHtml, $rowTemplate);
+			}
+			
+		?>
+		</div>
+		
+		<div class="hor-scroll" id="config-container-default">
+			<div class="option-box">
+				<table cellspacing="0" cellpadding="0" class="option-header form-list">
+				<thead>
+					<tr>
+						<th class="opt-type"><?php echo $this->__('Default State'); ?> <span class="required">*</span></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>
+							<?php echo $this->mHelper('adminhtml')->getRibbonConditionDefaultStateSelectBox($ribbon->getDefaultConditionState() ? $ribbon->getDefaultConditionState() : 'fail'); ?>
+							<p class="note"><?php echo $this->__('If the product does not match any condition groups, then this determines whether the ribbon will be shown on the product. Almost always select "Fail" unless you want to show on every product.'); ?></p>
+						</td>
+					</tr>
+				</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	var configRowCount = <?php echo $configRowCount; ?>;
+	var conditionRowCount = [];
+	<?php
+	$j = 0;
+	foreach ($rows as $row) {
+		$j++;
+		echo 'conditionRowCount[' . $j . '] = ' . count($row['conditions']) . ';';
+	}
+	?>
+	<?php
+		$searchReplace = array(
+			'{{condition_sort_order_box}}' => $this->mHelper('adminhtml')->getRibbonConditionSortOrderBox(),
+			'{{condition_table_body}}' => '',
+		);
+		
+		$configTemplateBlank = str_replace(array_keys($searchReplace), array_values($searchReplace), $configTemplate);
+	?>
+	var configTemplate = <?php echo json_encode($configTemplateBlank); ?>
+
+	<?php if ($ribbon->isObjectNew()): ?>
+	if (!configRowCount) {
+		addConfigDynamicRow();
+	}
+	<?php endif; ?>
+	
+	function addConfigDynamicRow() {
+		configRowCount++;
+		conditionRowCount[configRowCount] = 0;
+		var template = configTemplate;
+		template = template.replace(/\{\{j\}\}/g, configRowCount);
+		$('config-container').insert({before: template});
+	}
+	
+	function removeConfigDynamicRow(j) {
+		conditionRowCount[j] = 0;
+		var e = $('config-container-'+j);
+		if (e) {
+			e.replace('');
+			configRowCount--;
+		}
+	}
+	
+	function addConditionDynamicRow(j) {
+		if (!conditionRowCount[j]) {
+			conditionRowCount[j] = 0;
+		}
+		conditionRowCount[j]++;
+		<?php
+			$searchReplace = array(
+				'{{attribute_select_box}}' => $this->mHelper('adminhtml')->getRibbonConditionAttributeSelectBox(),
+				'{{condition_select_box}}' => $this->mHelper('adminhtml')->getRibbonConditionConditionSelectBox(),
+				'{{value_input_box}}' => $this->mHelper('adminhtml')->getRibbonConditionValueInputBox(),
+			);
+			
+			$conditionTemplateBlank = str_replace(array_keys($searchReplace), array_values($searchReplace), $conditionTemplate);
+		?>
+		var template = <?php echo json_encode($conditionTemplateBlank); ?>;
+		template = template.replace(/\{\{i\}\}/g, conditionRowCount[j]);
+		template = template.replace(/\{\{j\}\}/g, j);
+		$('condition-table-body-' + j).insert(template);
+	}
+
+	function removeConditionDynamicRow(e, j) {
+		if ($$('a[name="condition"]').first().hasClassName('active')) {
+			e.parentNode.parentNode.parentNode.removeChild(e.parentNode.parentNode);
+			conditionRowCount[j] = 0;
+		}
+	}
+
+	function attributeChangedEvent(attribute, j, i) {
+		return getConditionValueInputBox(attribute, 'condition'+j+'-'+i+'-value-container', j, i);
+	}
+
+
+	function getConditionValueInputBox(attribute, container, j, i) {
+		if (!$(container)) return;
+		var params = {
+			attribute: attribute,
+			store_id: 0
+		};
+
+		var url = <?php echo json_encode($this->getUrl('*/*/getConditionValueInputBoxAjax')); ?>;
+		new Ajax.Request(url, {
+			parameters: params,
+			onSuccess: function(transport) {
+				try {
+					var result = transport.responseText.replace(/\{\{i\}\}/g, i);
+					result = result.replace(/\{\{j\}\}/g, j);
+					$(container).replace(result);
+				} catch (e) { }
+			}
+		});
+	}
+</script>

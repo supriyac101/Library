@@ -1,0 +1,8 @@
+.content-header .form-buttons {white-space:normal !important;}
+
+.files .row {margin-bottom:1px; width: 280px;}
+.files .row .uploader {width: 241px;}
+.files .row img {vertical-align: top;}
+.files .row button.delete {float:right; width: 31px;}
+.files .row button.browse {float:right; width: 31px;}
+

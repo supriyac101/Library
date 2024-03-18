@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+@author Brainvire Team 
+@copyright Brainvire 
+@package Brainvire_Featuredproducts 
+-->
+<config>
+    <modules>
+        <Brainvire_Ordercomment>
+            <active>true</active>
+            <codePool>community</codePool>
+            <depends>
+                <Mage_Checkout />
+                <Mage_Sales />
+            </depends>
+        </Brainvire_Ordercomment>
+    </modules>
+</config>

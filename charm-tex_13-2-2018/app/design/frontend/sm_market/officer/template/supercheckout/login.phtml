@@ -1,0 +1,274 @@
+<div id="fb-root"></div>
+<?php 
+$settings = Mage::getSingleton('supercheckout/supercheckout')->getData('settings');
+$account = Mage::getSingleton('supercheckout/supercheckout')->getData('account');
+$googleurl = Mage::getSingleton('supercheckout/supercheckout')->getData('googleurl');
+$forgotten = Mage::getUrl('customer/account/forgotpassword');
+$facebook_enable = $settings['step']['facebook_login']['display'];
+$google_enable = $settings['step']['google_login']['display'];
+if (Mage::getSingleton('customer/session')->isLoggedIn()){
+    $logout_url = Mage::helper('customer')->getLogoutUrl();
+    $account_url = Mage::helper('customer')->getAccountUrl();
+}else{
+    $logout_url = "";
+    $account_url = "";
+}
+//var_dump($logouturl);
+        
+if($settings['general']['layout']=='3-Column'){
+            $layout_name='three-column';
+        }elseif($settings['general']['layout']=='2-Column'){
+            $layout_name='two-column';
+        }elseif($settings['general']['layout']=='1-Column'){
+            $layout_name='one-column';
+        }
+        ?>
+<?php
+$login_url	= $this->getUrl('*/*/login', array('_secure'=>(!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS']==='on')));
+//$logout_url	= $this->getUrl('*/*/login', array('_secure'=>(!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS']==='on')));
+$http_mode	= (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS']==='on');
+if($http_mode){
+	$login_url	= str_replace('http:', 'https:', $login_url);  
+}
+if($http_mode && Mage::getSingleton('customer/session')->isLoggedIn())
+        $logout_url	= str_replace('http:', 'https:', $login_url);  
+?>
+<script>
+
+</script>
+<div id="supercheckoutLoginBlock" class="supercheckout-blocks" data-column="<?php echo $settings['step']['login'][$layout_name]['column']; ?>" data-row="<?php echo $settings['step']['login'][$layout_name]['row']; ?>" data-column-inside="<?php echo $settings['step']['login'][$layout_name]['column-inside']; ?>"  >
+    <ul class="headingCheckout">
+        <li>
+            <span class="supercheckout-numbers fontss icon-edit-user-512"></span>
+                <span class="heading_style_icon" ><?php if('notlogged'){ echo $this->__('Login Options');}else{echo $this->__('Welcome ');} ?></span>
+                <div ng-show="displayLoader == 'showLoginLoader'">
+                    <div  class="loader" ></div>
+                </div>
+            </li>
+    </ul>
+            
+            
+            <div class="supercheckout-checkout-content" style="display:block;">
+                <div class="warning" ng-show="login_error">{{login_error_msg}}</div>
+            </div>
+            
+            
+            
+            
+            
+            
+            
+            
+            <?php if (!Mage::getSingleton('customer/session')->isLoggedIn()){ ?>
+                    <div class="supercheckout-extra-wrap">
+                        <?php echo $this->__('Email:'); ?><span class="supercheckout-required">*</span><br />
+                        <input ng-keypress="onKeyPress($event)" autocomplete="off" type="text" id="email" ng-model="data.billing.email" name="email" value="" class="supercheckout-large-field" />
+                        <br/>
+                    </div>    
+                    <div id="loginDetails">
+                        
+                        <div  class="supercheckout-extra-wrap" style="display:<?php if($settings['step']['login']['option']['guest']['display'] ){ echo 'block'; }else{ echo 'none';} ?>;">
+                            <label for="guest">
+                                <?php if ($account == 'guest') { ?>
+                                <input ng-model="loginRadio" type="radio" name="account" value="guest" id="guest" checked="checked" />
+                                <?php } else { ?>
+                                <input ng-model="loginRadio" type="radio" name="account" value="guest" id="guest" />
+                                <?php } ?>
+                                <b><?php echo $this->__('Guest Checkout'); ?></b></label>
+                        </div>
+                        
+                        <div class="supercheckout-extra-wrap">
+                            <label for="register">
+                                <?php if ($account == 'register') { ?>
+                                <input ng-model="loginRadio" type="radio" ng-click="data.billing.register_account=null"  name="account" value="register" id="register" checked="checked" />
+                                <?php } else { ?>
+                                <input ng-model="loginRadio" ng-click="data.billing.register_account=null"  type="radio" name="account" value="register" id="register" />
+                                <?php } ?>
+                                <b><?php echo $this->__('Already registered'); ?></b></label>
+                        </div>  
+                        <?php if($settings['general']['guest_manual']){ ?>
+                        <div class="supercheckout-extra-wrap">
+                            <label for="register_manual">
+                                <?php if ($account == 'register_manual') { ?>
+                                <input ng-model="loginRadio" ng-init="data.billing.register_account= 1"  type="radio" name="account" value="register_manual" id="register_manual" checked="checked" />
+                                <?php } else { ?>
+                                <input ng-model="loginRadio" ng-click="data.billing.register_account=1" type="radio" name="account" value="register_manual" id="register_manual" />
+                                <?php } ?>
+                                <b><?php echo $this->__('Create Account'); ?></b></label>
+                            <input type="hidden" ng-init="data.billing.register_account = 1" ng-if="loginRadio == 'register_manual'" ng-model="data.billing.register_account" >
+                            <input type="hidden" ng-init="data.billing.register_account = 1" ng-if="auto_register == 'register'" ng-model="data.billing.register_account" >
+                            
+                        </div>  
+                        <?php } ?>
+                    </div>
+                    <div ng-show="loginRadio == 'register'" >
+                        <div class="supercheckout-extra-wrap">
+                            <?php echo $this->__('Password'); ?><span class="supercheckout-required">*</span><br />
+                            <input ng-keypress="onKeyPress($event)" autocomplete="off" type="password" ng-model="password" id="password" name="password" value="" class="supercheckout-large-field" />
+                            <br />
+                            <div id="forgotpasswordlink"><a href="<?php echo $forgotten; ?>"><?php echo $this->__('Forgot Password?'); ?></a></div>
+                            <br />
+                            <input ng-click="buttonClicked()" ng-disabled="flag" type="button" value="<?php echo $this->__('Login'); ?>" id="button-login" class="orangebuttonsmall" /><br />
+                        </div>
+                        <input type="hidden" ng-init="data.billing.registered_customer = 1" ng-if="loginRadio == 'register'" ng-model="data.billing.registered_customer">       <!--Code Added by Raghubendra Singh on 19-Jan-2015 to set an extra variable in post data in case already registered radio is selected-->
+                    </div>
+                        <!-- Start Code Added by Raghubendra Singh on 06-Jan-2015 to add fields in case they are enabled for guest user -->
+                        <div ng-show="loginRadio == 'guest'" >
+                                <input type="hidden" ng-init="data.billing.registered_customer = 0" ng-if="loginRadio == 'guest'" ng-model="data.billing.registered_customer">          <!--Code Added by Raghubendra Singh on 19-Jan-2015 to unset the extra variable in post data in case already registered radio is not checked-->
+                                <?php $_dob = $this->getLayout()->createBlock('customer/widget_dob'); ?>
+                                <?php if ($_dob->isEnabled()): ?>
+                                <div class="supercheckout-extra-wrap supercheckout_password_fields">
+                                        <label for="<?php echo $this->getFieldId('month')?>"<?php if ($_dob->isRequired()) echo ' class="required"' ?>><?php if ($_dob->isRequired()) echo '<em>*</em>' ?><?php echo $this->__('Date of Birth') ?></label>
+                                        <div class="input-box customer-dob">
+                                        <?php
+                                            $_dob->setDateInput('d',
+                                                '<div class="dob-day">
+                                                     <input type="text" id="sc_day" ng-model="data.billing.dob_day" value="' . $_dob->getDay() . '" title="' . $this->__('Day') . '" class="input-text validate-custom"/>
+                                                     <label for="' . $_dob->getFieldId('day') . '">' . $this->__('DD') . '</label>
+                                                 </div>'
+                                            );
+
+                                            $_dob->setDateInput('m',
+                                                '<div class="dob-month">
+                                                     <input type="text" id="sc_month" ng-model="data.billing.dob_month" value="' . $_dob->getMonth()  . '" title="' . $this->__('Month')  . '" class="input-text validate-custom"/>
+                                                     <label for="' . $_dob->getFieldId('month') . '">' . $this->__('MM')  . '</label>
+                                                 </div>'
+                                            );
+
+                                            $_dob->setDateInput('y',
+                                                '<div class="dob-year">
+                                                     <input type="text" id="sc_year" ng-model="data.billing.dob_year" value="' . $_dob->getYear()  . '" title="' . $this->__('Year')  . '" class="input-text validate-custom"/>
+                                                     <label for="' . $_dob->getFieldId('year') . '">' . $this->__('YYYY')  . '</label>
+                                                 </div>'
+                                            );
+                                        ?>
+                                            <?php echo $_dob->getSortedDateInputs() ?>
+                                        </div>
+                                </div>
+                                <?php endif ?>
+                                <?php $_taxvat = $this->getLayout()->createBlock('customer/widget_taxvat') ?>
+                                <?php if ($_taxvat->isEnabled()): ?>
+                                <div class="supercheckout-extra-wrap supercheckout_password_fields">
+                                        <label for="<?php echo $_taxvat->getFieldId('taxvat')?>"<?php if ($_taxvat->isRequired()) echo ' class="required"' ?>><?php if ($_taxvat->isRequired()) echo '<em>*</em>' ?><?php echo $this->__('Tax/VAT number') ?></label>
+                                        <div class="input-box">
+                                            <input type="text" id="<?php echo $_taxvat->getFieldId('taxvat')?>" ng-model="data.billing.taxvat" value="<?php echo $_taxvat->escapeHtml($_taxvat->getTaxvat()) ?>" title="<?php echo $this->__('Tax/VAT number') ?>" class="input-text <?php echo $this->helper('customer/address')->getAttributeValidationClass('taxvat') ?>" <?php echo $_taxvat->getFieldParams() ?> />
+                                        </div>
+                                </div>
+                                <?php endif ?>
+                                <?php $_gender = $this->getLayout()->createBlock('customer/widget_gender') ?>
+                                <?php if ($_gender->isEnabled()): ?>
+                                <div class="supercheckout-extra-wrap supercheckout_password_fields">
+                                        <label for="<?php echo $_gender->getFieldId('gender')?>"<?php if ($_gender->isRequired()) echo ' class="required"' ?>><?php if ($_gender->isRequired()) echo '<em>*</em>' ?><?php echo $this->__('Gender') ?></label>
+                                        <div class="input-box">
+                                            <select id="<?php echo $_gender->getFieldId('gender')?>" ng-model="data.billing.gender" title="<?php echo $this->__('Gender') ?>"<?php if ($_gender->isRequired()):?> class="validate-select"<?php endif; ?> <?php echo $_gender->getFieldParams() ?>>
+                                                <?php $options = Mage::getResourceSingleton('customer/customer')->getAttribute('gender')->getSource()->getAllOptions();?>
+                                                <?php $value = $_gender->getGender();?>
+                                                <?php foreach ($options as $option):?>
+                                                    <option value="<?php echo $option['value'] ?>"<?php if ($option['value'] == $value) echo ' selected="selected"' ?>><?php echo $option['label'] ?></option>
+                                                <?php endforeach;?>
+                                            </select>
+                                        </div>
+                                </div>
+                                <?php endif ?>                
+                        </div>
+                        <!--End Code Added by Raghubendra Singh on 06-Jan-2015 to add fields in case they are enabled for guest user-->
+                        
+                <input ng-if="auto_register == 'register'" ng-init="data.billing.customer_password = randomSequence" type="hidden" ng-model="data.billing.customer_password">
+                <input ng-if="auto_register == 'register'" ng-init="data.billing.confirm_password = randomSequence" type="hidden" ng-model="data.billing.confirm_password">
+                    <div ng-if="loginRadio == 'register_manual'" >
+                                <input type="hidden" ng-init="data.billing.registered_customer = 0" ng-if="loginRadio == 'register_manual'" ng-model="data.billing.registered_customer">                <!--Code Added by Raghubendra Singh on 19-Jan-2015 to unset the extra variable in post data in case already registered radio is not checked-->
+                                <div class="supercheckout-extra-wrap supercheckout_password_fields">
+                                    <span class="supercheckout-login-label supercheckout_password_fields"><?php echo $this->__('Password'); ?><span class="supercheckout-required">*</span></span><br/>
+                                    <span class="supercheckout-login-value"><input autocomplete="off" type="password" id="password" ng-model="data.billing.customer_password" name="password_register" value="" class="supercheckout-large-field " /></span>
+                                </div>
+
+                                <div class="supercheckout-extra-wrap supercheckout_password_fields" style="/*float:left;*/">
+                                        <span class="supercheckout-login-label"><?php echo $this->__('Confirm Password'); ?><span class="supercheckout-required">*</span></span><br/>
+                                        <span class="supercheckout-login-value"><input autocomplete="off" type="password" id="confirm_password" ng-model="data.billing.confirm_password" name="confirm_password" value="" class="supercheckout-large-field " /></span>
+                                </div>
+                                <!--Start Code Added by Raghubendra Singh on 02-Jan-2015 to add fields in case they are enabled for new user-->
+                                <?php $_dob = $this->getLayout()->createBlock('customer/widget_dob'); ?>
+                                <?php if ($_dob->isEnabled()): ?>
+                                <div class="supercheckout-extra-wrap supercheckout_password_fields">
+                                        <label for="<?php echo $this->getFieldId('month')?>"<?php if ($_dob->isRequired()) echo ' class="required"' ?>><?php if ($_dob->isRequired()) echo '<em>*</em>' ?><?php echo $this->__('Date of Birth') ?></label>
+                                        <div class="input-box customer-dob">
+                                        <?php
+                                            $_dob->setDateInput('d',
+                                                '<div class="dob-day">
+                                                     <input type="text" id="sc_day" ng-model="data.billing.dob_day" value="' . $_dob->getDay() . '" title="' . $this->__('Day') . '" class="input-text validate-custom"/>
+                                                     <label for="' . $_dob->getFieldId('day') . '">' . $this->__('DD') . '</label>
+                                                 </div>'
+                                            );
+
+                                            $_dob->setDateInput('m',
+                                                '<div class="dob-month">
+                                                     <input type="text" id="sc_month" ng-model="data.billing.dob_month" value="' . $_dob->getMonth()  . '" title="' . $this->__('Month')  . '" class="input-text validate-custom"/>
+                                                     <label for="' . $_dob->getFieldId('month') . '">' . $this->__('MM')  . '</label>
+                                                 </div>'
+                                            );
+
+                                            $_dob->setDateInput('y',
+                                                '<div class="dob-year">
+                                                     <input type="text" id="sc_year" ng-model="data.billing.dob_year" value="' . $_dob->getYear()  . '" title="' . $this->__('Year')  . '" class="input-text validate-custom"/>
+                                                     <label for="' . $_dob->getFieldId('year') . '">' . $this->__('YYYY')  . '</label>
+                                                 </div>'
+                                            );
+                                        ?>
+                                            <?php echo $_dob->getSortedDateInputs() ?>
+                                        </div>
+                                </div>
+                                <?php endif ?>
+                                <?php $_taxvat = $this->getLayout()->createBlock('customer/widget_taxvat') ?>
+                                <?php if ($_taxvat->isEnabled()): ?>
+                                <div class="supercheckout-extra-wrap supercheckout_password_fields">
+                                        <label for="<?php echo $_taxvat->getFieldId('taxvat')?>"<?php if ($_taxvat->isRequired()) echo ' class="required"' ?>><?php if ($_taxvat->isRequired()) echo '<em>*</em>' ?><?php echo $this->__('Tax/VAT number') ?></label>
+                                        <div class="input-box">
+                                            <input type="text" id="<?php echo $_taxvat->getFieldId('taxvat')?>" ng-model="data.billing.taxvat" value="<?php echo $_taxvat->escapeHtml($_taxvat->getTaxvat()) ?>" title="<?php echo $this->__('Tax/VAT number') ?>" class="input-text <?php echo $this->helper('customer/address')->getAttributeValidationClass('taxvat') ?>" <?php echo $_taxvat->getFieldParams() ?> />
+                                        </div>
+                                </div>
+                                <?php endif ?>
+                                <?php $_gender = $this->getLayout()->createBlock('customer/widget_gender') ?>
+                                <?php if ($_gender->isEnabled()): ?>
+                                <div class="supercheckout-extra-wrap supercheckout_password_fields">
+                                        <label for="<?php echo $_gender->getFieldId('gender')?>"<?php if ($_gender->isRequired()) echo ' class="required"' ?>><?php if ($_gender->isRequired()) echo '<em>*</em>' ?><?php echo $this->__('Gender') ?></label>
+                                        <div class="input-box">
+                                            <select id="<?php echo $_gender->getFieldId('gender')?>" ng-model="data.billing.gender" title="<?php echo $this->__('Gender') ?>"<?php if ($_gender->isRequired()):?> class="validate-select"<?php endif; ?> <?php echo $_gender->getFieldParams() ?>>
+                                                <?php $options = Mage::getResourceSingleton('customer/customer')->getAttribute('gender')->getSource()->getAllOptions();?>
+                                                <?php $value = $_gender->getGender();?>
+                                                <?php foreach ($options as $option):?>
+                                                    <option value="<?php echo $option['value'] ?>"<?php if ($option['value'] == $value) echo ' selected="selected"' ?>><?php echo $option['label'] ?></option>
+                                                <?php endforeach;?>
+                                            </select>
+                                        </div>
+                                </div>
+                                <?php endif ?>
+                                <!--End Code Added by Raghubendra Singh on 02-Jan-2015 to add fields in case they are enabled for new user-->
+           
+                            <div class="supercheckout-clear"></div>
+                    </div> 
+                    <?php if($facebook_enable || $google_enable) {   ?>
+                    <div class="orSeparator"><span><?php echo $this->__("OR"); ?></span></div>
+                    <h3><?php echo $this->__("Sign in with"); ?></h3>
+                    <div class="socialNetwork">
+                        <?php if($facebook_enable){ ?>
+                        <div class="fbButton" id="fb-auth" ></div>
+                        <?php }if($google_enable){ ?>
+                        <div class="googleButton" onclick="window.open('<?php echo $googleurl; ?>', 'name','resizable=1,scrollbars=no,width=500,height=400')"></div>
+                        <?php } ?>
+                        <div class="supercheckout-clear"></div>
+                    </div>
+                    <?php } ?>
+                    <?php }else{ ?>
+                    <div class="myaccount">
+                        <ol class="rectangle-list">                            
+                            <li>
+                                <a href="<?php echo $account_url; ?>"><?php  echo $this->__('My Account'); ?></a>
+                            </li>                            
+                            <li>
+                                <a href="<?php  echo $logout_url; ?>"><?php  echo $this->__('Logout'); ?></a>
+                            </li>
+                            <div class="supercheckout-clear"></div>
+                        </ol>
+                    </div>
+                    <?php } ?>                        
+</div>

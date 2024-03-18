@@ -1,0 +1,257 @@
+
+<?php $_helper = $this->helper('catalog/output'); ?>
+
+<?php $_product = $this->getProduct(); ?>
+
+
+
+<script type="text/javascript">
+    var optionsPrice = new Product.OptionsPrice(<?php echo $this->getJsonConfig() ?>);
+</script>
+
+<div id="messages_product_view"><?php echo $this->getMessagesBlock()->getGroupedHtml() ?></div>
+
+<div class="product-view">
+
+<div class="wd_head">
+<img src="<?php echo $this->getSkinUrl('images/wd_head.jpg') ?>" alt="one great Wine Deal  Every Week!" title="one great Wine Deal  Every Week!" />
+</div>
+	
+	<div class="product-essential-wrapper">
+    <div class="product-essential">
+
+    <form action="<?php echo $this->getSubmitUrl($_product) ?>" method="post" id="product_addtocart_form"<?php if($_product->getOptions()): ?> enctype="multipart/form-data"<?php endif; ?>>
+
+        <div class="no-display">
+            <input type="hidden" name="product" value="<?php echo $_product->getId() ?>" />
+            <input type="hidden" name="related_product" id="related-products-field" value="" />
+        </div>
+
+
+
+        <div class="product-shop">
+			
+			<div class="wd_wrapper">
+				<div class="head">
+					<img src="<?php echo $this->getSkinUrl('images/tltb.jpg') ?>" alt="Time Left to Buy" title="Time Left to Buy" />
+				</div>
+				
+					
+					<?php					
+					$_currentDay= date('D' ,Mage::getModel('core/date')->timestamp(time()));
+					
+					if($_currentDay=='Sun')
+						$_currentTime=date("Y-m-d-H-i-s", Mage::getModel('core/date')->timestamp(time())); 
+					else
+						$_currentTime=date("Y-m-d-H-i-s", strtotime('next Sunday'));
+					
+					
+					$_currentTimeArray=explode('-',$_currentTime); 
+					$_currentTimeArray[2]=$_currentTimeArray[2];
+					$_currentTimeArray[3]=24-$_currentTimeArray[3];
+					$_currentTimeArray[4]=60-$_currentTimeArray[4]; 
+					?>
+					
+							<!-- Countdown dashboard start -->
+							<div id="countdown_dashboard" class="ak12">
+					<!--			<div class="dash weeks_dash">
+									<span class="dash_title">weeks</span>
+									<div class="digit">0</div>
+									<div class="digit">0</div>
+								</div> -->
+					
+								<div class="dash days_dash">
+									<div class="digit_wrapper">	
+									<div class="digit">0</div>
+									<div class="digit">0</div>
+									</div>									
+								</div>
+					
+								<div class="dash hours_dash">
+									<div class="digit_wrapper">					
+									<div class="digit first">0</div>
+									<div class="digit">0</div>
+									</div>									
+								</div>
+					
+								<div class="dash minutes_dash">
+								<div class="digit_wrapper">				
+									<div class="digit first">0</div>
+									<div class="digit">0</div>
+								</div>								
+								</div>
+					
+								<div class="dash seconds_dash">	
+								<div class="digit_wrapper">				
+									<div class="digit first">0</div>
+									<div class="digit">0</div>
+								 </div>								 
+								</div>
+					
+							
+							
+							<script language="javascript" type="text/javascript">
+								jQuery.noConflict();
+								jQuery(document).ready(function() {
+									jQuery('#countdown_dashboard').countDown({
+										targetDate: {
+											'day': 		<?php echo $_currentTimeArray[2];?>,
+											'month': 	<?php echo $_currentTimeArray[1];?>,
+											'year': 	<?php echo $_currentTimeArray[0];?>,
+											'hour': 	24,
+											'min': 		0,
+											'sec': 		0
+										},omitWeeks: true
+									});
+								});
+							</script>
+							</div>
+							<!-- Countdown dashboard end -->
+				
+				<div class="bottom">
+					<img src="<?php echo $this->getSkinUrl('images/whmh.jpg') ?>" alt="Days Hours Minutes Seconds" title="Days Hours Minutes Seconds" />
+				</div>								
+			</div>
+			
+						
+            <div class="product-name">
+                <h1><?php echo $_helper->productAttribute($_product, $_product->getName(), 'name') ?></h1>
+            </div>
+            <?php //echo $this->getReviewsSummaryHtml($_product, false, true)?>
+
+			<div class="price_share">			
+			<?php echo $this->getPriceHtml($_product, true) ?>
+			
+			<!-- AddThis Button BEGIN -->
+			<div class="addthis_toolbox addthis_default_style ">
+			<h3><?php echo $this->__('Share This Deal'); ?></h3>
+			<a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+			<a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+			<?php echo $this->getChildHtml('Moii_Pinterest') ?>
+			</div>
+			<script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=xa-4f29f97520800b91"></script>
+			<!-- AddThis Button END -->	
+			
+			</div><!-- END price_share -->	
+			
+			
+			<?php if (!$this->hasOptions()):?>
+                <div class="add-to-box">
+                    <?php //if($_product->isSaleable()): ?>
+                        <?php echo $this->getChildHtml('addtocart') ?>
+                    <?php //endif; ?>
+                    <?php //echo $this->getChildHtml('addto') ?>
+                </div>
+            <?php else:?>
+                <?php //echo $this->getChildHtml('addto') ?>
+            <?php endif; ?>
+			
+			
+<?php if ($_product->getShortDescription()):?>
+<?php $_des=$_helper->productAttribute($_product, nl2br($_product->getDescription()), 'description'); ?>
+
+<div class="short-description">
+
+<?php if(strlen($_des) > 380): ?>
+
+<div class="std long_std" style="display:none;">
+<?php echo $_helper->productAttribute($_product, nl2br($_product->getDescription()), 'description'); ?>
+<a href="#" id="hide_std" style="padding:0px 5px; font-size:11px;">Hide</a>
+</div>
+<div class="std short_std">
+<?php echo substr($_des,0,380); ?>
+<a href="#" id="show_std" style="padding:0px 5px; font-size:11px;">Read more</a>
+</div>
+
+<?php else: ?>
+
+<div class="std">
+<?php echo $_helper->productAttribute($_product, nl2br($_product->getDescription()), 'description'); ?>
+</div>
+<?php endif; ?>
+
+</div>
+
+<script type="text/javascript">
+jQuery(document).ready(function() {	
+
+	jQuery('#show_std').click(function(){
+		jQuery('.short_std').hide('slow');
+		jQuery('.long_std').show('slow');
+		return false;
+	});
+	
+	jQuery('#hide_std').click(function(){
+		jQuery('.short_std').show('slow');
+		jQuery('.long_std').hide('slow');
+		return false;		
+	});
+
+});
+</script>
+<?php endif;?>
+		
+			<div id="product-attributes">
+				<?php echo $this->getChildHtml('additional_attribute') ?>
+			</div>
+			
+            <?php echo $this->getChildHtml('alert_urls') ?>
+            <?php echo $this->getChildHtml('product_type_data') ?>
+            <?php echo $this->getTierPriceHtml() ?>
+
+            <?php if ($this->canEmailToFriend()): ?>
+                <p class="email-friend"><a href="<?php echo $this->helper('catalog/product')->getEmailToFriendUrl($_product) ?>"><?php echo $this->__('Email to a Friend') ?></a></p>
+            <?php endif; ?>
+           
+
+            <?php echo $this->getChildHtml('other');?>
+
+            <?php if ($_product->isSaleable() && $this->hasOptions()):?>
+                <?php echo $this->getChildChildHtml('container1', '', true, true) ?>
+            <?php endif;?>
+			
+        </div>
+
+
+
+        <div class="product-img-box">
+            <?php echo $this->getChildHtml('media') ?>							
+        </div>
+
+
+
+        <div class="clearer"></div>
+        <?php if ($_product->isSaleable() && $this->hasOptions()):?>
+            <?php echo $this->getChildChildHtml('container2', '', true, true) ?>
+        <?php endif;?>
+
+    </form>
+
+		<script type="text/javascript">
+		//<![CDATA[
+				var productAddToCartForm = new VarienForm('product_addtocart_form');
+				productAddToCartForm.submit = function(){
+						if (this.validator.validate()) {
+								this.form.submit();
+						}
+				}.bind(productAddToCartForm);
+		//]]>
+		</script>
+
+    </div>
+	</div> <!-- end product-essential-wrapper -->
+   
+
+    <div class="product-collateral">
+        <?php if (!Mage::getStoreConfig('easy_tabs/general/descriptiontabbed')):?>
+	        <?php echo $this->getChildHtml('description') ?>
+        <?php endif;?>
+        <?php echo $this->getChildHtml('additional') ?>       
+        <?php echo $this->getChildHtml('product_additional_data') ?>
+		<?php //echo $this->getChildHtml('upsell_products') ?>
+		<?php echo $this->getChildHtml('awautorelated2') ?>		
+		<?php echo $this->getChildHtml('product_reviews') ?>	
+    </div>
+
+</div>
+

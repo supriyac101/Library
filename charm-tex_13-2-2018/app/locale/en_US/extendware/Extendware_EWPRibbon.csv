@@ -1,0 +1,167 @@
+"A lower number is a higher priority","A lower number is a higher priority"
+"A prototype CSS selector that finds the product block in your catalog listings","A prototype CSS selector that finds the product block in your catalog listings"
+"A prototype CSS selector that finds the product image on the product page","A prototype CSS selector that finds the product image on the product page"
+"A prototype CSS selector that finds the product image within the product product block","A prototype CSS selector that finds the product image within the product product block"
+Action,Action
+"Add after","Add after"
+"Add Condition Collection","Add Condition Collection"
+"Add CSS Selector","Add CSS Selector"
+"Add New Condition","Add New Condition"
+"Add Product Ribbon","Add Product Ribbon"
+"Add Ribbon Image","Add Ribbon Image"
+"Advanced Information","Advanced Information"
+"Always Continue","Always Continue"
+"Any selected attribute must be available to the products on the pages that the ribbon displays. This usually means the attribute must be set to ""Used in Product Listing"" in Catalog -> Attributes.","Any selected attribute must be available to the products on the pages that the ribbon displays. This usually means the attribute must be set to ""Used in Product Listing"" in Catalog -> Attributes."
+"Are you sure?","Are you sure?"
+"Attrib. Set Name","Attrib. Set Name"
+Attribute,Attribute
+"Bottom Center","Bottom Center"
+"Bottom Left","Bottom Left"
+"Bottom Right","Bottom Right"
+"Cannot change namespace","Cannot change namespace"
+"Category Image","Category Image"
+"Category Page Ribbon","Category Page Ribbon"
+"Category Product Image Selector","Category Product Image Selector"
+"Category product items cannot be found on the page. You will need to alter the Category Product Selector in the developer section of the configuration to match your theme, so that products can be found. We can perform this action for you as part of our custom development service.","Category product items cannot be found on the page. You will need to alter the Category Product Selector in the developer section of the configuration to match your theme, so that products can be found. We can perform this action for you as part of our custom development service."
+"Category Product Selector","Category Product Selector"
+"Category Text","Category Text"
+"Change status","Change status"
+Condition,Condition
+"Condition condition is invalid","Condition condition is invalid"
+"Condition is invalid","Condition is invalid"
+Conditions,Conditions
+Configuration,Configuration
+Configure,Configure
+"Container Style","Container Style"
+Created,Created
+"CSS Selector","CSS Selector"
+"CSS style to modify inner container","CSS style to modify inner container"
+"CSS style to modify outer container. Useful for positioning and z-index","CSS style to modify outer container. Useful for positioning and z-index"
+"CSS style to modify ribbon image (width, height, border, etc)","CSS style to modify ribbon image (width, height, border, etc)"
+"CSS style to modify ribbon text (color, size, positioning, etc)","CSS style to modify ribbon text (color, size, positioning, etc)"
+Custom,Custom
+"Debugging Status","Debugging Status"
+Default,Default
+"Default State","Default State"
+Delete,Delete
+"Delete Condition Collection","Delete Condition Collection"
+"Deleting default image is currently not supported","Deleting default image is currently not supported"
+Developer,Developer
+Disabled,Disabled
+"Do not upload duplicate images","Do not upload duplicate images"
+Edit,Edit
+"Enable or disable product ribbons","Enable or disable product ribbons"
+Enabled,Enabled
+"Equal to","Equal to"
+Exluded,Exluded
+Extendware,Extendware
+Fail,Fail
+"Fallback Position Selectors","Fallback Position Selectors"
+"From Date","From Date"
+General,General
+"General Information","General Information"
+"Greater than","Greater than"
+"Greater than or equal to","Greater than or equal to"
+Height,Height
+"Hide if ribbon already exists in this position","Hide if ribbon already exists in this position"
+"Hide Status","Hide Status"
+ID,ID
+"If enabled, then an alert box will give notice why ribbons are not displaying.","If enabled, then an alert box will give notice why ribbons are not displaying."
+"If enabled, this ribbon will not be shown if another ribbon with a higher priority is shown in the same position. Position is defined on the ribbon page (e.g., top right, middle center, etc)","If enabled, this ribbon will not be shown if another ribbon with a higher priority is shown in the same position. Position is defined on the ribbon page (e.g., top right, middle center, etc)"
+"If set to ""stop"" no more ribbons will be added to a product after this ribbon is added. Set to ""always continue"" if there will be multiple ribbons shown on a single product.","If set to ""stop"" no more ribbons will be added to a product after this ribbon is added. Set to ""always continue"" if there will be multiple ribbons shown on a single product."
+"If the product does not match any condition groups, then this determines whether the ribbon will be shown on the product. Almost always select ""Fail"" unless you want to show on every product.","If the product does not match any condition groups, then this determines whether the ribbon will be shown on the product. Almost always select ""Fail"" unless you want to show on every product."
+Image,Image
+"Image File","Image File"
+"Image file already exists","Image file already exists"
+"Image file does not exist","Image file does not exist"
+"Image has been deleted","Image has been deleted"
+"Image has been successfully saved","Image has been successfully saved"
+"Image Information","Image Information"
+"Image Style","Image Style"
+Images,Images
+"Improve Your Store","Improve Your Store"
+Included,Included
+"Inner Container Style","Inner Container Style"
+"Input one per line. The first matching one on the page will be used in order to help position the ribbons","Input one per line. The first matching one on the page will be used in order to help position the ribbons"
+"Invalid path name","Invalid path name"
+"Less than","Less than"
+"Less than or equal to","Less than or equal to"
+Like,Like
+Main,Main
+"Manage Extensions","Manage Extensions"
+"Manage Images","Manage Images"
+"Manage Product Ribbons","Manage Product Ribbons"
+"Middle Center","Middle Center"
+"Middle Left","Middle Left"
+"Middle Right","Middle Right"
+"Missing data for condition","Missing data for condition"
+"Missing data for item","Missing data for item"
+Name,Name
+Namespace,Namespace
+"New lines are converted to line breaks. You may enter special variables with <i>{{var [name]}}</i> where you replace <i>[name]</i> with the name of variable. For example, {{var price}} will output the price. You can format the output using <i>sprintf</i> formatting and using other value filters (look at the user guide). Here are two examples of using filters: <br/><br/><ul><li><b>{{var ew:discount_percent|sprintf:%s}}</b> - format the discount percent to only show leading digits</li><li><b>{{var ew:seconds_since_creation|divide:86400|round|max:1}}</b> - convert the seconds since creation to days since creation</li></ul> <br/><b>List of Variable Names</b><br/>%s<br/><br/><b>Note:</b> If a variable is not showing in the frontend then you need to make sure the product attribute is available to the loaded product. This usually means the attribute must be set to ""Used in Product Listing"" in Catalog -> Attributes.","New lines are converted to line breaks. You may enter special variables with <i>{{var [name]}}</i> where you replace <i>[name]</i> with the name of variable. For example, {{var price}} will output the price. You can format the output using <i>sprintf</i> formatting and using other value filters (look at the user guide). Here are two examples of using filters: <br/><br/><ul><li><b>{{var ew:discount_percent|sprintf:%s}}</b> - format the discount percent to only show leading digits</li><li><b>{{var ew:seconds_since_creation|divide:86400|round|max:1}}</b> - convert the seconds since creation to days since creation</li></ul> <br/><b>List of Variable Names</b><br/>%s<br/><br/><b>Note:</b> If a variable is not showing in the frontend then you need to make sure the product attribute is available to the loaded product. This usually means the attribute must be set to ""Used in Product Listing"" in Catalog -> Attributes."
+"No Image","No Image"
+"Normal Attributes","Normal Attributes"
+"Not equal to","Not equal to"
+"Not like","Not like"
+"Only set this if you only want the ribbon active within a certain date range. Current time is %s","Only set this if you only want the ribbon active within a certain date range. Current time is %s"
+Pass,Pass
+Path,Path
+Piority,Piority
+"Please <u>read the help descriptions, field descriptions, fieldset descriptions, and user guides</u> so you may configure this extension to suit your needs.","Please <u>read the help descriptions, field descriptions, fieldset descriptions, and user guides</u> so you may configure this extension to suit your needs."
+"Please select an item(s) before submitting to the mass processor","Please select an item(s) before submitting to the mass processor"
+Position,Position
+Preview,Preview
+Price,Price
+Priority,Priority
+"Processing Mode","Processing Mode"
+"Product IDs cannot be determined from your category listing page. Inside of each category listing block you should output <span id=""extendware-pid-[product id here]""></span> so that the product ID may be determined. We can perform this action for you as part of our custom development service.","Product IDs cannot be determined from your category listing page. Inside of each category listing block you should output <span id=""extendware-pid-[product id here]""></span> so that the product ID may be determined. We can perform this action for you as part of our custom development service."
+"Product Image","Product Image"
+"Product image cannot be determined from your category listing page. You will need to adjust the Category Image Selector CSS selector in the developer section of the product ribbon configuration to match your theme, so that product images can be found. We can perform this action for you as part of our custom development service.","Product image cannot be determined from your category listing page. You will need to adjust the Category Image Selector CSS selector in the developer section of the product ribbon configuration to match your theme, so that product images can be found. We can perform this action for you as part of our custom development service."
+"Product image cannot be determined from your product page. You will need to adjust the Product Image Selector CSS selector in the developer section of the product ribbon configuration to match your theme, so that product images can be found. We can perform this action for you as part of our custom development service.","Product image cannot be determined from your product page. You will need to adjust the Product Image Selector CSS selector in the developer section of the product ribbon configuration to match your theme, so that product images can be found. We can perform this action for you as part of our custom development service."
+"Product Image Selector","Product Image Selector"
+"Product Overrides","Product Overrides"
+"Product overrides allow you to always include / exclude a product despite other conditions.","Product overrides allow you to always include / exclude a product despite other conditions."
+"Product Page Ribbon","Product Page Ribbon"
+"Product Ribbon","Product Ribbon"
+"Product ribbon has been successfully saved","Product ribbon has been successfully saved"
+"Product Ribbons","Product Ribbons"
+"Product Text","Product Text"
+"Reference Positino CSS Selectors","Reference Positino CSS Selectors"
+"Reference Position CSS Selectors","Reference Position CSS Selectors"
+Remove,Remove
+Ribbon,Ribbon
+"Ribbon has been deleted","Ribbon has been deleted"
+"Ribbon Image","Ribbon Image"
+"Ribbon Images","Ribbon Images"
+"Ribbon will only be shown in these stores. Use CTRL+Click to select more than store","Ribbon will only be shown in these stores. Use CTRL+Click to select more than store"
+"Ribbon with that name already exists","Ribbon with that name already exists"
+Ribbons,Ribbons
+"Ribbons are processed according to priority. Ribbons with a higher priority will appear on top of other ribbons if they are in the same position on the product image.","Ribbons are processed according to priority. Ribbons with a higher priority will appear on top of other ribbons if they are in the same position on the product image."
+"Root Category","Root Category"
+"Selected item(s) (%d) have been mass processed by the %s processor","Selected item(s) (%d) have been mass processed by the %s processor"
+"Selected item(s) (%d) have failed to be mass processed by the %s processor","Selected item(s) (%d) have failed to be mass processed by the %s processor"
+Selectors,Selectors
+Settings,Settings
+SKU,SKU
+"Sort Order","Sort Order"
+"Special Attributes","Special Attributes"
+State,State
+Status,Status
+"Stop On Match","Stop On Match"
+"Store View","Store View"
+"Style Information","Style Information"
+Text,Text
+"Text Style","Text Style"
+"The general location the ribbon will appear. You can customize further with styles if needed.","The general location the ribbon will appear. You can customize further with styles if needed."
+"This is normally one of the main div containers on the page such as div.main or div.catalog-products, etc.","This is normally one of the main div containers on the page such as div.main or div.catalog-products, etc."
+"This is normally one of the main div containers on the page such as div[class~=""main""] or div[class~=""category-products""], etc. It will be an element where the css position is set to ""relative"".","This is normally one of the main div containers on the page such as div[class~=""main""] or div[class~=""category-products""], etc. It will be an element where the css position is set to ""relative""."
+"This text will appear over the product image. Special variables are available","This text will appear over the product image. Special variables are available"
+"To Date","To Date"
+"Top Center","Top Center"
+"Top Left","Top Left"
+"Top Right","Top Right"
+Type,Type
+"User Guides / Help","User Guides / Help"
+Value,Value
+Width,Width
+"You can use an ""image style"" to change the dimensions of the image","You can use an ""image style"" to change the dimensions of the image"

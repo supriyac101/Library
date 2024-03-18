@@ -1,0 +1,229 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magento.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magento.com for more information.
+ *
+ * @category    design
+ * @package     rwd_default
+ * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+/**
+ * @var Mage_Page_Block_Html_Header $this
+ */
+
+/**
+ * Set 'LoginBackUrl' variable in session when loading header.phtml (this file) for the wished page
+ */
+if(!Mage::helper('customer')->isLoggedIn()){
+	$loginback=$this->helper('core/url')->getCurrentUrl();
+	$check=strstr($loginback, 'customer/account/login');  //check if not loading header.phtml (this) for the redirected login page
+	if(!strlen($check)){
+		Mage::getSingleton('core/session')->setLoginBackUrl($loginback);
+	}
+}
+?>
+<header id="header" class="header-full">
+	<?php /* ?>
+	<div class="topLinks mob-hedr">
+		<ul class="links">
+			<li><a href="<?php echo $this->getUrl('') ?>">Home</a></li>
+			<li><a href="<?php echo $this->getUrl('about-us')?>">ABOUT US</a></li>
+			<li><a href="<?php echo $this->getUrl('contacts')?>">CONTACT US</a></li>
+			
+		</ul>
+	</div>
+	<?php */ ?>
+	<?php /* ?>
+	<div class="topLinks">
+		<ul class="links">
+			<li><a href="<?php echo $this->getUrl('')?>">HOME</a></li>
+			<li><a href="<?php echo $this->getUrl('about-us')?>">ABOUT US</a></li>
+			<li><a href="<?php echo $this->getUrl('')?>request-catalog">REQUEST CATALOG</a></li>
+			<li><a href="<?php echo $this->getUrl('')?>clearance.html">CLEARANCE</a></li>
+			<li><a href="<?php echo $this->getUrl('')?>free-samples">FREE SAMPLES</a> </li>
+			<li><a href="<?php echo $this->getUrl('')?>shippinginfo-policies">SHIPPING INFO & POLICIES</a></li>
+			<li><a href="<?php echo $this->getUrl('contacts')?>">CONTACT US</a></li>
+		</ul>
+	</div>
+	<?php */ ?>
+	<div class="container clearfix">
+		<a class="logo" href="<?php echo $this->getUrl('') ?>">
+			<img src="<?php echo $this->getLogoSrc() ?>" alt="<?php echo $this->getLogoAlt() ?>" class="large" />
+			<img src="<?php echo $this->getLogoSrcSmall() ?>" alt="<?php echo $this->getLogoAlt() ?>" class="small" />
+		</a>
+		<div class="headerRight">
+			<div class="infoPanel">
+				<div class="infoBoxRt">
+					<div class="infoText callUs">
+						<span class="text1"><a href="tel:8002113147"><?php echo $this->__('800-221-3147') ?></a></span>
+						<!--<span class="text2">Providers of Jail Supplies</span>-->
+					</div>
+					
+					<?php echo $this->getChildHtml('topSearch') ?>
+					
+					<div class="infoText">
+						<div class="header-acc">
+							<a href="<?php echo Mage::getUrl('customer/account');?>"><?php echo $this->__('Account') ?></a>
+						</div>
+					</div>
+					<div class="infoText">
+						<div class="header-minicart">
+							<?php echo $this->getChildHtml('minicart_head'); ?>
+						</div>
+					</div>
+					<div class="infoText">
+						<ul class="header-login">
+							<?php if (!Mage::getSingleton('customer/session')->isLoggedIn()): ?>
+							<li>
+								<a href="<?php echo Mage::getUrl('customer/account/create'); ?>">Register </a>
+							</li>
+							<li>
+								<a href="<?php echo Mage::helper('customer')->getLoginUrl(); ?>"><?php echo $this->__('Login') ?></a>
+							</li>
+							<?php else: ?>
+							<li>
+								<a href="<?php echo Mage::helper('customer')->getLogoutUrl(); ?>"><?php echo $this->__('Logout') ?></a>
+							</li>
+							
+							<?php endif; ?>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+    <div class="navigationPan">
+        <div class="container clearfix">
+          <div class="allCate"> <span class="allCateClick"><?php echo $this->__('Shop <span>By Department</span>') ?></span>
+            <div class="allCateDrop">
+                <?php 
+               //$parentCategoryId =4;
+                $children = Mage::getModel('catalog/category')->getCollection()->setStoreId(Mage::app()->getStore()->getId());
+                $children->addAttributeToSelect('*')
+                    ->addAttributeToFilter('parent_id',613 )
+                    ->addAttributeToFilter('is_active', 1)//get only active categories if you want
+                    ->addAttributeToSort('position');?>
+				<ul>
+                    <?php foreach($children as $subCatid){
+					if ($subCatid->getIncludeInMenu()){	
+						?>
+			<li><a href="<?php echo $subCatid->getUrl() ?>"><?php echo $subCatid->getName() ?></a>
+				<?php $collection = Mage::getModel('catalog/category')->getCollection();
+				
+				$collection->addAttributeToSelect('*') 
+				 ->addIdFilter($subCatid->getChildren()) 
+				 ->setOrder('name', Varien_Db_Select::SQL_ASC) 
+				 ->load();?>
+				 <?php if (count($collection) > 0){ ?>
+				 <?php /* ?>
+					<i class="fa fa-caret-right"></i>
+				 <?php */ ?>
+				
+				<ul class="sub-menu">
+					<div class="main-cat"><a href="<?php echo $subCatid->getUrl() ?>"><?php echo $subCatid->getName() ?></a></div>
+					<?php foreach ($collection as $child) { ?>
+					<li><a href="<?php echo $child->getUrl() ?>"><?php echo $child->getName() ?></a></li>
+				       <?php }?>
+				       <?php if ($_thumbnail = Mage::getModel('catalog/category')->load($subCatid->getId())->getImage()): ?>
+					<?php $_imageurl = Mage::getBaseUrl('media') . 'catalog/category/' . $_thumbnail;?>
+					<div class="sub-category-image">
+					    <a title="<?php echo  $subCatid ?>" href="<?php echo $subCatid->getUrl() ?>"><img width="622" height="200" alt="<?php echo  $subCatid ?>" src="<?php echo $_imageurl ?>"></a>
+					</div>
+				    <?php endif; ?>
+				       
+			       </ul>
+				
+				<?php }
+					}?>
+				
+			</li>
+                    <?php } ?>
+               </ul>
+            </div>
+          </div>
+          <a class="skip-link skip-nav skip-active" href="#header-nav"> <span class="icon"></span> <span class="label"><?php echo $this->__('Menu') ?></span> </a>
+          <div class="skip-content" id="header-nav">
+			  <?php echo $this->getChildHtml('topMenu') ?>
+		<ul class="nav-links">
+			<li><a href="<?php echo $this->getUrl('') ?>"><?php echo $this->__('Home') ?></a></li>
+			<li><a href="<?php echo $this->getUrl('about-us')?>"><?php echo $this->__('ABOUT US') ?></a></li>
+			<li><a href="<?php echo $this->getUrl('contacts')?>"><?php echo $this->__('CONTACT US') ?></a></li>
+			
+		</ul>
+          </div>
+	  
+        </div>
+	
+    </div>
+    <?php $catalogSearchHelper =  $this->helper('catalogsearch');?>
+	<div class="container">
+		<div class="searchBox mobile-view">
+			<div class="skip-content" id="header-search-2">
+				<form id="search_mini_form-2" action="<?php echo $catalogSearchHelper->getResultUrl() ?>" method="get">
+					<div class="input-box">
+						<input id="search2" type="search" name="<?php echo $catalogSearchHelper->getQueryParamName() ?>" value="<?php echo $catalogSearchHelper->getEscapedQueryText() ?>" class="input-text required-entry" maxlength="<?php echo $catalogSearchHelper->getMaxQueryLength();?>" placeholder="<?php echo $this->__('Search entire store here...') ?>" />
+						<button type="submit" title="<?php echo $this->__('Search') ?>" class="button search-button"><span><span><?php echo $this->__('Search') ?></span></span></button>
+					</div>
+					
+					<div class="search-autocomplete" id="search_autocomplete-2" style="display: none;"></div>
+					<script type="text/javascript">
+						//<![CDATA[
+							var searchForm = new Varien.searchForm('search_mini_form-2', 'search', '');
+							searchForm.initAutocomplete('<?php echo $catalogSearchHelper->getSuggestUrl() ?>', 'search_autocomplete-2');
+						//]]>
+					</script>
+				</form>
+			</div>
+		</div>
+	</div>
+	<?php  ?>
+</header>
+
+<?php echo $this->getChildHtml('topContainer'); ?>
+<script type="text/javascript">
+	jQuery(document).ready(function(){
+		//alert("hello");
+		jQuery('.allCateDrop ul li.parent').hover(function(){
+			jQuery(this).find("ul.sub-menu").css({'height':(jQuery('.allCateDrop').height())+'px'});
+			//alert("done");
+			var menuhgt = jQuery('.navigationPan').offset().top;
+			var innerhgt = jQuery('.navigationPan').height();
+			//alert(innerhgt);
+			var toporghgt = (menuhgt + innerhgt) ;
+			var tophgt = jQuery(this).find("ul.sub-menu").offset().top ;
+			var orghgt = -(tophgt- toporghgt);
+			jQuery(this).find("ul.sub-menu").css('top',orghgt);
+			//alert(tophgt);
+		},function(){
+			jQuery(this).find("ul.sub-menu").attr('style','');
+		});
+	var windowWidth = jQuery(window).width();
+	if (windowWidth <= 768) {
+		jQuery(".skip-nav").click(function(){
+			//alert("done");
+			jQuery("#header-nav").slideToggle();
+			jQuery('html, body').animate({
+				scrollTop: jQuery(".skip-nav").offset().top
+			}, 2000);
+		});
+	}
+	
+	});
+</script>

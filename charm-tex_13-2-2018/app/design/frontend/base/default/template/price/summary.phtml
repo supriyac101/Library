@@ -1,0 +1,70 @@
+<?php $summary = $this->getSummary() ?>
+<?php if (isset($summary['main'])) : ?>
+    <ul class="tier-prices product-pricing">
+        <li><strong><?php echo $this->__('Your personal price') ?></strong></li>
+        <?php ?>
+        <?php foreach ($summary['main'] as $price) : ?>
+            <li><?php echo $price['final_price']  ?> (-<?php echo $price['percent_save'] ?>%)</li>
+        <?php endforeach; ?>
+    </ul>
+<?php endif; ?>
+<?php if (isset($summary['tier'])) : ?>
+    <ul class="tier-prices product-pricing">
+        <li><strong><?php echo $this->__('Buy more and save big') ?></strong></li>
+        <?php foreach ($summary['tier'] as $price) : ?>
+            <li><?php echo $this->__('Buy %1$s for %2$s each', $price['price_tier_quantity'], $price['final_price'], 20) ?> and save <?php echo $price['percent_save'] ?>%</li>
+        <?php endforeach; ?>
+    </ul>
+    <script>
+		if ('undefined' !== typeof jQuery)
+		{
+			(function($)
+			{
+				var map = [];
+				
+				<?php foreach ($summary['tier'] as $price): ?>
+
+					map.push(<?php echo json_encode($price) ?>);
+				
+				<?php endforeach ?>
+
+				/**
+				 * Update price display depending on current quantity
+				 */
+				var update = function()
+				{
+					var quantity = parseInt($(this).val()), max = 0, up = null;
+
+					if (quantity > 0)
+					{
+						for (i = 0, l = map.length; i < l; i++)	
+						{
+							if (quantity >= parseInt(map[i].price_tier_quantity) && parseInt(map[i].price_tier_quantity) >= max)
+							{
+								up = map[i];
+
+								max = parseInt(map[i].price_tier_quantity);
+							}
+						}
+
+						if (up)
+						{
+							$('p.special-price').find('span.price').html(up.final_price);
+						}
+					}
+				}; 
+				
+				$(document).ready(function()
+				{
+					$('[name=qty]').on(
+					{
+						blur: 	update,
+						focus: 	update,
+						change: update
+					});
+				});
+		
+			})(jQuery);
+		}
+	</script>
+<?php endif ?>

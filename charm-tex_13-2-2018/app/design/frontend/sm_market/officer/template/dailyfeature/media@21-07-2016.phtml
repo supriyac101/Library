@@ -1,0 +1,164 @@
+<?php
+    $_product = $this->getProduct();
+    $_helper = $this->helper('catalog/output');
+    
+    $_lightboxConfig = Mage::getStoreConfig('easy_lightbox/general');
+    /* Main Image Size */
+    if (strstr($_lightboxConfig['mainImageSize'], '_')) {
+        $mainImageSize = explode('_', $_lightboxConfig['mainImageSize'], 2);
+    } else {
+        $mainImageSize = array(265, 265);
+    }
+    /* Popup Image Size */
+    if (strstr($_lightboxConfig['popupImageSize'], '_')) {
+        $popupImageSize = explode('_', $_lightboxConfig['popupImageSize'], 2);
+    } else {
+        $popupImageSize = array(0, 0);
+    } 
+    /* Additional Images Size */
+    if (strstr($_lightboxConfig['additionalImageSize'], '_')) {
+        $additionalImageSize = explode('_', $_lightboxConfig['additionalImageSize'], 2);
+    } else {
+        $additionalImageSize = array(60, 60);
+    }
+    
+    $image = $this->helper('catalog/image')->init($_product, 'image');
+    if ($popupImageSize[0] > 0) {
+        $image = $this->helper('catalog/image')->init($_product, 'image')->resize($popupImageSize[0], $popupImageSize[1]);
+    }
+       
+?>
+
+<?php if(!$_lightboxConfig['defaulzoom']): ?>
+
+<?php
+	$maintitle = $this->htmlEscape($_product->getImageLabel());
+	if( empty($maintitle) ):
+	        $maintitle  = $_product->getName();
+	endif;
+?>
+<div class="right_img_box">
+<a href="<?php echo $image; ?>" 
+    rel="lightbox[rotation]" 
+    title="<?php echo $maintitle ;?>"
+    onclick="return false;"
+><img src="<?php echo $this->helper('catalog/image')->init($_product, 'image')->resize(400); ?>" alt="<?php echo $maintitle; ?>"
+/></a>
+
+ <h2 class="txt_center"><?php echo $this->__('Click on above image to enlarge') ?></h2>
+ </div><!-- right_img_box -->
+<?php else: ?>
+
+<p class="product-image-zoom">
+    <?php
+        $_img = '<img id="image" src="'.$this->helper('catalog/image')->init($_product, 'image').'" alt="'.$maintitle.'" title="'.$maintitle.'" />';
+        echo $_helper->productAttribute($_product, $_img, 'image')
+    ?>
+</p>
+<p class="a-center" id="track_hint"><?php echo $this->__('Double click on above image to view full picture') ?></p>
+
+<div class="image-zoom" id="track_outer">
+    <img id="zoom_out" src="<?php echo $this->getSkinUrl('images/slider_btn_zoom_out.gif') ?>" alt="<?php echo $this->__('Zoom Out') ?>" class="btn-zoom-out" />
+    <div id="track">
+        <div id="handle"></div>
+    </div>
+    <img id="zoom_in" src="<?php echo $this->getSkinUrl('images/slider_btn_zoom_in.gif') ?>" alt="<?php echo $this->__('Zoom In') ?>" class="btn-zoom-in" />
+</div>
+<script type="text/javascript">
+    Event.observe(window, 'load', function() {
+        product_zoom = new Product.Zoom('image', 'track', 'handle', 'zoom_in', 'zoom_out', 'track_hint');
+    });
+</script>
+
+<?php endif; ?>
+
+<?php if (count($this->getGalleryImages()) > 0): ?>
+<div class="full-width more-views">
+ <h2 class="txt_center"><?php echo $this->__('Click on above image to enlarge') ?></h2>
+ <script>
+    jQuery(window).load(function() {
+	jQuery(".img_thumb").css("display","block"); 
+	jQuery('.img_thumb').owlCarousel({
+		loop:true,
+		nav:true,
+		dots:false,
+		animateOut: 'fadeOut',
+		autoplay:true,
+		margin: 10,
+		items:4
+	    });
+    });
+ </script>
+
+    <div class="img_thumb" style="display: none">
+    <?php $_counter=1 ;foreach ($this->getGalleryImages() as $_image): ?>
+	<?php
+	$subtitle = $this->htmlEscape($_image->getLabel());
+	if( empty($subtitle) ):
+	        $subtitle  = $_product->getName();
+	endif;
+	?>
+    <div class="item">
+        <a href="<?php echo $this->helper('catalog/image')->init($this->getProduct(), 'image', $_image->getFile())->resize(75,75); ?>" 
+            rel="lightbox[rotation]" 
+            title="<?php echo $subtitle; ?>"
+            onclick="return false;"
+        ><img src="<?php echo $this->helper('catalog/image')->init($this->getProduct(), 'thumbnail', $_image->getFile())->resize(75,75); ?>" title="<?php echo $subtitle.'#'.$_counter; ?>" alt="<?php echo $subtitle.'#'.$_counter; ?>"
+        />
+	
+	<!--<img src="<?php echo $this->helper('catalog/image')->init($this->getProduct(), 'thumbnail', $_image->getFile())->resize(100,100); ?>" title="<?php echo $subtitle.'#'.$_counter; ?>" alt="<?php echo $subtitle.'#'.$_counter; ?>"
+        />-->
+	</a>
+    </div>
+    <?php $_counter++; endforeach; ?>
+
+    </div>
+</div>
+
+<script type="text/javascript">
+jQuery(document).ready(function() {
+	// example 1
+	jQuery(".product_gallery ul").simplecarousel({
+		width:80,
+		height:90,
+		visible: 4,
+		auto: false,
+		vertical: true,
+		next: jQuery('.next_btn'),
+		prev: jQuery('.prev_btn')
+	});
+
+});
+
+</script>
+	
+<?php endif; ?>
+
+<script type="text/javascript">
+function initLightbox(){
+    new Lightbox({
+        fileLoadingImage: '<?php echo $this->getSkinUrl('images/lightbox/loading.gif') ?>',
+        fileBottomNavCloseImage: '<?php echo $this->getSkinUrl('images/lightbox/closelabel.gif') ?>',
+        overlayOpacity: <?php echo $_lightboxConfig['overlayOpacity'] ?>,
+        animate: <?php echo (($_lightboxConfig['animate'] > 0)? "1":"0"); ?>,
+        resizeSpeed: <?php echo $_lightboxConfig['resizeSpeed'] ?>,
+        borderSize: <?php echo $_lightboxConfig['borderSize'] ?>,
+        labelImage: '<?php echo $_lightboxConfig['labelImage'] ?>',
+        labelOf: '<?php echo $_lightboxConfig['labelOf'] ?>'
+    });
+}
+
+
+if (Prototype.Browser.IE) {
+    Event.observe(window, 'load', function(){ //KB927917 fix
+        initLightbox();
+    });
+} else {
+    document.observe("dom:loaded", function(){
+        initLightbox();
+    });
+}
+</script>
+
+
+

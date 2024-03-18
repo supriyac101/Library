@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <ordergrid_adminhtml_ordergrid_index>
+        <reference name="content">
+            <block type="ordergrid/adminhtml_ordergrid" name="ordergrid" />
+        </reference>
+    </ordergrid_adminhtml_ordergrid_index>
+</layout>

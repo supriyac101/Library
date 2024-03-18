@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<!--
+@author Brainvire Team 
+@copyright Brainvire 
+@package Brainvire_Ordercomment 
+-->
+<config>
+    <modules>
+        <Brainvire_Ordercomment>
+            <version>1.0.6</version>
+        </Brainvire_Ordercomment>
+    </modules>
+    <frontend>
+        <routers>
+            <brainvire_ordercomment>
+            <use>standard</use>
+                <args>
+                    <module>Brainvire_Ordercomment</module>
+                    <frontName>ordercomment</frontName>
+                </args>
+            </brainvire_ordercomment>    
+        </routers>    
+        <translate>
+          <modules>
+            <Brainvire_Ordercomment>
+              <files>
+                <default>Ordercomment.csv</default>
+              </files>
+            </Brainvire_Ordercomment>
+          </modules>
+        </translate>
+          <events>
+                <checkout_type_onepage_save_order>
+                    <observers>
+                        <saveCustomerComment>
+                            <class>Brainvire_Ordercomment_Model_Observer</class>
+                            <method>saveOrderComment</method>
+                        </saveCustomerComment>
+                    </observers>
+                </checkout_type_onepage_save_order>
+                <checkout_type_multishipping_create_orders_single>
+                    <observers>
+                        <saveCustomerComment>
+                            <class>Brainvire_Ordercomment_Model_Observer</class>
+                            <method>saveOrderComment</method>
+                        </saveCustomerComment>
+                    </observers>
+                </checkout_type_multishipping_create_orders_single>
+          </events>
+      
+      <layout>
+        <updates>
+            <ordercomment>
+                <file>ordercomment.xml</file>
+            </ordercomment>
+        </updates>
+     </layout>
+    </frontend>
+    <global>
+        <models>
+            <ordercomment>
+                <class>Brainvire_Ordercomment_Model</class>
+                    <resourceModel>ordercomment_resource</resourceModel>
+            </ordercomment>
+            
+            <checkout>
+                <rewrite>
+                    <type_onepage>Brainvire_Ordercomment_Model_Type_Onepage</type_onepage>
+                </rewrite>
+            </checkout>   
+       
+            <ordercomment_resource>
+                <class>Brainvire_Ordercomment_Model_Resource</class>
+                <deprecatedNode>ordercomment_mysql4</deprecatedNode>
+            </ordercomment_resource>
+            <sales_resource>
+                <rewrite>
+                    <order_grid_collection>Brainvire_Ordercomment_Model_Mysql4_Order_Grid_Collection</order_grid_collection>
+                </rewrite>
+            </sales_resource>              
+                            
+        </models>
+          
+        <helpers>
+            <ordercomment>
+                <class>Brainvire_Ordercomment_Helper</class>
+            </ordercomment>
+        </helpers>
+        
+        <blocks>        
+            <checkout>
+                <rewrite>
+                    <onepage>Brainvire_Ordercomment_Block_Onepage</onepage>
+                </rewrite>
+            </checkout>        
+        
+            <ordercomment>
+                <class>Brainvire_Ordercomment_Block</class>
+            </ordercomment>  
+            
+            <ordercommentonepage>
+                <class>Brainvire_Ordercomment_Block_Onepage</class>
+            </ordercommentonepage>
+            
+            <adminhtml>
+                <rewrite>
+                    <sales_order_grid>Brainvire_Ordercomment_Block_Adminhtml_Sales_Order_Grid</sales_order_grid>
+                </rewrite>
+            </adminhtml>                                
+        </blocks>
+
+        <rewrite>
+          <brainvire_ordercomment_onepage>
+            <from><![CDATA[#^/checkout/onepage/#]]></from>
+            <to>/ordercomment/onepage/</to>
+          </brainvire_ordercomment_onepage>
+        </rewrite>
+    </global>
+</config>

@@ -1,0 +1,228 @@
+<?php $settings = Mage::getSingleton('supercheckout/supercheckout')->getData('settings');
+       $logged		= $this->isCustomerLoggedIn();
+$has_addr	= $this->customerHasAddresses(); 
+$default_bill_address_id = Mage::getSingleton('supercheckout/supercheckout')->getData('default_bill_address_id');
+        $default_ship_address_id = Mage::getSingleton('supercheckout/supercheckout')->getData('default_ship_address_id');
+if($settings['general']['layout']=='3-Column'){
+            $layout_name='three-column';
+        }elseif($settings['general']['layout']=='2-Column'){
+            $layout_name='two-column';
+        }elseif($settings['general']['layout']=='1-Column'){
+            $layout_name='one-column';
+        }
+?>
+<script>
+app.controller('shipping_address',function($scope,$rootScope,$http){
+//    $scope.$on('USE_SHIPPING',function(evenet,message){
+//       alert(JSON.stringify(message)); 
+//    });
+$scope.$on('handleBroadcast', function() {
+    });
+});
+</script>
+<script>
+app.controller('shipping_address',function($scope,$rootScope,$http){
+    
+    
+    
+    
+})
+</script>
+<div id="supercheckoutShippingAddressBlock" ng-show="show_shipping_address == false" class="supercheckout-blocks"  data-column="<?php echo $settings['step']['shipping_address'][$layout_name]['column']; ?>" data-row="<?php echo $settings['step']['shipping_address'][$layout_name]['row']; ?>" data-column-inside="<?php echo $settings['step']['shipping_address'][$layout_name]['column-inside']; ?>">
+                <ul>
+                    <li>
+                        <span class="supercheckout-numbers fontss icon-glossy-black-icon-transport-travel-transpor"></span>
+                            <span class="heading_style_icon"><?php echo $this->__('Shipping Address'); ?></span>
+                    </li>
+                </ul>
+    <?php if($has_addr){ ?>
+                <div class="supercheckout-extra-wrap" ng-init="data.shippingAddressRadio = 'existing'">
+                    <input ng-click="refresh_supercheckout_Shipaddress()" ng-model="data.shippingAddressRadio" type="radio" name="shipping_address" value="existing" id="shipping-address-existing" class="shipping-address-existing" checked="checked" />
+                    <label for="shipping-address-existing"><?php echo $this->__('I want to use an existing address'); ?></label>
+                </div>    
+                <div ng-show="data.shippingAddressRadio == 'existing'" id="shipping-existing">
+                    
+                    <select onchange="updateShipping(this.value)" ng-change="refresh_supercheckout()" id="shipping_address_select_box" ng-init="data.shipping_address_id = <?php echo $default_ship_address_id ; ?>" ng-model="data.shipping_address_id" ng-change="setExistingAddress()" style="width:97%;">
+                        <option value = "" style = "display:none;"></option>
+                        <option ng-repeat="option in payment_address_select_option" ng-selected="shipping_address_selected == {{option.value}}"  value="{{option.value}}">{{option.label}}</option>    
+                    </select>	
+                </div>
+                
+                
+                <div class="supercheckout-extra-wrap shipping_edit_form"> </div>
+                
+        <div class="supercheckout-extra-wrap shipping_edit_form_loader" style="display:none;"><img src="/images/loading12.gif"> </div>
+                <div class="supercheckout-extra-wrap msg_con" style="display:none; color:#060;"></div>
+                
+                
+                
+                <div class="supercheckout-extra-wrap">
+                    <p>
+                        <input ng-click="refresh_supercheckout_Shipaddress()" ng-model="data.shippingAddressRadio" type="radio" name="shipping_address" value="new" id="shipping-address-new" class="shipping-address-new" />
+                        <label for="shipping-address-new"><?php echo $this->__('I want to use a new address'); ?></label>
+                    </p>
+                </div>
+    <?php } ?>
+                <div id="shipping-new" <?php echo $has_addr?'ng-show="data.billing.use_for_shipping == \'new\' || data.shippingAddressRadio ==\'new\' "':'';?> >
+                        <table id="shipping_address_table" class="supercheckout-form">
+                            <tr ng-show="shipping_firstname_show== 1" class="sort_data"   sort-data="<?php echo $settings['step']['shipping_address']['fields']['firstname']['sort_order'] ?>" >
+                                <td><?php echo $this->__('Firstname'); ?><span ng-show="shipping_firstname_require== 1"  class="supercheckout-required">*</span>
+                                    <input ng-init="data.shipping.firstname = null" ng-model="data.shipping.firstname" type="text" class="supercheckout-large-field" />
+                                    <span ng-show="shipping_firstname_error" class="errorsmall">{{shipping_firstname_error_msg}}</span>
+                                    </td>
+                            </tr>
+                            <tr ng-show="shipping_lastname_show== 1" class="sort_data"  sort-data="<?php echo $settings['step']['shipping_address']['fields']['lastname']['sort_order'] ?>" >
+                                <td><?php echo $this->__('Lastname'); ?> <span ng-show="shipping_lastname_require== 1"  class="supercheckout-required">*</span>
+                                    <input ng-init="data.shipping.lastname = null" ng-model="data.shipping.lastname" type="text" class="supercheckout-large-field" />
+                                    <span ng-show="shipping_lastname_error" class="errorsmall">{{shipping_lastname_error_msg}}</span>
+                                    </td>
+                            </tr>
+                            <tr ng-show="shipping_address_1_show== 1" class="sort_data"   sort-data="<?php echo $settings['step']['shipping_address']['fields']['address_1']['sort_order'] ?>" >
+                                <td><?php echo $this->__('Address Line 1'); ?> <span ng-show="shipping_address_1_require== 1"  class="supercheckout-required">*</span>
+                                    <input ng-init="data.shipping.address_1 = null" ng-model="data.shipping.address_1" type="text" class="supercheckout-large-field" />
+                                    <span ng-show="shipping_address_1_error" class="errorsmall">{{shipping_address_1_error_msg}}</span>
+                                </td>
+                            </tr>
+                            <tr ng-show="shipping_address_2_show== 1" class="sort_data"   sort-data="<?php echo $settings['step']['shipping_address']['fields']['address_2']['sort_order'] ?>" >
+                                <td><?php echo $this->__('Address Line 2'); ?> <span ng-show="shipping_address_2_require== 1" class="supercheckout-required">*</span>
+                                    <input ng-init="data.shipping.address_2 = null" ng-model="data.shipping.address_2" type="text" class="supercheckout-large-field" />
+                                    <span ng-show="shipping_address_2_error" class="errorsmall">{{shipping_address_2_error_msg}}</span>
+                                </td>
+                            </tr>
+                            <tr ng-show="shipping_city_show== 1" class="sort_data"   sort-data="<?php echo $settings['step']['shipping_address']['fields']['city']['sort_order'] ?>" >
+                                <td><?php echo $this->__('City'); ?> <span ng-show="shipping_city_require== 1"  class="supercheckout-required">*</span>
+                                    <input ng-init="data.shipping.city = null" ng-model="data.shipping.city" type="text" class="supercheckout-large-field" />
+                                    <span ng-show="shipping_city_error" class="errorsmall">{{shipping_city_error_msg}}</span>
+                                </td>
+                            </tr>
+                            <tr ng-show="shipping_postcode_show== 1" class="sort_data"   sort-data="<?php echo $settings['step']['shipping_address']['fields']['postcode']['sort_order'] ?>" >
+                                <td><?php echo $this->__('Zip Code'); ?> <span ng-show="shipping_postcode_require== 1"  class="supercheckout-required">*</span>
+                                    <input ng-blur="refresh_supercheckout()" ng-init="data.shipping.postcode = null" ng-model="data.shipping.postcode" type="text" class="supercheckout-large-field" />
+                                    <span ng-show="shipping_zip_error" class="errorsmall">{{shipping_zip_error_msg}}</span>
+                                </td>
+                            </tr>
+                            
+                            <tr ng-show="shipping_country_show== 1" class="sort_data"  sort-data="<?php echo $settings['step']['shipping_address']['fields']['country_id']['sort_order'] ?>" >
+                                <td> <?php echo $this->__('Country'); ?><span ng-show="shipping_country_require== 1"  class="supercheckout-required">*</span>
+                                    <select ng-init="data.shipping.country_id = select_ship_country_id"  ng-model="data.shipping.country_id" ng-change="shipping_country_selected(data.shipping.country_id)" style="width:98%;">
+                                        <!--<option value="">Please Select</option>-->
+                                        <option ng-repeat="ctr in shipping_countries" ng-selected="select_ship_country_id == '{{ctr.country_id}}'"  value="{{ctr.country_id}}">{{ctr.name}}</option>
+                                    </select>
+                                    <span ng-show="shipping_country_error" class="errorsmall">{{shipping_country_error_msg}}</span>
+                                </td>
+                            </tr>
+                            <tr ng-show="shipping_region_show== 1" class="sort_data"  sort-data="<?php echo $settings['step']['shipping_address']['fields']['zone_id']['sort_order'] ?>" >
+                                <td> <?php echo $this->__('Region/State'); ?><span ng-show="shipping_region_require== 1"  class="supercheckout-required">*</span>
+                                    <select ng-init="data.shipping.region_id = ''" ng-change="refresh_supercheckout()" ng-show="no_region_shipping==false"  ng-model="data.shipping.region_id" style="width:98%;">
+                                        <option value="">Please Select</option>
+                                        <option ng-repeat="regn in shipping_regions" value="{{regn.region_id}}">{{regn.name}}</option>
+                                    </select>
+                                    <input ng-model="data.shipping.region" ng-show="no_region_shipping==true" type="text"/>
+                                    <span ng-show="shipping_state_error" class="errorsmall">{{shipping_state_error_msg}}</span>
+                                </td>
+                            </tr>
+                
+                        </table>
+
+                </div>                
+</div>
+<?php if($has_addr){ ?>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        
+        var sel = document.getElementById("shipping_address_select_box");
+        
+        
+            sel.removeChild(sel.firstChild);
+        
+    })
+</script>
+<?php } ?>
+
+
+
+
+<script>
+function change_countrys(country_id){
+  
+  jQuery.ajax({
+	  type: "POST",
+	  url: '/change-country.php',
+	  data:{country_id:country_id,formName:'shipping'},
+	  dataType: 'html',
+	  beforeSend:function(){
+		 //jQuery(".billing_edit_form").html('<img src="/images/loading12.gif">');
+	   },
+	  success:function(html){
+		  jQuery(".shipping_edit_form .select_state").html(html);
+	  }
+	});
+	
+}
+
+
+function updateShipping(sippingAdressId){
+  
+  jQuery.ajax({
+	  type: "POST",
+	  url: '/ajax-form.php',
+	  data:{address_id:sippingAdressId,formName:'shipping'},
+	  dataType: 'html',
+	  beforeSend:function(){
+		 jQuery(".shipping_edit_form").html('<img src="/images/loading12.gif">');
+	   },
+	  success:function(html){
+		  jQuery(".shipping_edit_form").html(html);
+	  }
+	});
+	
+}
+
+
+
+
+
+function saveShippingChange()
+{
+	jQuery(".msg_con").css('display','block').html('');
+	
+  jQuery.ajax({
+	  type: "POST",
+	  url: '/save-shipping.php',
+	  data:jQuery(".shipping_edit_form input,select").serialize(),
+	  dataType: 'json',
+	  beforeSend:function(){
+		 jQuery(".shipping_edit_form_loader").show();
+	   },
+	  success:function(response){
+		   jQuery(".msg_con").html(response['msg']);
+		    
+		   jQuery(".shipping_edit_form_loader").hide();
+		    $scope.refresh_supercheckout();
+	  }
+	});
+	
+}
+
+
+jQuery( document ).ready(function() {
+    
+jQuery( ".shipping-address-new" ).click(function() {
+
+  jQuery(".shipping_edit_form").css('display','none');
+    
+});
+
+jQuery( ".shipping-address-existing" ).click(function() {
+
+  jQuery(".shipping_edit_form").css('display','block');
+  
+});
+ 
+  
+  
+});
+
+
+</script>

@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+@author Brainvire Team 
+@copyright Brainvire 
+@package Brainvire_Featuredproducts 
+-->
+<layout version="0.1.0">
+
+<checkout_onepage_index>
+	<reference name="checkout.onepage">
+		<block type="ordercomment/onepage_ordercomment" name="checkout.onepage.ordercomment" as="ordercomment" after="checkout.onepage.billing" template="ordercomment/checkout/onepage/ordercomment.phtml"/>		
+	</reference>
+</checkout_onepage_index>
+<sales_order_view>
+        <reference name="sales.order.view">
+            <action method="setTemplate"><template>ordercomment/sales/order/view.phtml</template></action>
+        </reference>
+    </sales_order_view>
+    <sales_order_print>
+        <reference name="sales.order.print">
+            <action method="setTemplate"><template>ordercomment/sales/order/print.phtml</template></action>
+        </reference>
+    </sales_order_print>
+</layout>

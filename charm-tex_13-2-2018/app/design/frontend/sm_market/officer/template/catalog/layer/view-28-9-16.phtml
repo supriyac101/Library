@@ -1,0 +1,183 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magento.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magento.com for more information.
+ *
+ * @category    design
+ * @package     rwd_default
+ * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+?>
+<?php
+/**
+ * Category layered navigation
+ *
+ * @see Mage_Catalog_Block_Layer_View
+ */
+?>
+<?php $currentCat = Mage::getModel('catalog/layer')->getCurrentCategory();
+?>
+<?php
+$_helper = Mage::helper('catalog/category') ?>
+
+<?php $_categories =Mage::getModel('catalog/category')
+					->getCollection()
+					->addAttributeToSelect('*')
+					->addAttributeToFilter('parent_id',1 )
+                    ->addAttributeToFilter('is_active', 1);
+
+ $currentCategory = Mage::registry('current_category') ?>
+<?php if (count($_categories) > 0): ?>
+<div class="custom-filtar">
+	<div class="block block-layered-nav">   
+	   <div class="block-title">
+			<strong><span><?php echo $this->__('Shop By Category') ?></span></strong>
+		</div>
+		<ul class="category-list">
+			<?php foreach($_categories as $_category): ?>
+				<li class="top-category">
+					<?php //if ($currentCategory && $currentCategory->getId() == $_category->getId()): ?>
+						<?php $_category = Mage::getModel('catalog/category')->load($_category->getId()) ?>
+						<?php $_subcategories = $_category->getChildrenCategories() ?>
+						<?php if (count($_subcategories) > 0): ?>
+							<ul>
+								<?php foreach($_subcategories as $_subcategory): ?>
+									<li class="second-cat" id="<?php echo "cat-".$_subcategory->getId();?>">
+										<span class="subcat-link">
+											<?php echo $_subcategory->getName() ?>
+										</span>
+										
+	
+										<?php $_category1 = Mage::getModel('catalog/category')->load($_subcategory->getId()) ?>
+						 <?php $_subcategories1 = $_category1->getChildrenCategories() ?>
+						 <?php if (count($_subcategories1) > 0): ?>
+							
+							 <ul class="third-cat" style="display: none">
+								 <?php foreach($_subcategories1 as $_subcategory1): ?>
+									 <li id="<?php echo "sub-cat-".$_subcategory1->getId(); ?>">
+										 <a href="<?php echo $_helper->getCategoryUrl($_subcategory1) ?>">
+											 <?php echo $_subcategory1->getName() ?>
+										 </a>
+									 </li>
+										
+								 <?php endforeach; ?>
+							 </ul>
+							 
+						 <?php endif; ?>
+	
+									</li>
+								<?php endforeach; ?>
+							</ul>
+						<?php endif; ?>
+					<?php // endif; ?>
+				</li>
+			<?php endforeach; ?>
+		</ul>
+	</div>
+</div>
+<?php endif;?>
+
+<script type="text/javascript">
+    jQuery(document).ready(function(){
+        jQuery(".subcat-link").click(function(){
+          //alert("ok");
+          if (jQuery(this).next(".third-cat").css("display") == "none") {
+            jQuery(".third-cat").css("display","none");
+            jQuery(this).next(".third-cat").css("display","block");
+            jQuery(this).addClass("active");
+          }else{
+            jQuery(this).next(".third-cat").css("display","none");
+            jQuery(this).removeClass("active");
+            jQuery(".subcat-link").removeClass("active");
+          }
+          
+        });
+    });
+</script>
+<script type="text/javascript">
+    jQuery(document).ready(function(){
+        var parent_id = "<?php echo $currentCat->getParentCategory()->getId(); ?>";
+        jQuery("#cat-<?php echo $currentCat->getId();?>").addClass("current");
+        jQuery("#cat-"+parent_id).find("ul.third-cat").css("display","block");
+        jQuery("#cat-"+parent_id).find(".subcat-link").addClass("active");
+        var curCat_id = "<?php echo $currentCat->getId(); ?>"
+        jQuery("#cat-"+parent_id).find("#sub-cat-"+curCat_id).find("a").addClass("open");
+        jQuery(".subcat-link").click(function(){
+            if (jQuery(".subcat-link").hasClass("active")) {
+               jQuery(".subcat-link").addClass("active");
+            }else{
+               jQuery(".subcat-link").removeClass("active");
+            }
+        });
+		
+		
+		jQuery(".filter-name").click(function(){
+          //alert("ok");
+          if (jQuery(this).next(".filter-content").css("display") == "none") {
+            jQuery(this).next(".filter-content").css("display","block");
+            jQuery(this).addClass("active");
+          }else{
+            jQuery(this).next(".filter-content").css("display","none");
+            jQuery(this).removeClass("active");
+          }
+          
+        });
+    });
+</script>
+
+
+
+
+
+
+<?php  if($this->canShowBlock()): ?>
+<div class="block block-layered-nav<?php if (!$this->getLayer()->getState()->getFilters()): ?> block-layered-nav--no-filters<?php endif; ?>">
+    <div class="block-title">
+        <strong><span><?php echo $this->__('Filter By') ?></span></strong>
+    </div>
+    <div class="block-content toggle-content">
+        <?php echo $this->getStateHtml() ?>
+        <?php if ($this->getLayer()->getState()->getFilters()): ?>
+            <div class="actions"><a href="<?php echo $this->getClearUrl() ?>"><?php echo $this->__('Clear All') ?></a></div>
+        <?php endif; ?>
+        <?php if($this->canShowOptions()): ?>
+            <p class="block-subtitle block-subtitle--filter"><?php echo $this->__('Filter') ?></p>
+            <dl id="narrow-by-list">
+                <?php $_filters = $this->getFilters() ?>
+                <?php foreach ($_filters as $_filter): ?>
+		<?php if($_filter->getName() == 'Price' && !Mage::getSingleton('customer/session')->isLoggedIn()){continue;}?>
+                <?php if($_filter->getItemsCount()): ?>
+                    <?php if($_filter->getName() == 'Category'){ ?>
+					<?php	
+					}else{ ?>
+					<dt class="filter-name"><?php echo $this->__($_filter->getName()) ?></dt>
+					<dd class="filter-content" style="display: none"><?php echo $_filter->getHtml() ?></dd>
+                <?php
+					}
+				endif; ?>
+                <?php endforeach; ?>
+            </dl>
+            <script type="text/javascript">decorateDataList('narrow-by-list')</script>
+        <?php endif; ?>
+    </div>
+</div>
+<?php endif;  ?>
+
+
+

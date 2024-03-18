@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <tabs>
+        <recapture translate="label" module="recapture">
+            <label>Recapture Connector</label>
+            <sort_order>100</sort_order>
+        </recapture>
+    </tabs>
+    <sections>
+        <recapture translate="label" module="recapture">
+            <label>Extension Options</label>
+            <tab>recapture</tab>
+            <sort_order>1000</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+
+            <groups>
+                <configuration translate="label" module="recapture">
+                    <label>Authentication</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+
+                    <fields>
+                        <status translate="label">
+                            <label>Authentication Status</label>
+                            <sort_order>0</sort_order>
+                            <type>text</type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <frontend_model>recapture/adminhtml_system_config_status</frontend_model>
+                        </status>
+                        <authenticate translate="label">
+                            <label>Authenticate Account</label>
+                            <sort_order>1</sort_order>
+                            <type>button</type>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <frontend_model>recapture/adminhtml_system_config_authenticate</frontend_model>
+                        </authenticate>
+                        <enabled translate="label">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>2</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                        </enabled>
+                        <api_key translate="label">
+                            <label>API Key</label>
+                            <frontend_type>text</frontend_type>
+                            <frontend_model>recapture/adminhtml_system_config_key</frontend_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </api_key>
+                    </fields>
+                </configuration>
+                <abandoned_carts translate="label" module="recapture">
+                    <label>Abandoned Carts Configuration</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>20</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+
+                    <fields>
+                        <track_email translate="label">
+                            <label>Enable Pre-submit Email Capturing</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <comment>When enabled, this will immediately capture typed email addresses anywhere on your site, without requiring the customer to submit any type of form. Useful on checkouts like One Step Checkout.</comment>
+                        </track_email>
+                        <capture_subscriber translate="label">
+                            <label>Enable Newsletter Subscription Capturing</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <comment>When enabled, this will capture any emails that are subscribed to your newsletter.</comment>
+                        </capture_subscriber>
+                        <return_landing translate="label">
+                            <label>Click Through Landing</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <source_model>recapture/landing</source_model>
+                            <comment>What page do you want the customer to land on when they click a link in any abandoned cart emails we send?</comment>
+                        </return_landing>
+                        <include_tax_with_products translate="label">
+                            <label>Include Tax with Product Totals</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <comment>Whether or not to include tax in the product total.</comment>
+                        </include_tax_with_products>
+                        
+                        <ignore_ips translate="label">
+                            <label>Bot IP Addresses</label>
+                            <frontend_type>text</frontend_type>
+                            <frontend_model>recapture/adminhtml_system_config_key</frontend_model>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <comment>Activity will not be recorded for these IP addresses. Useful if you have a bot that tests your checkout on a scheduled basis. Multiple IP addresses must be comma separated.</comment>
+                        </ignore_ips>
+                    </fields>
+                </abandoned_carts>
+            </groups>
+        </recapture>
+    </sections>
+</config>

@@ -1,0 +1,345 @@
+<?xml version="1.0"?>
+<config>
+	<tabs>
+        <b4mtab translate="label">
+            <label>BEST4MAGE EXTENSIONS</label>
+            <sort_order>200</sort_order>
+        </b4mtab>
+    </tabs>
+	<sections>
+        <fcpm translate="label" module="frontendconfigurableproductmatrix">
+			<label>Best4Mage FCPM</label>
+            <tab>b4mtab</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>50</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+			<groups>
+                <basic_options translate="label">
+                    <label>Basic Options</label>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+						<enable translate="label">
+                            <label>Enable</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                        </enable>
+						<product_level translate="label">
+                            <label>Use product level settings</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                        </product_level>
+					</fields>
+				</basic_options>
+				<layout_options translate="label">
+                    <label>Position and layout</label>
+                    <sort_order>20</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+						<matrix_template translate="label">
+                            <label>Select Matrix Template</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>frontendconfigurableproductmatrix/system_config_source_matrixtemplate</source_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </matrix_template>
+						<matrix_position translate="label">
+                            <label>Select Matrix Position
+							<![CDATA[<script type="text/javascript">document.observe('dom:loaded', function() {$('fcpm_layout_options_matrix_position').observe('change', fcpmShowHideDropdownConfigurable);function fcpmShowHideDropdownConfigurable(){if ($("fcpm_layout_options_matrix_position").value == 0 || $("fcpm_layout_options_matrix_position").value == 2) {$("fcpm_layout_options_showfdd").value = 0;}}});</script>]]>
+							</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>frontendconfigurableproductmatrix/system_config_source_matrixposition</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </matrix_position>
+                        <matrix_columns translate="label">
+                            <label>Matrix Columns</label>
+                            <comment>This columns selection will be used when "Matrix Template" is set to "Template 1".</comment>
+                            <frontend_type>multiselect</frontend_type>
+                            <sort_order>25</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>frontendconfigurableproductmatrix/system_config_source_matrixcolumns</source_model>
+                        </matrix_columns>
+						<show_link translate="label">
+                            <label>Show Matrix Link</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                        </show_link>
+                        <showfdd translate="label">
+                            <label>Show Dropdown in frontend</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                        </showfdd>
+                        <second_attribute>
+							<label>Second Attribute in Matrix
+							<![CDATA[<script type="text/javascript">document.observe('dom:loaded', function(){ $('fcpm_layout_options_second_attribute').observe('change',fcpmSecondAttribute); function fcpmSecondAttribute() {if($("fcpm_layout_options_second_attribute").value==1){$("fcpm_layout_options_showfdd").value=1;$("row_fcpm_layout_options_second_attribute_position").show();} else {$("row_fcpm_layout_options_second_attribute_position").hide();}} fcpmSecondAttribute();});</script>]]>
+							</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+						</second_attribute>
+						<second_attribute_position translate="label">
+                            <label>Show Layout</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>frontendconfigurableproductmatrix/system_config_source_secondposition</source_model>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </second_attribute_position>
+                        <display_tabs translate="label">
+                            <label>Display Tabs
+                                <![CDATA[<script type="text/javascript">document.observe('dom:loaded', function(){ $('fcpm_layout_options_display_tabs').observe('change',fcpmSetFdd); function fcpmSetFdd() {if($("fcpm_layout_options_display_tabs").value==2){$("fcpm_layout_options_showfdd").value=0;}} fcpmSetFdd();});</script>]]>
+                            </label>
+                            <comment>When set to 'Order Multiple', 'Show Dropdown in frontend' must be set to No.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>frontendconfigurableproductmatrix/system_config_source_displaytabs</source_model>
+                            <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </display_tabs>
+						<default_tab translate="label">
+                            <label>Default Tab</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>frontendconfigurableproductmatrix/system_config_source_defaulttab</source_model>
+                            <sort_order>80</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends><display_tabs>0</display_tabs></depends>
+                        </default_tab>
+						<multiple_option translate="label">
+                            <label>Number of columns</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>90</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </multiple_option>
+					</fields>
+				</layout_options>
+				<matrix_options translate="label">
+                    <label>Matrix options</label>
+                    <sort_order>30</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+						<only_checkbox translate="label">
+                            <label>Show Only Checkbox</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                        </only_checkbox>
+                        <show_product_price>
+							<label>Show Product Price</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>15</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                        </show_product_price>
+						<show_rowtotal translate="label">
+                            <label>Show Row Total</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                        </show_rowtotal>
+						<show_grandtotal translate="label">
+                            <label>Show Grand Total</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                        </show_grandtotal>
+                        <hide_total_column>
+							<label>Hide Total Column</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                        </hide_total_column>
+                        <show_stock translate="label">
+                            <label>Show Stock</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                        </show_stock>
+                        <show_image>
+							<label>Show Product Image</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+						</show_image>
+                        <apply_price_color>
+                            <label>Apply Price Colors</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                        </apply_price_color>
+					</fields>
+				</matrix_options>
+				<category_options translate="label">
+                    <label>Category layout</label>
+                    <sort_order>40</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+						<catenable translate="label">
+                            <label>Enable</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                        </catenable>
+						<iaddtocart translate="label">
+                            <label>Do you want individual Add to Cart</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                        </iaddtocart>
+                     </fields>
+				</category_options>
+                <price_color_options>
+                    <label>Price Color Options</label>
+                    <sort_order>60</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <price_colors>
+                            <label>Price Color based on available Qty</label>
+                            <frontend_model>frontendconfigurableproductmatrix/system_config_pricecolors</frontend_model>
+                            <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </price_colors>
+                    </fields>
+                </price_color_options>
+				<other_options translate="label">
+                    <label>Other settings</label>
+                    <sort_order>100</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>   
+						<jquery translate="label">
+                            <label>Include jQuery</label>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                        </jquery>
+						<customer_roles translate="label">
+                            <label>Enable for Customer Group</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <source_model>frontendconfigurableproductmatrix/system_config_source_customergroup</source_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </customer_roles>	
+						<qty_price_selector>
+                            <label>Qty / Price selectors</label>
+                            <comment>Add html class to select the Qty/Price field/label/container on product page. Put comma seperated values for multiple elements.</comment>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </qty_price_selector>	
+					</fields>
+				</other_options>
+                <support_info translate="label">
+                    <label>Support Info</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>1001</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <version translate="label">
+                            <label>Version</label>
+                            <frontend_type>label</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </version>
+                        <portal_link translate="label">
+                            <label>For support go to</label>
+                            <frontend_type>label</frontend_type>
+                            <frontend_model>frontendconfigurableproductmatrix/system_config_form_fieldset_support</frontend_model>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </portal_link>
+                    </fields>
+                </support_info>
+            </groups>
+        </fcpm>
+    </sections>
+</config>

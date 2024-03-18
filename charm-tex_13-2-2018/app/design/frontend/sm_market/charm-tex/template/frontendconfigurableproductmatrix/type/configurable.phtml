@@ -1,0 +1,132 @@
+<script type="text/javascript">
+	jQuery(document).ready(function($){
+		jQuery('#order_multiple').click(function(){
+			jQuery('#order_multiple_content').detach().appendTo('.conf-grid-view');
+		});
+	});
+</script>
+<?php $_product = $this->getProduct();?>
+<?php $_acsp = ($this->helper('frontendconfigurableproductmatrix')->isAcspEnable() ? 'acsp/' : '');?>
+<?php $tabs = $this->helper('frontendconfigurableproductmatrix')->getDisplayTabs($_product);?>
+<?php $qtyPriceSelectors = $this->helper('frontendconfigurableproductmatrix')->getQtyPriceSelectors(); ?>
+<?php $qtyPriceSelectors = str_replace(', ', ',', $qtyPriceSelectors); ?>
+
+<?php if($this->helper('frontendconfigurableproductmatrix')->isEnable($_product) && $this->helper('frontendconfigurableproductmatrix')->isCustomerShowMatrix()): $mPosition = $this->helper('frontendconfigurableproductmatrix')->getMatrixPosition($_product);?>
+	<?php if(($tabs != 0 && $mPosition == 1) || ($tabs != 0 && $mPosition == 3) || $tabs == 2):?>
+        <?php if($this->helper('frontendconfigurableproductmatrix')->isSecondMatrix($_product) != 1):?>
+            <?php if(($mPosition == 1 || $mPosition == 3 || !$this->helper('frontendconfigurableproductmatrix')->isCustomerShowMatrix()) && $this->helper('frontendconfigurableproductmatrix')->isShowFDD($_product) == 1):?>
+                <?php echo $this->setTemplate($_acsp.'catalog/product/view/type/options/configurable.phtml')->toHtml();?>
+            <?php elseif(($mPosition == 0 || $mPosition == 2) && $this->helper('frontendconfigurableproductmatrix')->isShowFDD($_product) == 0):?>
+                <?php echo $this->getChildHtml('fmatrix');?>
+                <style type="text/css">.product-options-bottom .price-box,.product-options-bottom .add-to-cart label,.product-options-bottom .add-to-cart #qty{display:none;}</style>
+            <?php endif;?>
+            <?php if(($mPosition == 1 || $mPosition == 3 || !$this->helper('frontendconfigurableproductmatrix')->isCustomerShowMatrix()) && $this->helper('frontendconfigurableproductmatrix')->isShowFDD($_product) == 0):?>
+                <style type="text/css">#product-options-wrapper,.product-options-bottom{display:none;}</style>
+            <?php endif;?>
+        <?php else:?>
+            <?php echo $this->setTemplate($_acsp.'catalog/product/view/type/options/configurable.phtml')->toHtml();?>
+        <?php endif;?>
+    <?php elseif($tabs == 1):?>
+        <?php echo $this->setTemplate($_acsp.'catalog/product/view/type/options/configurable.phtml')->toHtml();?>
+    <?php else:?>
+    	<?php $multiple = $this->helper('frontendconfigurableproductmatrix')->isTabMultiple($_product);?>
+        <div class="fcpm_tabs" style="display: none;">
+            <ul>
+                <li id="order_one" class="first<?php echo ($multiple ? '' : ' active');?>"><?php echo $this->__('Order One');?></li>
+            </ul>
+		</div>
+        <div id="order_one_content" class="fcpm_tabcontent"><?php echo $this->setTemplate($_acsp.'catalog/product/view/type/options/configurable.phtml')->toHtml();?></div>
+		
+		<div class="fcpm_tabs for_show">
+			<ul>
+				<span class="order_multiple_txt" style="margin-right: 10px;"><?php echo $this->__('To order multiple sizes and/or colors:');?></span>
+				<li id="order_multiple" class="last<?php echo ($multiple ? ' active' : '');?>"><?php echo $this->__('View Order Grid');?></li>
+			</ul>
+		</div>
+		
+		<div id="order_multiple_content" class="fcpm_tabcontent">
+            <div class="fcpm_tabs for_hide" style="display: none; text-align: center;">
+				<ul>
+					<li id="hide_order_multiple" class="last<?php echo ($multiple ? ' active' : '');?>"><?php echo $this->__('Hide Order Grid');?></li>
+				</ul>
+			</div>
+			<?php if($fmatrix = $this->getChildHtml('fmatrix')):?>
+                <?php echo $fmatrix;?>
+            <?php endif;?>
+        </div>
+        <script type="text/javascript">
+			$$('.fcpm_tabcontent').invoke('hide');
+			$$('.fcpm_tabs li')
+				.invoke('observe', 'click', function(ele) {
+					$$('.fcpm_tabs li').invoke('removeClassName','active');
+					$$('.fcpm_tabcontent').invoke('hide');
+					this.addClassName('active');
+					$(this.id+'_content').show();
+					if(this.id == 'order_multiple')
+					{
+						$$('.product-options > dl.last, <?php echo $qtyPriceSelectors ?>').invoke('hide');
+						$$('.product-options > dl.last .input-box > *').each(function(elem){
+							elem.disabled = true;
+						});
+						if(typeof setUpMyUlSlider == 'function') setUpMyUlSlider();
+					} else {
+						$$('.product-options > dl.last, <?php echo $qtyPriceSelectors ?>').invoke('show');
+						$$('.product-options > dl.last .input-box > *').each(function(elem){
+							elem.disabled = false;
+						});
+					}
+				})
+				.each(function(ele) {
+					if($(ele.id).hasClassName('active')){
+						$(ele.id+'_content').show();
+						$(ele.id).click();
+						setTimeout(function() {
+							if(ele.id == 'order_multiple')
+							{
+								$$('.product-options > dl.last, <?php echo $qtyPriceSelectors ?>').invoke('hide');
+								$$('.product-options > dl.last .input-box > *').each(function(elem){
+									elem.disabled = true;
+								});
+							} else {
+								$$('.product-options > dl.last, <?php echo $qtyPriceSelectors ?>').invoke('show');
+								$$('.product-options > dl.last .input-box > *').each(function(elem){
+									elem.disabled = false;
+								});
+							}
+						}, 800);
+					}
+				});
+		</script>
+    <?php endif;?>
+    <script type="text/javascript">
+    	jQuery(document).ready(function($){
+			$('input[type="text"].matrix-qty').bind('focus', function(){
+				if($(this).val() <= 0){
+					$(this).val('');
+				}
+			});
+			$('input[type="text"].matrix-qty').bind('focusout', function(){
+				if($(this).val() == ''){
+					$(this).val(0);
+				}
+			});
+			
+			/* custom code */
+			$('#order_multiple').click(function(){
+				$(this).parents('.fcpm_tabs').css('display', 'none');
+				$('#hide_order_multiple').parents('.fcpm_tabs').css('display', 'block');
+                $('.add-to-box').detach().insertAfter(".conf-grid-view");
+			});
+			$('#hide_order_multiple').click(function(){
+				$(this).parents('.fcpm_tabs').css('display', 'none');
+				$('#order_multiple').parents('.fcpm_tabs').css('display', 'block');
+				$('#order_one').trigger('click');
+				$('.add-to-box').detach().insertAfter("#order_one_content");
+				$('.qty-wrapper').children().css('display', 'block');
+			});
+            $(".for_show").detach().insertAfter(".add-to-box");
+		});
+    </script>
+<?php else:?>
+	<?php echo $this->setTemplate($_acsp.'catalog/product/view/type/options/configurable.phtml')->toHtml();?>
+<?php endif;?>

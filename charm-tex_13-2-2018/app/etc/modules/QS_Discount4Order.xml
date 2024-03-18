@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Discount For Order Extension
+ *
+ * @category   QS
+ * @package    QS_Discount4Order
+ * @author     Quart-soft Magento Team <magento@quart-soft.com> 
+ * @copyright  Copyright (c) 2010 Quart-soft Ltd http://quart-soft.com
+ */
+-->
+<config>
+    <modules>
+        <QS_Discount4Order>
+            <active>true</active>
+            <codePool>community</codePool>
+        </QS_Discount4Order>
+    </modules>
+</config> 

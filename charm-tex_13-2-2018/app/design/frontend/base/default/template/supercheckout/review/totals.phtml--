@@ -1,0 +1,32 @@
+
+<?php if ($this->getTotals()): ?>
+<table class="supercheckout-totals">
+<tfoot>
+    <?php $_colspan = $this->helper('tax')->displayCartBothPrices() ? 5 : 3; ?>
+    <?php echo $this->renderTotals(null, $_colspan); ?>
+    <?php echo $this->renderTotals('footer', $_colspan); ?>
+    <?php if ($this->needDisplayBaseGrandtotal()):?>
+    <tr>
+        <td class="a-right" colspan="<?php echo $_colspan; ?>">
+            <small><?php echo $this->helper('sales')->__('Your credit card will be charged for') ?></small>
+        </td>
+        <td class="a-right">
+            <small><?php echo $this->displayBaseGrandtotal() ?></small>
+        </td>
+    </tr>
+    
+    <?php endif?>
+</tfoot>
+
+        
+</table>
+<table class="supercheckout-totals">
+    <tr style="display:<?php // if($logged){ if($settings['option']['logged']['cart']['option']['coupon']['display']){ echo' ';}else{ echo'none';} }else{ if($settings['option']['guest']['cart']['option']['coupon']['display']){ echo' ';}else{ echo'none';}} ?>;">
+            <td class="title"><b><?php echo $this->__('Coupon Code:'); ?></b></td>
+            <td class="value"><input  id="coupon_code" name="coupon" type="text" class="voucherText">
+                <input type="hidden" value="coupon" name="next">
+                <input id="button-coupon" type="button" ng-Click="callCoupon()" class="orangebuttonapply" value="Apply">
+            </td>
+        </tr>
+</table>
+<?php endif; ?>

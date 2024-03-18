@@ -1,0 +1,55 @@
+<?php 
+$settings = Mage::getSingleton('supercheckout/supercheckout')->getData('settings');
+$selected_shipping_method = Mage::helper('supercheckout')->getSelectedShippingMethod();
+
+if($settings['general']['layout']=='3-Column'){
+    $layout_name='three-column';
+}elseif($settings['general']['layout']=='2-Column'){
+    $layout_name='two-column';
+}elseif($settings['general']['layout']=='1-Column'){
+    $layout_name='one-column';
+}
+?>
+
+<?php  // SAURABH BOC DATE: April,03 2015 to hide shipping methods if hidden by admin control regardless type of product in cart. ?>
+<div ng-show="show_shipping_method_block == 1" id="shippingMethodBlock"  class="supercheckout-blocks" data-column="<?php echo $settings['step']['shipping_method'][$layout_name]['column']; ?>" data-row="<?php echo $settings['step']['shipping_method'][$layout_name]['row']; ?>" data-column-inside="<?php echo $settings['step']['shipping_method'][$layout_name]['column-inside']; ?>" >
+<?php  // SAURABH EOC DATE: April,03 2015 to hide shipping methods if hidden by admin control regardless type of product in cart. ?>    <ul>
+        <li style="display:inline;">
+            <span class="supercheckout-numbers fontss icon-fork-truck-512"></span>
+                <span class="heading_style_icon"><?php echo $this->__('Shipping Method'); ?></span>
+            <div ng-show="displayLoader == 'showShippingMethodLoader'" class="loader" id="shippingMethodLoader"></div>
+        </li>                
+    </ul>
+    <div class="supercheckout-checkout-content" style="display:block">
+        <div ng-show="shipping_method_error != null" class="warning">{{shipping_method_error_msg}}</div>
+    </div>
+    <table ng-show="shipping_method_error == null" class="radio">
+        <tbody ng-repeat="item in shipping_method">
+            <tr>
+                <td colspan="3"><b>{{item.title}}</b></td>
+            </tr>
+            
+            <tr class="highlight">
+                <td>
+                    <input ng-init="data.shipping_method = selected_temp_value" ng-model="data.shipping_method" ng-click="shipping_method_click($event)" type="radio" name="shipping_method" value="{{item.value}}" id="lb_{{item.value}}" />                
+                </td>
+                <td><label for="lb_{{item.value}}">{{item.label}}</label></td>
+                <td style="text-align: right;" class="price">
+               
+                
+                <div ng-if="item.exclusive != '$0.00'" style="text-align:left;">
+                <label for="lb_{{item.value}}">{{item.exclusive}}</label>
+                 </div>
+                <div ng-if="item.exclusive === '$0.00'" style="color:#F00; text-align:left;">
+** Because one or more items in your shopping bag are oversized & therefore must ship via a common carrier - your freight will be calculated & added to you invoice.
+
+            </div>
+                
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3"><div class="error">{{item.error}}</div></td>
+            </tr>
+        </tbody>
+    </table>
+</div>

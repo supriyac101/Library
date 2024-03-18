@@ -1,0 +1,187 @@
+<div class='velsof-modal'>
+    <div class="modal-dialog">
+        <?php
+        $settings = Mage::getSingleton('core/session')->getShoppingCartPopUpSettings();
+        $settings_array = unserialize($settings);
+        //print_r($settings_array);
+        $rightSide = $settings_array['supercheckout']['shopping_cart']['show'];
+        $style = '';
+        $height = '';
+
+        if ($settings_array['supercheckout']['shopping_cart']['show'] == "banner") {
+            if($settings_array['supercheckout']['shopping_cart']['banner_count'] == 3){
+                $height = "height: 515px !important;";
+            }
+
+            $style = ' style="width: 69%; float: left;"';
+            $banner_style = ' style="width: 30%; float: left;"';
+            $banner_count = $settings_array['supercheckout']['shopping_cart']['banner_count'];
+            $banner_url = array_values($settings_array['supercheckout']['shopping_cart']['banner_url']);
+            $banner_image_url = array_values($settings_array['supercheckout']['shopping_cart']['image']);
+        } else if ($settings_array['supercheckout']['shopping_cart']['show'] == 'related_product') {
+            $style = ' style="width: 69%; float: left;"';
+            $related_product_style = ' style="width: 30%; float: left;"';
+        }else{
+            $style = ' style="border-right: 0px !important;"';
+        }
+        ?>
+        <div class="velsof-content-loading" ng-show="showLoader" style="<?php echo $height; ?>"></div>
+        <div id="velsof-popup-dialog" class="modal-content velsof-popup-dialog">
+            <div class="velsof-modal-header">
+                <h4 class="velsof-modal-title"><?php echo $this->__('Your Cart'); ?></h4>
+                <a href="javascript:void(0);" class="dialog-titlebar-close" id="dialog-titlebar-close" role="button" ng-click="cancel()">
+                    <span class="header_close_icon">close</span>
+                </a>
+            </div>
+
+            <div class="velsof-popup-body"<?php echo $style; ?>>
+                <div id="velsof-popup-cart-info" ng-show="showContent">
+                    <div class="velsof-popup-cart-msg" id="velsof-popup-success-cart-msg" ng-show="successShow">
+                        {{messages.success}}
+                        <img ng-src="<?php echo Mage::getDesign()->getSkinUrl("images/supercheckout/remove-small.png"); ?>" alt="" class="close" ng-click="closeSuccessDiv()"/>
+                    </div>
+                    <div id="velsof-popup-cart-products">
+                        <table id="velsof-popup-cart-table">
+                            <thead id="velsof-popup-cart-table-head">
+                                <tr>
+                                    <td class="velsof-popup-th-image"><?php echo $this->__('Image'); ?></td>
+                                    <td class="velsof-popup-th-name"><?php echo $this->__('Product Name'); ?></td>
+                                    <td class="velsof-popup-th-model"><?php echo $this->__('Style Number'); ?></td>
+                                    <td class="velsof-popup-th-quantity"><?php echo $this->__('Qty'); ?></td>
+                                    <td class="velsof-popup-th-price"><?php echo $this->__('Unit Price'); ?></td>
+                                    <td class="velsof-popup-th-total"><?php echo $this->__('Subtotal'); ?></td>
+                                    <td class="velsof-popup-th-remove"></td>
+                                </tr>
+                            </thead>
+                            <tbody ng-if="cartProducts != ''">
+                                <tr ng-repeat="cartProduct in cartProducts">
+                                    <td class="velsof-popup-td-image">
+                                        <a href="{{cartProduct.productUrl}}" target="_blank">
+                                            <img ng-src="{{cartProduct.productImage}}" width="70" alt="{{cartProduct.productName}}" title="{{cartProduct.productName}}" />
+                                        </a>
+                                    </td>
+                                    <td class="velsof-popup-td-name">
+                                        <a class="velsof-popup-a-name" href="{{cartProduct.productUrl}}" target="_blank">
+                                            <span class="velsof-popup-pro-name">{{cartProduct.productName}}</span><br>
+					    {{cartProduct.customAttr}}
+                                            <div ng-repeat="productAttr in cartProduct.productAttrs">
+                                                {{productAttr.label}}: {{productAttr.value}}
+                                            </div>
+                                            <div class="velsof-bundle-products" ng-repeat="bundleProductOption in cartProduct.bundleProductOptions">
+                                                <span>{{bundleProductOption.label}}</span>
+                                                <div class="velsof-bundle-products-options" ng-repeat="productOption in bundleProductOption.value">
+                                                    {{productOption.qty}}x{{productOption.title}} {{productOption.price}}
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </td>
+
+                                    <td class="velsof-popup-td-model">{{cartProduct.productSKU}}</td>
+
+                                    <td class="velsof-popup-td-quantity"><input class="velsof-popup-input-quantity" type="text" name="quantity[{{cartProduct.productCartID}}]" id="quantity{{cartProduct.productCartID}}" pid="{{cartProduct.productCartID}}" value="{{cartProduct.quantity}}" size="1" ng-keypress="updateQty($event)" />
+                                        <div>
+                                            <a class="velsof-popup-a-update" href="javascript:void(0);" id="{{cartProduct.productCartID}}" ng-click="updateQuantity($event)">
+                                                <?php echo $this->__('Update'); ?>
+                                            </a>
+                                        </div>
+                                    </td>
+
+                                    <td class="velsof-popup-td-price">{{cartProduct.finalPrice}}</td>
+                                    <td class="velsof-popup-td-total">{{cartProduct.priceTotal}}</td>
+
+                                    <td class="velsof-popup-td-remove">
+                                        <a href="javascript://"  style="display:block;"  >
+                                            <div class="velsof-popup-div-remove" id="{{cartProduct.productCartID}}" data-ng-click="removeProduct($event);">  </div>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="velsof-popup-sub-total" ng-show="showContent"  style="display:none;">
+                    <div id="velsof-subtotal"><?php echo $this->__('Subtotal:'); ?></div>
+                    <div id="velsof-subtotal-amount">{{cartTotal.subtotal}}</div>
+                </div>
+                <div id="velsof-popup-coupon-discount" ng-show="showContent"  style="display:none;">
+                    <div class="velsof-voucher_fields" ng-show="cartTotal.couponCode == ''">
+                        <input id="scp_coupon_code" name="scp_coupon_code" type="text" placeholder="<?php echo $this->__('Enter Coupon Code'); ?>" class="voucherText" value="{{cartTotal.couponCode}}"  ng-keypress="applyCouponCode($event)"/>
+                        <input type="hidden" value="coupon" name="next"/>
+                        <input id="button-coupon" type="button" data-ng-click="applyCoupon()" class="orangebuttonapply" value="<?php echo $this->__('Apply'); ?>"/>
+                    </div>
+                    <div class="voucher_redeem_block" ng-show="cartTotal.couponCode != ''">
+                        <span class="velsof_voucher_text"><?php echo $this->__('Coupon:'); ?>({{cartTotal.couponCode}})</span>
+                        <span class="velsof_voucher_redeem">
+                            <a style="float:right;" href="javascript:void(0);" id="coupon" data-ng-click="redeemCoupon()">
+                                <div title="<?php echo $this->__('Remove'); ?>" class="velsof-popup-div-remove voucher_remove"></div>
+                            </a>
+                        </span>
+                    </div>
+                    <div class="velsof-popup-discount-total">
+                        <div id="velsof-coupon-title">{{cartTotal.discount.title}}</div>
+                        <div id="velsof-discount-amount">{{cartTotal.discount.discount}}</div>
+                    </div>
+                </div>
+                <div id="velsof-popup-cart-total" ng-show="showContent">
+                    <div id="velsof-popup-cart-total-info">
+                        <span id="velsof-popup-estimated-cost" style="margin-right:120px;">
+                            <span class="velsof-popup-estimated-cost"><?php echo $this->__('Estimated Cost:'); ?> </span>
+                            <span class="velsof-popup-estimated-cost">{{cartTotal.grandTotal}}</span>
+                        </span>
+                    </div>
+                    <div id="velsof-popup-popup-button">
+                       
+                        <div id="velsof_help_details">
+                            <a id="velsof-popup-mail-to" style="display:none;" href="mailto:<?php echo Mage::getStoreConfig('trans_email/ident_support/email'); ?>" >
+                                <?php echo $this->__('Click here to help'); ?>
+                            </a>
+                        </div>
+                        <div style="float:right; margin-left:20px;" >
+                            <a href="javascript:void(0);"  id="velsof-popup-btn-continue-shop" ng-click="cancel()"><?php echo $this->__('Continue Shopping'); ?></a>
+                        </div>
+                        
+                        
+                        <div style="float:right;">
+                            <a href="<?php echo Mage::helper('checkout/url')->getCheckoutUrl(); ?>" class="velsof-popup-btn">
+                                <?php echo $this->__('Checkout'); ?>
+                            </a>
+                        </div>
+                        
+                         
+                    </div>                    
+                </div>
+            </div>
+
+            <?php if (isset($rightSide) && ($rightSide == 'banner')) { ?>
+                <div id="velsof-popup-banner" <?php echo $banner_style; ?> >
+                    <?php for ($i = 0; $i < $banner_count; $i++) { ?>
+                        <div id="velsof-popup-banner-<?php echo $i; ?>" class="banner_images">
+                            <a target="_blank" href="<?php echo $banner_url[$i]; ?>">
+                                <img width="300" height="145" ng-src="<?php echo Mage::getBaseUrl('media') . "supercheckout/shopping_cart/banners/" . $banner_image_url[$i]; ?>" />
+                            </a>
+                        </div>
+                    <?php } ?>
+                </div>   
+            <?php } ?>
+            <?php if (isset($rightSide) && ($rightSide == 'related_product')) { ?>
+                <div id="velsof-popup-related-product" <?php echo $related_product_style; ?> >
+                    <div id="velsof-popup-tbl-related-product" ng-show="showContent">
+                        <div ng-repeat="relatedProduct in relatedProducts" class="velsof-popup-td-r-image" ng-if="relatedProducts" ng-style="$index == 2 ? {clear:'both'} : {}">
+                            <a class="velsof-popup-a-name" href="{{relatedProduct.href}}">
+                                <div> 
+                                    <img ng-src="{{relatedProduct.thumb}}" />
+                                </div>
+                                <div class="velsof-popup-pro-name">{{relatedProduct.name}}</div>
+                                <div class="velsof-popup-pro-name" ng-if="relatedProduct.price != 0">{{relatedProduct.price}}</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>   
+            <?php } ?>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
+<?php
+Mage::getSingleton('core/session')->setShowModalBox(false);
+?>

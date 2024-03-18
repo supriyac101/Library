@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout version="0.1.0">
+	<default>
+		<update handle="ewpribbon_default_handle" ewminify_inherit="1" ewifhelper="ewpribbon/config/isEnabled"/>
+	</default>
+	
+	<catalog_product_view>
+		<update handle="ewpribbon_default_handle" ewminify_inherit="1" ewifhelper="ewpribbon/config/isEnabled"/>
+	</catalog_product_view>
+	
+	<catalog_category_default>
+		<update handle="ewpribbon_default_handle" ewminify_inherit="1" ewifhelper="ewpribbon/config/isEnabled"/>
+	</catalog_category_default>
+	
+	<catalog_category_layered>
+		<update handle="ewpribbon_default_handle" ewminify_inherit="1" ewifhelper="ewpribbon/config/isEnabled"/>
+	</catalog_category_layered>
+	
+    <ewpribbon_default_handle>
+    	<update handle="ewcore_center_handle" ewminify_inherit="1"/>
+		<reference name="head">
+			<action method="addItem" ewminify_ignore_order="1"><type>ewgenerated_js</type><name>ewpribbon/js_general</name></action>
+		</reference>
+		<reference name="before_body_end">
+            <block type="ewpribbon/code" name="ewpribbon_code" after="-">
+            	<action method="setWrapInDomLoadedEvent"><value>1</value></action>
+            </block>
+        </reference>
+	</ewpribbon_default_handle>
+</layout>

@@ -1,0 +1,151 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magento.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magento.com for more information.
+ *
+ * @category    design
+ * @package     rwd_default
+ * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+/**
+ * @var Mage_Page_Block_Html_Header $this
+ */
+?>
+<header id="header" class="header-full">
+	<div class="topLinks mob-hedr">
+		<ul class="links">
+			<li><a href="<?php echo Mage::getUrl('customer/account');?>"><i class="fa fa-user"></i>My Account</a></li>
+			<li><a href="<?php echo Mage::getUrl('customer/account/create');?>"><i class="fa fa-edit"></i>Register</a></li>
+			<?php if (!Mage::getSingleton('customer/session')->isLoggedIn()): ?>
+				<li><a href="<?php echo Mage::helper('customer')->getLoginUrl(); ?>"><i class="fa fa-lock"></i><?php echo $this->__('Login') ?></a></li>
+			<?php else: ?>
+				<li><a href="<?php echo Mage::helper('customer')->getLogoutUrl(); ?>"><i class="fa fa-lock"></i><?php echo $this->__('Logout') ?></a></li>
+			<?php endif; ?>
+		</ul>
+	</div>
+	<div class="container clearfix">
+		<a class="logo" href="<?php echo $this->getUrl('') ?>">
+			<img src="<?php echo $this->getLogoSrc() ?>" alt="<?php echo $this->getLogoAlt() ?>" class="large" />
+			<img src="<?php echo $this->getLogoSrcSmall() ?>" alt="<?php echo $this->getLogoAlt() ?>" class="small" />
+		</a>
+		<div class="headerRight">
+			<div class="topLinks">
+				<ul class="links">
+					<li><a href="#"><i class="fa fa-heart"></i>Favorites</a></li>
+					<li><a href="<?php echo Mage::getUrl('customer/account');?>"><i class="fa fa-user"></i>My Account</a></li>
+					<li><a href="<?php echo Mage::getUrl('checkout/cart');?>"><i class="fa fa-check"></i>Checkout</a></li>
+					<li><a href="<?php echo Mage::getUrl('customer/account/create');?>"><i class="fa fa-edit"></i>Register</a></li>
+						<?php if (!Mage::getSingleton('customer/session')->isLoggedIn()): ?>
+							<li><a href="<?php echo Mage::helper('customer')->getLoginUrl(); ?>"><i class="fa fa-lock"></i><?php echo $this->__('Login') ?></a></li>
+						<?php else: ?>
+							<li><a href="<?php echo Mage::helper('customer')->getLogoutUrl(); ?>"><i class="fa fa-lock"></i><?php echo $this->__('Logout') ?></a></li>
+						<?php endif; ?>
+				</ul>
+			</div>
+			<?php
+				require_once Mage::getBaseDir('lib') . DS . 'Mobile-Detect-master' . DS . 'Mobile_Detect.php';
+				$detect = new Mobile_Detect;
+				
+				$deviceType = ($detect->isMobile() ? ($detect->isTablet() ? 'tablet' : 'phone') : 'computer');
+				$scriptVersion = $detect->getScriptVersion();
+			?>
+			<div class="infoPanel">
+				<?php
+					//if($deviceType == "computer"){
+						echo $this->getChildHtml('topSearch');
+					//}
+				?>
+				<div class="infoBoxRt">
+					<div class="infoText callUs">
+						<i class="fa fa-phone"></i>
+						<span class="text1">call <a href="tel:8002113147">800-221-3147</a></span>
+						<span class="text2">Providers of Jail Supplies</span>
+					</div>
+					<div class="infoText">
+						<div class="header-minicart">
+							<?php echo $this->getChildHtml('minicart_head'); ?>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+      
+      <div class="navigationPan">
+        <div class="container clearfix">
+          <div class="allCate"> <span class="allCateClick">all categories <i class="fa fa-list"></i></span>
+            <div class="allCateDrop">
+                <?php 
+               //$parentCategoryId =4;
+                $children = Mage::getModel('catalog/category')->getCollection()->setStoreId(Mage::app()->getStore()->getId());
+                $children->addAttributeToSelect('*')
+                    ->addAttributeToFilter('parent_id',2 )
+                    ->addAttributeToFilter('is_active', 1)//get only active categories if you want
+                    ->addAttributeToSort('position');?>
+                <ul>
+                    <?php foreach($children as $subCatid){ ?>
+			<li><a href="<?php echo $subCatid->getUrl() ?>"><?php echo $subCatid->getName() ?></a>
+				<?php $collection = Mage::getModel('catalog/category')->getCollection();
+				
+				$collection->addAttributeToSelect('*') 
+				 ->addIdFilter($subCatid->getChildren()) 
+				 ->setOrder('name', Varien_Db_Select::SQL_ASC) 
+				 ->load();?>
+				 <?php if (count($collection) > 0){ ?>
+				<i class="fa fa-caret-right"></i>
+				
+				<ul class="sub-menu">
+					<div class="main-cat"><a href="<?php echo $subCatid->getUrl() ?>"><?php echo $subCatid->getName() ?></a></div>
+					<?php foreach ($collection as $child) { ?>
+					<li><a href="<?php echo $child->getUrl() ?>"><?php echo $child->getName() ?></a></li>
+				       <?php }?>
+				       <?php if ($_thumbnail = Mage::getModel('catalog/category')->load($subCatid->getId())->getThumbnail()): ?>
+					<?php $_imageurl = Mage::getBaseUrl('media') . 'catalog/category/' . $_thumbnail;?>
+					<div class="sub-category-image">
+					    <a title="<?php echo  $subCatid ?>" href="<?php echo $subCatid->getUrl() ?>"><img width="155" height="155" alt="<?php echo  $subCatid ?>" src="<?php echo $_imageurl ?>"></a>
+					</div>
+				    <?php endif; ?>
+				       
+			    </ul>
+				
+				<?php } ?>
+				
+			</li>
+                    <?php } ?>
+               </ul>
+            </div>
+          </div>
+          <a class="skip-link skip-nav skip-active" href="#header-nav"> <span class="icon"></span> <span class="label">Menu</span> </a>
+          <div class="skip-content" id="header-nav">
+			  <?php echo $this->getChildHtml('topMenu') ?>
+          </div>
+	  
+        </div>
+	
+      </div>
+	  <?php
+		  //if($deviceType != "computer"){
+			  echo $this->getChildHtml('newSearch');
+		  //}
+	  ?>
+    
+</header>
+
+<?php echo $this->getChildHtml('topContainer'); ?>
+

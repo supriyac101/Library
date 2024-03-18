@@ -1,0 +1,19 @@
+<?php /* @var $this Potato_PrintAnyOrder_Block_Adminhtml_Sales_Order_Grid_Massaction */ ?>
+<?php if ($this->canShow()): ?>
+<script type="text/javascript">
+    //<![CDATA[
+    // Move Print Order option
+    if (<?php echo $this->getJsObjectName(); ?>.select) {
+        var pdfOrdersOption = <?php echo $this->getJsObjectName(); ?>.select.select('option[value=<?php echo $this->getPrintOrderOptionId(); ?>]').first();
+        var firstPdfOption = <?php echo $this->getJsObjectName(); ?>.select.select('option[value=pdfinvoices_order]').first();
+        if (pdfOrdersOption && firstPdfOption) {
+            <?php echo $this->getJsObjectName(); ?>.select.insertBefore(pdfOrdersOption, firstPdfOption);
+        }
+        var pdfAllOption = <?php echo $this->getJsObjectName(); ?>.select.select('option[value=<?php echo $this->getPrintAllOptionId(); ?>]').first();
+        if (pdfAllOption) {
+            <?php echo $this->getJsObjectName(); ?>.select.insertBefore(pdfAllOption, <?php echo $this->getJsObjectName(); ?>.select.lastChild);
+        }
+    }
+    //]]>
+</script>
+<?php endif; ?>

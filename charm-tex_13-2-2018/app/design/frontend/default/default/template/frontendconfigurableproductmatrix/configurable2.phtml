@@ -1,0 +1,765 @@
+<?php 
+	$_product = $this->getProduct();
+	$_allChilds = $this->getAllChildProducts();
+	$_superAttr = $this->getSuperAttribute();
+	$_superAttrIds = array_keys($_superAttr);
+	$_isLinked = $this->getMatrixHelper()->isShowLink($_product);
+	$_mPosition = $this->getMatrixHelper()->getMatrixPosition($_product);
+	$_isTab = $this->getMatrixHelper()->isInEasyTab($_product);
+	$_showOption = $this->getMatrixHelper()->getMultipleOption($_product);
+	$_isCptp = $this->getMatrixHelper()->isCptpEnable();
+	$_displyTab = $this->getMatrixHelper()->getDisplayTabs($_product);
+	$_showPrices = $this->getMatrixHelper()->isShowProductPrice($_product);
+	$_showTotalColumn = $this->getMatrixHelper()->isShowTotalColumn();
+	$_hasReplaced = false;
+	$_bodyTblCounter = count($_superAttr[$_superAttrIds[count($_superAttrIds)-1]]['option']);
+	if($this->getMatrixHelper()->isShowRowTotal($_product) || $this->getMatrixHelper()->isShowGrandTotal($_product))
+	{
+		$_bodyTblCounter++;
+	}
+	if(1*$_showOption == 0 || 1*$_showOption > $_bodyTblCounter) $_showOption = $_bodyTblCounter;
+	$backorderClass = $this->getMatrixHelper()->getBackordersClass();
+?>
+<?php if($_displyTab == 0 && $this->getBlockAlias() == 'matrix'):?>
+	<?php if($_isLinked):?><?php if($this->getBlockAlias() == 'fmatrix' || $_mPosition == 2 || $_mPosition == 3):?><h2><?php echo $this->__('Order Multiple') ?></h2><?php endif;?><button type="button" class="button" onclick="matrixBlockUI();"><span><span><?php echo $this->__('Product  Order Matrix') ?></span></span></button><div id="addToCartMatrix" style="display:none;position:relative;"><img src="<?php echo $this->getJsUrl('fcpm/close.png');?>" onclick="jQuery.unblockUI();" style="position:absolute;top:-27px;right:-27px;cursor:pointer;" /><?php endif;?>
+    <div class="clearer"></div>
+    <form id="fmatrix_addtocart_form" method="post" action="<?php echo $this->getSubmitUrl($_product) ?>"<?php if($_product->getOptions()): ?> enctype="multipart/form-data"<?php endif; ?>>
+    <div class="no-display">
+        <input type="hidden" name="product" value="<?php echo $_product->getId() ?>" />
+    </div>
+	<?php echo $this->getChildHtml('product.info.options.wrapper');?>
+    <?php echo $this->getChildHtml('product.info.options.wrapper.bottom');?>
+    </form>
+    <?php if($_isLinked):?></div><?php endif;?>
+    <script type="text/javascript">
+	//<![CDATA[
+	productAddToCartForm = new VarienForm('fmatrix_addtocart_form');
+	productAddToCartForm.submit = function(button, url) {
+		if (this.validator.validate()) {
+			var form = this.form;
+			var oldUrl = form.action;
+
+			if (url) {
+				<?php if($this->getMatrixHelper()->isRfqEnabled($_product)):?>
+				if(url.search('request4quote') !== -1){
+					var tempR4qUrl = '<?php echo $this->getRequest4quoteUrl($_product, true) ?>';
+					if($('product-matrix')){
+						if($('product-matrix').getStyle('width') == null && $('product-matrix').getStyle('height') == null)
+						{
+							tempR4qUrl = '<?php echo $this->getRequest4quoteUrl($_product) ?>';
+						}
+					}
+					form.action = tempR4qUrl;
+				} else {
+					form.action = url;
+				}
+				<?php else:?>
+				form.action = url;
+				<?php endif;?>
+			}
+			var e = null;
+			try {
+				this.form.submit();
+			} catch (e) {
+			}
+			this.form.action = oldUrl;
+			if (e) {
+				throw e;
+			}
+
+			if (button && button != 'undefined') {
+				button.disabled = true;
+			}
+		}
+	}.bind(productAddToCartForm);
+	//]]>
+	</script>
+<?php else:?>
+    <?php if ($_product->isSaleable() && count($_allChilds)):?>
+    	<?php if($_isLinked):?><?php if($this->getBlockAlias() == 'fmatrix' || $_mPosition == 2 || $_mPosition == 3):?><h2><?php echo $this->__('Order Multiple') ?></h2><?php endif;?><button type="button" class="button" onclick="matrixBlockUI();"><span><span><?php echo $this->__('Product  Order Matrix') ?></span></span></button><div id="addToCartMatrix" class="mfp-hide"><?php endif;?>
+			<?php if($_isTab && $_mPosition != 1):?><h2><?php echo $this->__('Order Multiple') ?></h2><?php endif;?>
+			<div class="clearer"></div>
+			<div class="std">
+				<?php if($this->getBlockAlias() != 'fmatrix'):?>
+				<form id="fmatrix_addtocart_form" method="post" action="<?php echo $this->getSubmitUrl($_product) ?>"<?php if($_product->getOptions()): ?> enctype="multipart/form-data"<?php endif; ?>>
+					<?php echo $this->getBlockHtml('formkey') ?>
+					<div class="no-display">
+						<input type="hidden" name="product" value="<?php echo $_product->getId() ?>" />
+						<input type="hidden" name="related_product" id="related-products-field" value="" />
+					</div>
+				<?php endif;?>
+					<?php if(count($_superAttrIds) == 2):?>
+					<!-- Matrix Start -->
+					<div id="product-matrix-std">
+					    <div id="product-matrix-fixedleft">
+					        <ul>
+					            <li>
+					                <img width="20" src="<?php echo $this->getJsUrl('fcpm/table_prev.png')?>" alt="<?php echo $this->__('Previous');?>" id="tLeft"/>
+					            </li>
+					      
+					            <?php foreach($_superAttr[$_superAttrIds[0]]['option'] as $attr1Id => $attr1Val):?>
+					            <li>
+					                <?php echo (($this->getMatrixHelper()->isReplacedWithSwatchs($_superAttrIds[0]) && $this->_showImage == 0) ? $this->generateSwatches($_superAttrIds[0],$attr1Id,$attr1Val['label'],$_superAttr[$_superAttrIds[1]]['code'],'row', $_product) : $attr1Val['label']).'<div id="first-'.$attr1Id.'"></div>';?>
+					            </li>
+					            <?php endforeach;?>
+					            <?php if($_showTotalColumn || $this->getMatrixHelper()->isShowGrandTotal($_product)):?>
+					                <li><?php echo ($_showTotalColumn ? $this->__('Total Quantity') : '&nbsp;');?></li>
+					            <?php endif;?>
+					        </ul>
+					    </div>
+
+					    <div id="product-matrix" class="product-matrix">
+					        <?php foreach($_superAttr[$_superAttrIds[1]]['option'] as $attr2Id => $attr2Val):?>
+					            <div class="item">
+					                <ul>
+					                    <li>
+					                        <?php echo $this->getMatrixHelper()->isReplacedWithSwatchs($_superAttrIds[1]) ? $this->generateSwatches($_superAttrIds[1],$attr2Id,$attr2Val['label'],$_superAttr[$_superAttrIds[1]]['code'],'col', $_product) : $attr2Val['label'];?>
+					                    </li>
+
+					                    <?php foreach($_superAttr[$_superAttrIds[0]]['option'] as $attr1Id => $attr1Val):?>
+					                        <?php $product = $this->isSuperSimpleProduct($_superAttr[$_superAttrIds[0]]['code'],$attr1Id,$_superAttr[$_superAttrIds[1]]['code'],$attr2Id);?>
+					                        <li>
+					                            <?php if($product == false):?>
+					                                <?php echo $this->__('-');?>
+					                            <?php else:?>
+					                                <?php if($this->_showImage == 1 && $product['has_img'] == 1): $divHtml = '<div style="cursor:pointer;" onclick="replaceSimpleMediaImages(\'row_'.$attr1Id.'\');">';?>
+					                                    <script type="text/javascript">
+					                                        $('first-<?php echo $attr1Id;?>').update("<?php echo addslashes($divHtml.$product['image']);?></div>");
+					                                    </script>
+					                                <?php endif;?>
+					                                <?php if($this->getMatrixHelper()->isOnlyCheckBox($_product)):?>
+					                                    <input type="checkbox" class="input-checkbox matrix-qty row_<?php echo $attr1Id;?> col_<?php echo $attr2Id;?>" title="Qty" value="1" maxlength="12" name="product_matrix[qty][<?php echo $product['id'];?>]" id="<?php echo $product['id'];?>" onclick="reloadMatrixPriceQtyCheckbox();"/>
+					                                <?php else:?>
+					                                	<?php /*---------- changelog 29.12.15 ----------*/?>
+					                                    <input type="text" data-max-qty="<?php echo $product['maxQty'] ?>" class="<?php echo $backorderClass;?> fcpm-validate input-text qty matrix-qty row_<?php echo $attr1Id;?> col_<?php echo $attr2Id;?>" title="Qty" value="0" maxlength="12" name="product_matrix[qty][<?php echo $product['id'];?>]" id="<?php echo $product['id'];?>" onkeyup="reloadMatrixPriceQty();"/>
+					                                    <?php /*---------- changelog 29.12.15 ----------*/?>
+					                                    <br />
+					                                    <?php if(isset($product['stock'])):?>
+					                                        <b><?php echo $this->__('Stock : ');?></b><?php echo $product['stock'];?><br />
+					                                    <?php endif;?>
+					                                    
+					                                    <?php if($_showPrices):?>
+					                                    <div id="tier-unit-price-<?php echo $product['id'];?>" class="config-price"><?php echo $product['fprice'];?></div>
+					                                    <?php endif;?>
+					                                    
+					                                    <?php if($this->getMatrixHelper()->isShowRowTotal($_product)):?>
+					                                        <div id="matrix-price-<?php echo $product['id'];?>"><?php echo $product['fprice'];?></div>
+					                                    <?php endif;?>
+					                                <?php endif;?>
+					                                <input type="hidden" name="product_matrix[<?php echo $product['id'];?>][super_attribute][<?php echo $_superAttrIds[0];?>]" value="<?php echo $product[$_superAttr[$_superAttrIds[0]]['code'].'_value'];?>" />
+					                                <input type="hidden" name="product_matrix[<?php echo $product['id'];?>][super_attribute][<?php echo $_superAttrIds[1];?>]" value="<?php echo $product[$_superAttr[$_superAttrIds[1]]['code'].'_value'];?>" />
+					                                <?php if(Mage::getStoreConfig('cpbu/basic_options/update_fields',Mage::app()->getStore()) != ''):?>
+					                                    <input type="hidden" name="product_matrix[<?php echo $product['id'];?>][customname]" value="<?php echo $product['name'];?>" />
+					                                    <input type="hidden" name="product_matrix[<?php echo $product['id'];?>][customthumb]" value="<?php echo $product['thumb'];?>" />
+					                                <?php endif;?>
+					                                <?php if($this->isSimple()):?>
+					                                    <input type="hidden" id="customprice-tier-<?php echo $product['id'];?>" name="product_matrix[<?php echo $product['id'];?>][customprice]" value="<?php echo $product['exTaxPrice'];?>" />
+					                                <?php endif;?>
+					                            <?php endif;?>
+					                        </li>
+					                    <?php endforeach;?>
+
+					                    <?php if($_showTotalColumn || $this->getMatrixHelper()->isShowGrandTotal($_product)):?>
+					                        <li <?php if($_showTotalColumn):?>class="matrix-col" id="<?php echo $attr2Id;?>"<?php endif;?>><?php if($_showTotalColumn):?>0<?php endif;?></li>
+					                    <?php endif;?>
+					                </ul>
+					            </div>
+					        <?php endforeach;?>
+					        
+					        <?php if($_showTotalColumn):?>
+					            <div class="item">
+					                <ul>
+					                    <li><?php echo $this->__('Total Quantity');?></li>
+					                    <?php foreach($_superAttr[$_superAttrIds[0]]['option'] as $attr1Id => $attr1Val):?>
+					                        <li>
+					                            <div class="matrix-row" id="<?php echo $attr1Id;?>">0</div>
+					                        </li>
+					                    <?php endforeach;?>
+					                    <li><div class="matrix-total-qty dyn">0</div></li>
+					                </ul>
+					            </div>
+					        <?php endif;?>
+					    </div>
+
+					    <?php if($this->getMatrixHelper()->isShowRowTotal($_product) || $this->getMatrixHelper()->isShowGrandTotal($_product)):?>
+					        <div id="product-matrix-fixedright">
+					            <ul>
+					                <li>
+					                    <img width="20" src="<?php echo $this->getJsUrl('fcpm/table_next.png')?>" alt="<?php echo $this->__('Next');?>" id="tRight"/>
+					                </li>
+					          
+					                <?php foreach($_superAttr[$_superAttrIds[0]]['option'] as $attr1Id => $attr1Val):?>
+					                    <?php if($this->getMatrixHelper()->isShowRowTotal($_product)):?>
+					                        <li><div id="<?php echo $attr1Id;?>" class="matrix-line-total"><?php echo Mage::helper('core')->currency(0,true);?></div></li>
+					                    <?php elseif($this->getMatrixHelper()->isShowGrandTotal($_product)):?>
+					                        <li>&nbsp;</li>
+					                    <?php endif;?>
+					                <?php endforeach;?>
+
+					                <?php if($this->getMatrixHelper()->isShowGrandTotal($_product)):?>
+					                    <li><div id="matrix-total-price"><?php echo Mage::helper('core')->currency(0,true);?></div></li>
+					                <?php elseif($this->getMatrixHelper()->isShowRowTotal($_product)):?>
+					                    <li>&nbsp;</li>
+					                <?php endif;?>
+					                
+					            </ul>
+					        </div>
+					    <?php else:?>
+					        <div id="product-matrix-fixedright">
+					            <ul><li><img width="20" src="<?php echo $this->getJsUrl('fcpm/table_next.png')?>" alt="<?php echo $this->__('Next');?>" id="tRight"/></li></ul>
+					        </div>
+					    <?php endif;?>
+					</div>
+					<!-- Matrix End -->
+					<?php elseif(count($_superAttrIds) > 2):?>
+					    <div id="product-matrix-outer"> 
+					        <?php 
+					            $countReduce = count($_superAttrIds)-2;
+					        ?>
+					        <dl>
+					        <?php foreach($_superAttr as $attrId => $sprAt): if($countReduce == 0) break;?>
+					        <dt><label><?php echo $sprAt['label'] ?></label></dt>
+					        <dd>
+					            <div class="input-box">
+					            <select id="<?php echo $sprAt['code'].'::'.$attrId;?>" class="product_matrix_selector">
+					                <option value=""><?php echo $this->__('Choose an Option...') ?></option>
+					                <?php foreach($sprAt['option'] as $optionId => $sprAttrOption):?>
+					                    <option value="<?php echo $optionId;?>"><?php echo $sprAttrOption['label'];?></option>
+					                <?php endforeach;?>
+					            </select>
+					            </div>
+					        </dd>
+					        <?php $countReduce--; endforeach;?>
+					        </dl>
+					        <div id="product-matrix-std" class="std"></div>
+					    </div>    
+					<?php elseif(count($_superAttrIds) == 1):?>
+					<!-- Matrix Start -->
+					<div id="product-matrix-std">
+					    <div id="product-matrix-fixedleft">
+					        <ul>
+					            <li>
+					                <img width="20" src="<?php echo $this->getJsUrl('fcpm/table_prev.png')?>" alt="<?php echo $this->__('Previous');?>" id="tLeft"/>
+					            </li>
+					      
+					            <li>&nbsp;</li>
+					            <?php if($_showTotalColumn || $this->getMatrixHelper()->isShowGrandTotal($_product)):?>
+					                <li><?php echo ($_showTotalColumn ? $this->__('Total Quantity') : '&nbsp;');?></li>
+					            <?php endif;?>
+					        </ul>
+					    </div>
+
+					    <div id="product-matrix" class="product-matrix">
+					        <?php foreach($_superAttr[$_superAttrIds[0]]['option'] as $attr1Id => $attr1Val):?>
+					            <div class="item">
+					                <ul>
+					                    <li>
+					                        <?php echo $this->getMatrixHelper()->isReplacedWithSwatchs($_superAttrIds[0]) ? $this->generateSwatches($_superAttrIds[0],$attr1Id,$attr1Val['label'],$_superAttr[$_superAttrIds[0]]['code'],'col', $_product) : $attr1Val['label'];?>
+					                    </li>
+
+				                        <?php $product = $this->isSuperSimpleProductSingle(($_superAttr[$_superAttrIds[0]]['code'],$attr1Id));?>
+				                        <li>
+				                            <?php if($product == false):?>
+				                                <?php echo $this->__('-');?>
+				                            <?php else:?>
+				                                <?php if($this->getMatrixHelper()->isOnlyCheckBox($_product)):?>
+				                                    <input type="checkbox" class="input-checkbox matrix-qty row_<?php echo $attr1Id;?> col_<?php echo $attr1Id;?>" title="Qty" value="1" maxlength="12" name="product_matrix[qty][<?php echo $product['id'];?>]" id="<?php echo $product['id'];?>" onclick="reloadMatrixPriceQtyCheckbox();"/>
+				                                <?php else:?>
+				                                	<?php /*---------- changelog 29.12.15 ----------*/?>
+				                                    <input type="text" data-max-qty="<?php echo $product['maxQty'] ?>" class="<?php echo $backorderClass;?> fcpm-validate input-text qty matrix-qty row_<?php echo $attr1Id;?> col_<?php echo $attr1Id;?>" title="Qty" value="0" maxlength="12" name="product_matrix[qty][<?php echo $product['id'];?>]" id="<?php echo $product['id'];?>" onkeyup="reloadMatrixPriceQty();"/>
+				                                    <?php /*---------- changelog 29.12.15 ----------*/?>
+				                                    <br />
+				                                    <?php if(isset($product['stock'])):?>
+				                                        <b><?php echo $this->__('Stock : ');?></b><?php echo $product['stock'];?><br />
+				                                    <?php endif;?>
+				                                    
+				                                    <?php if($_showPrices):?>
+				                                    <div id="tier-unit-price-<?php echo $product['id'];?>" class="config-price"><?php echo $product['fprice'];?></div>
+				                                    <?php endif;?>
+				                                    
+				                                    <?php if($this->getMatrixHelper()->isShowRowTotal($_product)):?>
+				                                        <div id="matrix-price-<?php echo $product['id'];?>"><?php echo $product['fprice'];?></div>
+				                                    <?php endif;?>
+				                                <?php endif;?>
+				                                <input type="hidden" name="product_matrix[<?php echo $product['id'];?>][super_attribute][<?php echo $_superAttrIds[0];?>]" value="<?php echo $product[$_superAttr[$_superAttrIds[0]]['code'].'_value'];?>" />
+				                                <input type="hidden" name="product_matrix[<?php echo $product['id'];?>][super_attribute][<?php echo $_superAttrIds[1];?>]" value="<?php echo $product[$_superAttr[$_superAttrIds[1]]['code'].'_value'];?>" />
+				                                <?php if(Mage::getStoreConfig('cpbu/basic_options/update_fields',Mage::app()->getStore()) != ''):?>
+				                                    <input type="hidden" name="product_matrix[<?php echo $product['id'];?>][customname]" value="<?php echo $product['name'];?>" />
+				                                    <input type="hidden" name="product_matrix[<?php echo $product['id'];?>][customthumb]" value="<?php echo $product['thumb'];?>" />
+				                                <?php endif;?>
+				                                <?php if($this->isSimple()):?>
+				                                    <input type="hidden" id="customprice-tier-<?php echo $product['id'];?>" name="product_matrix[<?php echo $product['id'];?>][customprice]" value="<?php echo $product['exTaxPrice'];?>" />
+				                                <?php endif;?>
+				                            <?php endif;?>
+				                        </li>
+
+					                    <?php if($_showTotalColumn || $this->getMatrixHelper()->isShowGrandTotal($_product)):?>
+					                        <li <?php if($_showTotalColumn):?>class="matrix-col" id="<?php echo $attr1Id;?>"<?php endif;?>><?php if($_showTotalColumn):?>0<?php endif;?></li>
+					                    <?php endif;?>
+					                </ul>
+					            </div>
+					        <?php endforeach;?>
+					        
+					        <?php if($_showTotalColumn):?>
+					            <div class="item">
+					                <ul>
+					                    <li><?php echo $this->__('Total Quantity');?></li>
+					                    <li>&nbsp;</li>
+					                    <li><div class="matrix-total-qty dyn">0</div></li>
+					                </ul>
+					            </div>
+					        <?php endif;?>
+					    </div>
+
+					    <?php if($this->getMatrixHelper()->isShowRowTotal($_product) || $this->getMatrixHelper()->isShowGrandTotal($_product)):?>
+					        <div id="product-matrix-fixedright">
+					            <ul>
+					                <li>
+					                    <img width="20" src="<?php echo $this->getJsUrl('fcpm/table_next.png')?>" alt="<?php echo $this->__('Next');?>" id="tRight"/>
+					                </li>
+
+					                <li>&nbsp;</li>
+					                <?php if($this->getMatrixHelper()->isShowGrandTotal($_product)):?>
+					                    <li><div id="matrix-total-price"><?php echo Mage::helper('core')->currency(0,true);?></div></li>
+					                <?php endif;?>
+					                
+					            </ul>
+					        </div>
+					    <?php else:?>
+					        <div id="product-matrix-fixedright">
+					            <ul><li><img width="20" src="<?php echo $this->getJsUrl('fcpm/table_next.png')?>" alt="<?php echo $this->__('Next');?>" id="tRight"/></li></ul>
+					        </div>
+					    <?php endif;?>
+					</div>
+					<!-- Matrix End -->
+					<?php endif;?>
+					<?php if($_isCptp == 1):?>
+					<input type="hidden" name="cptp_qty" id="cptp_qty"/>
+					<?php endif;?>
+					<?php echo $this->getChildHtml('configurable_matrix_options');?>
+					<br />
+					
+					<?php if(Mage::helper('core')->isModuleEnabled('ITwebexperts_Request4quote')):?>
+						<?php if(!$this->getMatrixHelper()->isRfqOrderDisabled($_product)):?>
+							<button id="allBtnCart" type="<?php if($_isLinked && $this->getBlockAlias() == 'fmatrix'):?>button<?php else:?>submit<?php endif;?>" title="<?php echo $this->__('Add to Cart');?>" class="button btn-cart right"><span><span><?php echo $this->__('Add to Cart');?></span></span></button>
+						<?php endif;?>
+						<?php echo $this->getChildHtml('request4quote.button');?>
+					<?php else:?>
+						<button id="allBtnCart" type="<?php if($_isLinked && $this->getBlockAlias() == 'fmatrix'):?>button<?php else:?>submit<?php endif;?>" title="<?php echo $this->__('Add to Cart');?>" class="button btn-cart right"><span><span><?php echo $this->__('Add to Cart');?></span></span></button>
+					<?php endif;?>
+				<?php if($this->getBlockAlias() != 'fmatrix'):?></form><?php endif;?>
+			</div>
+		<?php if($_isLinked):?></div><?php endif;?>
+
+		<script type="text/javascript">
+        //<![CDATA[
+            var leftRightFixedOwl = 80, owlFcpm, incrSoTbl = 1;
+		    var showOptionTbl = 1*<?php echo $_showOption;?>;
+		    var showOptionTbl0 = 1;
+		    var showOptionTbl320 = (showOptionTbl < 2) ? showOptionTbl : 2;
+		    var showOptionTbl480 = (showOptionTbl < 3) ? showOptionTbl : 3;
+		    var showOptionTbl640 = (showOptionTbl < 4) ? showOptionTbl : 4;
+
+		    fMatrixChildProducts = <?php echo json_encode($_allChilds);?>;
+            optionMatrixPrice = <?php echo $this->getJsonConfig() ?>;
+            totalMatrixPrice = totalMatrixQty = 0;
+
+            <?php if(!$this->getMatrixHelper()->isShowStock($_product)):?>incrSoTbl = 2;<?php endif;?>
+		    showOptionTbl += incrSoTbl;
+		    showOptionTbl0 = incrSoTbl;
+		    showOptionTbl320 += incrSoTbl;
+		    showOptionTbl480 += incrSoTbl;
+		    showOptionTbl640 += incrSoTbl;
+
+		    if(jQuery(window).width() < 640) leftRightFixedOwl = 60;
+		    else  leftRightFixedOwl = 80;
+
+		    jQuery(window).resize(function(event) {
+		        if(jQuery(window).width() < 640) leftRightFixedOwl = 60;
+		        else  leftRightFixedOwl = 80;
+		    });
+
+		    setUpMyUlSlider = function()
+		    {
+		        jQuery('#product-matrix-std li').removeAttr('style');
+		        
+		        var topBotHeightArr = [];
+		        var centerHeightArr = [];
+		        jQuery('#product-matrix-std ul').each(function(){
+		            var thisObj = jQuery(this);
+		            thisObj.find('li.first, li.last').each(function(){
+		                topBotHeightArr.push(jQuery(this).height());
+		            });
+
+		            thisObj.find('li').not(thisObj.find('li.first, li.last')).each(function(){
+		                centerHeightArr.push(jQuery(this).height());
+		            });
+		        });
+
+		        var centerHeight = Math.max.apply(null, centerHeightArr);
+		        centerHeight = (centerHeight <= 25) ? 25 : centerHeight;
+		        
+		        var tBheight = Math.max.apply(null, topBotHeightArr);
+		        tBheight = (tBheight == 0 ? 25 : tBheight);
+
+		        jQuery('#product-matrix-std ul').find('li.first, li.last').height(tBheight);
+
+		        jQuery('#product-matrix-std li')
+		            .not(jQuery('#product-matrix-std ul').find('li.first, li.last'))
+		            .height(centerHeight);
+		    }
+
+		    initMyUlSlider = function(isLoded)
+		    {
+		        jQuery('#product-matrix-fixedleft, #product-matrix-fixedright').width(leftRightFixedOwl);
+		        jQuery('#product-matrix').css('margin','0 '+leftRightFixedOwl+'px');
+		        
+		        $$('#product-matrix-std ul').each(function(item){
+		            decorateGeneric(item.select('li'), ['first'<?php if($_showTotalColumn || $this->getMatrixHelper()->isShowGrandTotal($_product)):?>,'last'<?php endif;?>]);
+		        });
+
+		        if(isLoded){
+		            owlFcpm = jQuery("#product-matrix").owlCarousel({
+		                pagination: false,
+		                navigation: false,
+		                rewindNav: false,
+                		mouseDrag : false,
+		                responsiveBaseWidth: '#product-matrix-std',
+		                itemsCustom : [[0, 1],[320, showOptionTbl320],[480, showOptionTbl480],[640, showOptionTbl640],[800, showOptionTbl]],
+		                item : showOptionTbl,
+		                afterInit : setUpMyUlSlider,
+		                afterUpdate : setUpMyUlSlider,
+		                beforeUpdate : function(){
+		                    jQuery('#product-matrix-std').removeAttr('style');
+		                },
+		                afterAction : function()
+		                {
+		                    var thisOwl = this.owl;
+		                    jQuery('#tLeft,#tRight').removeClass('disabled');
+		                    if(thisOwl.userItems.size() <= thisOwl.visibleItems.size())
+		                    {
+		                        jQuery('#tLeft,#tRight').addClass('disabled');
+		                    }
+		                    else if(thisOwl.currentItem == 0)
+		                    {
+		                        jQuery('#tLeft').addClass('disabled');
+		                    }
+		                    else if(thisOwl.userItems.size() == thisOwl.currentItem+thisOwl.visibleItems.size())
+		                    {
+		                        jQuery('#tRight').addClass('disabled');
+		                    }
+		                    if(jQuery(window).width() > 640){
+		                        var origVidth = jQuery('#product-matrix').width();
+		                        var calcVidth = this.itemsAmount*this.itemWidth;
+		                        if(origVidth >= calcVidth){
+		                            var finalCalcWidth = calcVidth+(2*leftRightFixedOwl);
+		                            if(origVidth != 0) jQuery('#product-matrix-std').width(finalCalcWidth);
+		                        }
+		                    }
+		                }
+		            });
+		        }
+		        
+		        if($('tLeft'))
+		        {
+		            $('tLeft').addClassName('mnavs').observe('click',function(){
+		                owlFcpm.trigger('owl.prev');
+		            });
+		        }
+
+		        if($('tRight'))
+		        {
+		            $('tRight').addClassName('mnavs').observe('click',function(){
+		                owlFcpm.trigger('owl.next');
+		            });
+		        }
+		    }
+
+		    initMyUlSlider(<?php if(count($_superAttrIds) <= 2):?>true<?php endif;?>);
+
+            <?php if($_mPosition != 2):?>
+			var matrixAddToCartForm = new VarienForm('fmatrix_addtocart_form');
+			matrixAddToCartForm.submit = function(button, url) {
+				if (this.validator.validate()) {
+					var form = this.form;
+					var oldUrl = form.action;
+
+					if (url) {
+						form.action = url;
+					}
+					var e = null;
+					try {
+						this.form.submit();
+					} catch (e) {
+					}
+					this.form.action = oldUrl;
+					if (e) {
+						throw e;
+					}
+
+					if (button && button != 'undefined') {
+						button.disabled = true;
+					}
+				}
+			}.bind(matrixAddToCartForm);
+			<?php endif;?>
+            
+            reloadMatrixPriceQty = function(){
+                totalMatrixPrice = totalMatrixQty = 0;
+                var arrPriceByPid = [];
+                $$('.matrix-qty').each(function(ele){
+                    if(fMatrixChildProducts[ele.id])
+                    {
+                        var currentPrice = currentQty = 0;
+                        <?php if($_isCptp == 1):?>
+                        currentPrice = returnPreparePriceOrTier(ele.id, fMatrixChildProducts[ele.id], (1*ele.value));
+                        <?php else:?>
+                        if(ele.value > 0) {
+                            currentPrice = returnPreparePriceOrTier(ele.id, fMatrixChildProducts[ele.id], ele.value);
+                            <?php if($this->getMatrixHelper()->isShowRowTotal($_product)):?>
+                            $('matrix-price-'+ele.id).down('.price').update(matrixPriceFormate(currentPrice));
+                            <?php endif;?>
+                        } else {
+                            if($('tier-unit-price-'+ele.id)) $('tier-unit-price-'+ele.id).down('.price').update(fMatrixChildProducts[ele.id].fprice);
+                            <?php if($this->getMatrixHelper()->isShowRowTotal($_product)):?>
+                            $('matrix-price-'+ele.id).down('.price').update(matrixPriceFormate(fMatrixChildProducts[ele.id].price));	
+                            <?php endif;?>	
+                        }
+                        <?php endif;?>	
+                        arrPriceByPid[ele.id] = currentPrice;
+                        totalMatrixPrice += currentPrice;
+                        currentQty = isNaN(parseInt(ele.value)) ? 0 : (parseInt(ele.value) < 0 ? 0 : parseInt(ele.value));
+                        totalMatrixQty += currentQty;
+                    }
+                });
+                <?php if($this->getMatrixHelper()->isShowRowTotal($_product)):?>
+                $$('.matrix-line-total').each(function(obj){
+                    var lineTotal = 0;
+                    $$('.row_'+obj.id).each(function(item){
+                        if(arrPriceByPid[item.id]){
+                            lineTotal += arrPriceByPid[item.id];
+                        }
+                    });
+                    obj.update(matrixPriceFormate(lineTotal));
+                });
+                <?php endif;?>
+                matrixRowColQty('row');
+                matrixRowColQty('col');
+                $$('.matrix-total-qty').each(function(item){ if(item.hasClassName('dyn')) item.update(totalMatrixQty); });
+                <?php if($this->getMatrixHelper()->isShowGrandTotal($_product)):?>
+                $('matrix-total-price').down('.price').update(matrixPriceFormate(totalMatrixPrice));
+                <?php endif;?>
+                <?php if($_isCptp == 1):?>
+                if($('cptp_qty')) $('cptp_qty').value = totalMatrixQty;
+                <?php endif;?>
+                if($$('.matrix_custom_options .matrix-custom-option').size()>0) changeAndUpdateOptionPrice();
+            }
+            
+            reloadMatrixPriceQtyCheckbox = function(){
+                totalMatrixPrice = totalMatrixQty = 0;
+                var arrPriceByPid = [];
+                $$('.matrix-qty').each(function(ele){
+                    if(fMatrixChildProducts[ele.id])
+                    {
+                        var currentPrice = currentQty = 0;
+                        if(ele.checked) {
+                            currentPrice = returnPreparePriceOrTier(ele.id, fMatrixChildProducts[ele.id], ele.value);
+                            currentQty = isNaN(parseInt(ele.value)) ? 0 : (parseInt(ele.value) < 0 ? 0 : parseInt(ele.value));
+                        } else {
+                            if($('tier-unit-price-'+ele.id)) $('tier-unit-price-'+ele.id).down('.price').update(fMatrixChildProducts[ele.id].fprice);
+                        }
+                        arrPriceByPid[ele.id] = currentPrice;
+                        totalMatrixPrice += currentPrice;
+                        totalMatrixQty += currentQty;
+                    }
+                });
+                <?php if($this->getMatrixHelper()->isShowRowTotal($_product)):?>
+                $$('.matrix-line-total').each(function(obj){
+                    var lineTotal = 0;
+                    $$('.row_'+obj.id).each(function(item){
+                        if(arrPriceByPid[item.id]){
+                            lineTotal += arrPriceByPid[item.id];
+                        }
+                    });
+                    obj.update(matrixPriceFormate(lineTotal));
+                });
+                <?php endif;?>
+                matrixRowColQtyCheckbox('row');
+                matrixRowColQtyCheckbox('col');
+                $$('.matrix-total-qty').each(function(item){ if(item.hasClassName('dyn')) item.update(totalMatrixQty); });
+                <?php if($this->getMatrixHelper()->isShowGrandTotal($_product)):?>
+                $('matrix-total-price').down('.price').update(matrixPriceFormate(totalMatrixPrice));
+                <?php endif;?>
+                <?php if($_isCptp == 1):?>
+                if($('cptp_qty')) $('cptp_qty').value = totalMatrixQty;
+                <?php endif;?>
+                if($$('.matrix_custom_options .matrix-custom-option').size()>0) changeAndUpdateOptionPrice();
+            }
+            
+            matrixRowColQty = function(varRowCol){
+                $$('.matrix-'+varRowCol).each(function(item){
+                    var intRowColQty = 0;
+                    $$('.'+varRowCol+'_'+item.id).each(function(qty){
+                        intRowColQty += isNaN(parseInt(qty.value)) ? 0 : (parseInt(qty.value) < 0 ? 0 : parseInt(qty.value));
+                    });
+                    item.update(intRowColQty);
+                });
+            }
+            
+            matrixRowColQtyCheckbox = function(varRowCol){
+                $$('.matrix-'+varRowCol).each(function(item){
+                    var intRowColQty = 0;
+                    $$('.'+varRowCol+'_'+item.id+':checked').each(function(qty){
+                        intRowColQty += isNaN(parseInt(qty.value)) ? 0 : (parseInt(qty.value) < 0 ? 0 : parseInt(qty.value));
+                    });
+                    item.update(intRowColQty);
+                });
+            }
+            
+            matrixPriceFormate = function (price){
+                return formatCurrency(price,optionMatrixPrice.priceFormat);
+            }
+            
+            <?php if($_isLinked):?>
+            matrixBlockUI = function() {
+                owlFcpm.data('owlCarousel').reinit();
+                var popUpMinWidth = jQuery(window).width()/2;
+            	popUpMinWidth = (popUpMinWidth < 480) ? 480 : popUpMinWidth;
+	        	jQuery('#addToCartMatrix').css('max-width',popUpMinWidth+'px');
+	        	jQuery.magnificPopup.open({
+	            	items: {
+	            		src: jQuery('#addToCartMatrix'),
+	            		type: 'inline',
+	            		alignTop: true
+	            	}
+	            });
+                <?php if($_isLinked && ($this->getBlockAlias() == 'fmatrix' || $_mPosition == 2)):?>
+                    jQuery('#allBtnCart').click( function() {
+                        jQuery.unblockUI();
+                        setTimeout(function() { 
+                            var objCart = jQuery('.add-to-cart .btn-cart');
+                            if($('product_addtocart_form')) $('product_addtocart_form').action = '<?php echo $this->getSubmitUrl($_product) ?>';
+							productAddToCartForm.submit(objCart[0]);
+                        },500);			
+                    });
+                <?php endif;?>
+            }
+            <?php endif;?>
+            
+            returnPreparePriceOrTier = function(pid, product, qty){
+                var unitPriceTier = product.price, currentPriceTier;
+                var tierPriceMatrix = product.tier;
+                var tirQty = product.tier_qty;
+                var forCheckQty = qty;
+                <?php if($_isCptp == 1):?>
+                forCheckQty = getTotalQty();
+                <?php endif;?>
+                if(product.tier_qty.length > 0){
+                    tirQty = tirQty.sort(function(a, b){return b-a});
+                    for(var i=0;i<tirQty.length;i++)
+                    {
+                        if(forCheckQty >= tirQty[i]){
+                            unitPriceTier = tierPriceMatrix[tirQty[i]];
+                            currentPriceTier = unitPriceTier*qty;
+                            break;	
+                        }
+                    }
+                }
+                currentPriceTier = unitPriceTier*qty;
+                if($('tier-unit-price-'+pid)) $('tier-unit-price-'+pid).down('.price').update(matrixPriceFormate(unitPriceTier));
+                <?php if($_isCptp == 1 && $this->getMatrixHelper()->isShowRowTotal($_product) && !$this->getMatrixHelper()->isOnlyCheckBox($_product)):?>
+                if(qty == 0)
+                    $('matrix-price-'+pid).down('.price').update(matrixPriceFormate(unitPriceTier));
+                else
+                    $('matrix-price-'+pid).down('.price').update(matrixPriceFormate(currentPriceTier));
+                <?php endif;?>
+                return currentPriceTier;
+            }
+            
+            getTotalQty = function(){
+                var qty = 0;
+                $$('.matrix-qty').each(function(ele){
+                    if(ele.type == 'checkbox'){
+                        if(ele.checked) qty++;
+                    } else {
+                        qty += (1*ele.value);
+                    }
+                });
+                return qty;
+            }
+            
+            replaceSimpleMediaImages = function(direction){
+                $$('input.'+direction).each(function(item){
+                    var pid = item.id;
+                    if(fMatrixChildProducts[pid]){
+                        if(fMatrixChildProducts[pid]['has_img'] == 1 && fMatrixChildProducts[pid]['media']){
+                            $$('.product-img-box')[0].update(fMatrixChildProducts[pid]['media']);
+                            setTimeout(function() { 
+                            <?php if(version_compare(Mage::getVersion(), '1.9.0.1', '<')===true):?>
+                                product_zoom = new Product.Zoom('image', 'track', 'handle', 'zoom_in', 'zoom_out', 'track_hint');
+                            <?php else:?>
+                                ProductMediaManager.init();
+                            <?php endif;?>
+                            }, 1000);
+                            throw $break;
+                        }
+                    }
+                });
+            }
+			
+			if($$('.product_matrix_selector').length > 0){
+				$$('.product_matrix_selector').invoke('observe', 'change', function(ele) {
+					var data = '', checkValid = false;
+					$('product-matrix-std').update('');
+					if($('t-next')) $('t-next').setStyle({visibility:'hidden'});
+					$$('.product_matrix_selector').each(function(item){
+						if(item.value == ''){
+							checkValid = true;
+							return $break;
+						}
+						data += '/'+item.id+'/'+item.value;
+					});
+					if(checkValid == false) {
+						data = data.substr(1);
+						$$('.product_matrix_selector').invoke('setAttribute','disabled',true);
+						new Ajax.Request('<?php echo $this->getUrl('frontendconfigurableproductmatrix/index/thirdgrid', array('pid' => $_product->getId()));?>'+data, {
+							method: 'get',
+							//parameters: data,
+							onSuccess: function(transport) {
+								var response = transport.responseText;
+								$('product-matrix-std').update(response);
+								if(response != ''){
+									setTimeout(function(){
+										initMyUlSlider(true);
+										jQuery('.fcpm-validate.matrix-qty').bind('keyup blur', fcpmValidate);
+									},500);
+								}
+							},
+							onComplete: function(){
+								$$('.product_matrix_selector').invoke('removeAttribute','disabled');	
+							}
+						});
+					}
+				});
+			}
+			
+			<?php if($this->getMatrixHelper()->isRfqEnabled($_product)):?>
+			window.onload = function() {
+				$$('#fmatrix_addtocart_form .btn-r4q').each(function(item){
+					item.setAttribute('onclick',"matrixAddToCartForm.submit(this,'<?php echo $this->getRequest4quoteUrl($_product, true) ?>')");
+				});
+			}
+			<?php endif;?>
+			<?php if($this->getMatrixHelper()->isApplyPriceColor($_product)): ?>;
+			document.observe('dom:loaded', function() {
+	            $$('.matrix-qty').each(function(el) {
+	                if(fMatrixChildProducts[el.id] && fMatrixChildProducts[el.id].priceColor != '') {
+	                    $('tier-unit-price-'+el.id).setStyle({color:'#'+fMatrixChildProducts[el.id].priceColor});
+	                }
+	            });
+	        });
+	        <?php endif;?>
+        //]]>
+        </script>
+    <?php endif;?>
+<?php endif;?>

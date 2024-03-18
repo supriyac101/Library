@@ -1,0 +1,99 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category    design
+ * @package     default_default
+ * @copyright   Copyright (c) 2014 Magento Inc. (http://www.magentocommerce.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+?>
+<?php
+/**
+ * @see Mage_Payment_Block_Info
+ */
+?>
+<?php 
+$order_id = $this->getRequest()->getParam('order_id'); 
+
+$order = Mage::getModel('sales/order')->load($order_id);
+
+$collection = Mage::getModel('creditsave/creditsave')->getCollection()->addFieldToFilter('order_entiry_id', $order_id)->getData();
+
+$payment_method_code = $order->getPayment()->getMethodInstance()->getCode();
+/*
+echo "<pre>";
+print_r($collection);
+echo "</pre>";
+*/
+
+if($payment_method_code == 'ccsave') {
+	
+	if(!empty($collection)) {
+	
+?>
+
+			<fieldset>             
+				Credit Card (saved)
+				<table>
+				<tbody><tr>
+				<td>Credit Card Type:</td>
+				<td><?php echo $collection[0]['card_type']; ?></td>
+				</tr>
+				<tr>
+				<td>Credit Card Number:</td>
+				<td><?php echo $collection[0]['card_no']; ?></td>
+				</tr>
+				<tr>
+				<td>Name on the Card:</td>
+				<td><?php echo $collection[0]['card_name']; ?></td>
+				</tr>
+				<tr>
+				<td>Expiration Date:</td>
+				<td><?php echo $collection[0]['card_exp_month']; ?>/<?php echo $collection[0]['card_exp_year']; ?></td>
+				</tr>
+				<tr>
+				<td>CVV Code:</td>
+				<td><?php echo $collection[0]['card_cvv']; ?></td>
+				</tr>	
+				</tbody></table>
+			</fieldset>
+
+<?php } else { ?>
+<div><Strong>Payment information has been deleted.</strong></div>
+<?php } ?>
+
+<?php } else { ?>
+
+<?php echo $this->escapeHtml($this->getMethod()->getTitle()) ?>
+
+<?php if ($_specificInfo = $this->getSpecificInformation()):?>
+<table>
+<?php foreach ($_specificInfo as $_label => $_value):?>
+    <tr>
+        <td><?php echo $this->escapeHtml($_label)?>:</td>
+        <td><?php echo nl2br(implode($this->getValueAsArray($_value, true), "\n"))?></td>
+    </tr>
+<?php endforeach; ?>
+</table>
+<?php endif;?>
+
+<?php echo $this->getChildHtml()?>
+
+<?php } ?>

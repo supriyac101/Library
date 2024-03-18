@@ -1,0 +1,163 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magento.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magento.com for more information.
+ *
+ * @category    design
+ * @package     base_default
+ * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+?>
+<?php
+/**
+ * Category view template
+ *
+ * @see Mage_Catalog_Block_Category_View
+ */
+?>
+<?php
+    $_helper    = $this->helper('catalog/output');
+    $_category  = $this->getCurrentCategory();
+    $_imgHtml   = '';
+    if ($_imgUrl = $_category->getImageUrl()) {
+        $_imgHtml = '<p class="category-image"><img src="'.$_imgUrl.'" alt="'.$this->escapeHtml($_category->getName()).'" title="'.$this->escapeHtml($_category->getName()).'" /></p>';
+        $_imgHtml = $_helper->categoryAttribute($_category, $_imgHtml, 'image');
+    }
+?>
+<div class="whiteBox">
+	<div class="cat-banner-box">
+		<?php if($this->IsRssCatalogEnable() && $this->IsTopCategory()): ?>
+			<a href="<?php echo $this->getRssLink() ?>" class="link-rss"><?php echo $this->__('Subscribe to RSS Feed') ?></a>
+		<?php endif; ?>
+		<?php echo $this->getMessagesBlock()->toHtml() ?>
+		
+		<?php if($_imgUrl): ?>
+			<?php echo $_imgHtml ?>
+		<?php endif; ?>
+		<div class="banner-text">
+			<h2><?php echo $_helper->categoryAttribute($_category, $_category->getName(), 'name') ?></h2>
+			<?php if($_description=$this->getCurrentCategory()->getDescription()): ?>
+				<p><?php echo $_helper->categoryAttribute($_category, $_description, 'description') ?></p>
+			<?php endif; ?>
+		</div>
+	</div>
+	<?php if($this->isContentMode()): ?>
+	
+	
+	<!--new code -->
+	
+	<?php
+	$currentCategory = $this->getCurrentCategory();
+	//echo $currentCategory->getId();
+	$_category = Mage::getModel('catalog/category')->load($currentCategory->getId());
+	$_subcategories = $_category->getChildren();
+	$total_cat_array=explode(',',$_subcategories); 
+	if (!empty($_subcategories)){ 
+?>
+		<div class="proListBox">
+			<ul>
+				<?php
+					foreach($total_cat_array as $subId){ 
+						$child = Mage::getModel('catalog/category')->load($subId); 
+						if($child->getIsActive()){
+							//echo $child->getUrl()."--".$child->getName()."--".$child->getThumbnail()."<br>";
+				?>	
+							<li class="item">
+								<a href="<?php echo $child->getUrl(); ?>">
+									<?php if ($child->getImage()): ?>
+										<img src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA)?>catalog/category/<?php echo $child->getThumbnail(); ?>" />
+									<?php else: ?>
+										<img src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA)?>catalog/category/default-cat.png" />
+									<?php endif; ?>
+								</a>
+								<div class="product-info">	
+									<h2 class="product-name">
+										<a href="<?php echo $child->getUrl(); ?>"><?php echo $child->getName();//echo $child->getThumbnail();?></a>
+									</h2>
+									<p><a class="product-dtls" href="<?php echo $child->getUrl(); ?>">View Products</a></p>
+								</div>
+							</li>
+				<?php
+						}
+					}
+				?>
+			</ul>
+		</div>
+<?php
+	}
+	//exit;
+?>
+	
+	
+	
+	<!--end new code -->
+	
+	
+	
+		<?php //echo $this->getCmsBlockHtml() ?>
+	<?php elseif($this->isMixedMode()): ?>
+		<?php echo $this->getCmsBlockHtml() ?>
+		<?php echo $this->getProductListHtml() ?>
+	<?php else: ?>
+	<div class="filter-by" style="cursor: pointer"><span><?php echo "Select filters" ;?></span></div>
+	<div class="hide-filter" style="cursor: pointer;display: none;"><span><?php echo "Hide filters" ;?></span></div>
+	<script type="text/javascript">
+		jQuery('document').ready(function(){
+			if (jQuery( window ).width() < 771){
+				//alert (jQuery( window ).width());
+				jQuery('.col-left').css('display','none');
+				jQuery('.filter-by').css('display','block');
+			}else{
+				jQuery('.col-left').css('display','block');
+				jQuery('.filter-by').css('display','none');
+			}
+			jQuery(window).resize(function(){
+				if (jQuery( window ).width() < 771){
+				jQuery('.col-left').css('display','none');
+				jQuery('.filter-by').css('display','block');	
+				}else{
+				jQuery('.col-left').css('display','block');
+				jQuery('.filter-by').css('display','none');
+				}
+			});
+			jQuery(function($){
+				$(".filter-by").click(function(){
+					$('.col-left').css('display','block');		
+					$(".col-left").slideDown();
+					// $('.col-left').css('display','block');
+					$(this).removeClass("closed");
+					$('.filter-by').css('display','none');
+					$('.hide-filter').css('display','block');
+				});
+			});
+		});
+	</script>
+	<script type="text/javascript">
+		jQuery(function($){
+			$(".hide-filter").click(function(){
+				$(".col-left").slideUp();
+				$(this).addClass("closed");
+				$('.hide-filter').css('display','none');
+				$('.filter-by').css('display','block');
+			});
+		});
+	</script>
+    <?php echo $this->getProductListHtml() ?>
+<?php endif; ?>
+</div>

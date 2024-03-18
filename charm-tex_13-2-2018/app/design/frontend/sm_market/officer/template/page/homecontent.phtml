@@ -1,0 +1,394 @@
+<?php //echo Mage::app()->getStore(true)->getId(); ?>
+<div class="banner bannerSec container">
+    <div id="fullSlider" class="owl-carousel owl-theme desktop-view">
+	<?php
+			$bannercollection = Mage::getModel('banner/banner')->getCollection()->addFieldToFilter('status',1);
+			$bannercollection->setOrder('sortby', Varien_Db_Select::SQL_ASC);
+			$i=1;
+			$count_bannercollection = count($bannercollection);
+			foreach($bannercollection as $banner){
+	    ?>
+			<?php if($banner->getStoreId()==3) { ?>
+				<div class="item <?php echo $banner->getSortby();?>">
+					<a href="<?php echo $this->getUrl();?><?php echo $banner->geturl();?>"><img src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA).$banner->getFilename(); ?>" alt="<?php echo $banner->getTitle();?>" /></a>
+					<?php if($banner->getContent()):?>
+						<div class="banCap"><?php echo $banner->getContent();?></div>
+					<?php endif;?>
+				</div>
+			<?php } ?>
+		<?php
+				$i++;
+			}
+	    ?>
+    </div>
+
+	
+	<div id="fullSlider1" class="owl-carousel owl-theme mobile-view">
+	    <?php
+			    $bannercollection1 = Mage::getModel('mobilebanner/mobilebanner')->getCollection()->addFieldToFilter('status',1);
+			    $bannercollection->setOrder('sortby', Varien_Db_Select::SQL_ASC);
+			    $i=1;
+			    $count_bannercollection = count($bannercollection1);
+			    foreach($bannercollection1 as $banner1){
+					if($banner1->getStoreId() ==  3){
+			?>
+						<div class="item">
+							<?php //echo Mage::getBaseDir(Mage_Core_Model_Store::URL_TYPE_MEDIA)."<br/>"; ?>
+							<a href="<?php echo $this->getUrl();?><?php echo $banner1->geturl();?>"><img src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA).$banner1->getFilename(); ?>" alt="<?php echo $banner1->getTitle();?>"  /></a>
+							<?php if($banner1->getContent()):?>
+								<div class="banCon"><?php echo $banner1->getContent();?></div>
+							<?php endif;?>
+						</div>
+				
+			<?php
+						
+					}
+				$i++;
+			    }
+		?>
+	    </div>
+	</div>
+	
+    <div class="block-under-main-banner">
+	<?php //echo $this->getLayout()->createBlock('cms/block')->setBlockId('block-under-main-banner')->toHtml();?>
+	<div class="container clearfix">
+	    <div class="promo-category">
+		<div class="prmo-sec1">
+		   <?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('homepage-promo-left')->toHtml(); ?>
+		</div>
+		<div class="prmo-sec-right">
+		    <?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('homepage-promo-right')->toHtml(); ?>
+		</div>
+	    </div>
+	</div>
+    </div>
+    
+    <div class="brand-section">
+		<div class="container clearfix">
+			<?php
+			echo $this->getLayout()->createBlock('manufacturer/manufacturer')->setTemplate('manufacturer/manufacturer.phtml')->toHtml();
+			?>
+		</div>
+    </div>
+	
+    <div class="product-section">
+		<div class="container clearfix">
+			<h2 class="slider-lable"><?php echo $this->__('On Sale') ?></h2>
+			<div class="categoryList products-grid">
+			<div id="owlDemo1" class="owl-carousel">
+				<?php
+					$categoryid = 631;
+				
+					$category = new Mage_Catalog_Model_Category();
+					$category->load($categoryid);
+					$collection = $category->getProductCollection();
+					$collection->addAttributeToSelect('*');
+					
+					$totalproduct = count($collection);
+					$x= 0; $_column = 2;
+					
+					foreach ($collection as $_product) { ?>
+						<?php if ($x++%$_column==0): ?>
+						<div class="item">
+							<?php endif; ?>
+							<div class="allpro">
+							<div class="category-image">
+								<?php 
+								// Get the Special Price
+								$specialprice = Mage::getModel('catalog/product')->load($_product->getId())->getSpecialPrice(); 
+								// Get the Special Price FROM date
+								$specialPriceFromDate = Mage::getModel('catalog/product')->load($_product->getId())->getSpecialFromDate();
+								// Get the Special Price TO date
+								$specialPriceToDate = Mage::getModel('catalog/product')->load($_product->getId())->getSpecialToDate();
+								// Get Current date
+								$today =  time();
+								 
+								if ($specialprice):
+									if($today >= strtotime( $specialPriceFromDate) && $today <= strtotime($specialPriceToDate) || $today >= strtotime( $specialPriceFromDate) && is_null($specialPriceToDate)):
+								?>
+									<div class="on-sale-icn"></div>
+								<?php  
+									endif;
+								endif;
+								?>
+								<a href="<?php echo $_product->getProductUrl() ?>"><img src="<?php echo $this->helper('catalog/image')->init($_product, 'small_image')->resize(135); ?>" width="135" height="135" alt="<?php echo $_product->getName(); ?>" /></a>
+							</div>
+							<div class="product-info">
+								<h2 class="product-name"><a href="<?php echo $_product->getProductUrl(); ?>"><?php echo $_product->getName(); ?></a></h2>
+								<div class="price-box">
+										<span id="product-price" class="regular-price">
+										<span class="price"><?php echo Mage::helper('core')->currency($_product->getFinalPrice());?></span>
+								</div>
+								<div class="addtocart">
+								<a href="<?php echo Mage::helper('checkout/cart')->getAddUrl($_product); ?>" title="Add to Cart">Add To Cart</a>
+								</div>
+							</div>
+							</div>
+								<?php if ($x%$_column==0 || $x==$totalproduct): ?>
+						</div>
+						<?php endif; ?>
+					<?php  } ?>
+			</div>
+			</div>
+		</div>
+    </div>
+	
+    <div class="product-section">
+		<div class="container clearfix">
+			<h2 class="slider-lable"><?php echo $this->__('featured items') ?></h2>
+			<div class="categoryList products-grid">
+			<div id="owlDemo2" class="owl-carousel">
+				<?php
+					$categoryid = 640;
+				
+					$category = new Mage_Catalog_Model_Category();
+					$category->load($categoryid);
+					$collection = $category->getProductCollection();
+					$collection->addAttributeToSelect('*');
+					
+					$totalproduct = count($collection);
+					$x= 0; $_column = 2;
+					
+					foreach ($collection as $_product) { ?>
+						<?php if ($x++%$_column==0): ?>
+						<div class="item">
+						<?php endif; ?>
+						<div class="allpro">
+							<div class="category-image">
+								<a href="<?php echo $_product->getProductUrl() ?>"><img src="<?php echo $this->helper('catalog/image')->init($_product, 'small_image')->resize(135); ?>" width="135" height="135" alt="<?php echo $_product->getName(); ?>" /></a>
+							</div>
+							<div class="product-info">
+								<h2 class="product-name"><a href="<?php echo $_product->getProductUrl(); ?>"><?php echo $_product->getName(); ?></a></h2>
+								<div class="price-box">
+									<span id="product-price" class="regular-price">
+									<span class="price"><?php echo Mage::helper('core')->currency($_product->getFinalPrice());?></span>
+								</div>
+								<div class="addtocart">
+								<a href="<?php echo Mage::helper('checkout/cart')->getAddUrl($_product); ?>" title="Add to Cart">Add To Cart</a>
+								</div>
+							</div>
+						</div>
+							<?php if ($x%$_column==0 || $x==$totalproduct): ?>
+						</div>
+						<?php endif; ?>
+				<?php } ?>
+			</div>
+			</div>
+		</div>
+    </div>
+	
+    
+	<?php //Deal Of The Week block ?>
+	<?php echo $this->getLayout()->createBlock('dailyfeature/dailyfeature')->setTemplate('dailyfeature/dailyfeature.phtml')->toHtml(); ?>
+</div>
+	
+	
+	
+	<div class="product-section">
+		<div class="container clearfix">
+			<h2 class="slider-lable"><?php echo $this->__('high security') ?></h2>
+			<div class="categoryList products-grid">
+			<div id="owlDemo4" class="owl-carousel">
+				<?php
+			
+				$categoryid = 498;
+			
+				$category = new Mage_Catalog_Model_Category();
+				$category->load($categoryid);
+				$collection = $category->getProductCollection();
+				$collection->addAttributeToSelect('*');
+				
+				$totalproduct = count($collection);
+				$x= 0; $_column = 2;
+				
+				foreach ($collection as $_product) { ?>
+					<?php if ($x++%$_column==0): ?>
+					<div class="item">
+					<?php endif; ?>
+					<div class="allpro">
+						   <div class="category-image">
+						<?php 
+								// Get the Special Price
+								$specialprice = Mage::getModel('catalog/product')->load($_product->getId())->getSpecialPrice(); 
+								// Get the Special Price FROM date
+								$specialPriceFromDate = Mage::getModel('catalog/product')->load($_product->getId())->getSpecialFromDate();
+								// Get the Special Price TO date
+								$specialPriceToDate = Mage::getModel('catalog/product')->load($_product->getId())->getSpecialToDate();
+								// Get Current date
+								$today =  time();
+								 
+								if ($specialprice):
+									if($today >= strtotime( $specialPriceFromDate) && $today <= strtotime($specialPriceToDate) || $today >= strtotime( $specialPriceFromDate) && is_null($specialPriceToDate)):
+								?>
+									<div class="on-sale-icn"></div>
+								<?php  
+									endif;
+								endif;
+								?>
+							   <a href="<?php echo $_product->getProductUrl() ?>"><img src="<?php echo $this->helper('catalog/image')->init($_product, 'small_image')->resize(135); ?>" width="135" height="135" alt="<?php echo $_product->getName(); ?>" /></a>
+							</div>
+							<div class="product-info">
+								<h2 class="product-name"><a href="<?php echo $_product->getProductUrl(); ?>"><?php echo $_product->getName(); ?></a></h2>
+								<div class="price-box">
+									<span id="product-price" class="regular-price">
+									<span class="price"><?php echo Mage::helper('core')->currency($_product->getFinalPrice());?></span>
+								</div>
+								<div class="addtocart">
+									<a href="<?php echo Mage::helper('checkout/cart')->getAddUrl($_product); ?>" title="Add to Cart">Add To Cart</a>
+								</div>
+							</div>
+					</div>
+					<?php if ($x%$_column==0 || $x==$totalproduct): ?>
+					</div>
+					<?php endif; ?>
+						<?php } ?>
+			</div>
+			</div>
+		</div>
+    </div>
+	
+    <div class="product-section">
+		<div class="container clearfix">
+			<h2 class="slider-lable"><?php echo $this->__('new products') ?></h2>
+			<div class="categoryList products-grid">
+			<div id="owlDemo5" class="owl-carousel">
+				<?php
+			
+				$categoryid = 496;
+			
+				$category = new Mage_Catalog_Model_Category();
+				$category->load($categoryid);
+				$collection = $category->getProductCollection();
+				$collection->addAttributeToSelect('*');
+			
+				$totalproduct = count($collection);
+				$x= 0; $_column = 2;
+				
+				foreach ($collection as $_product) { ?>
+					<?php if ($x++%$_column==0): ?>
+					<div class="item">
+					<?php endif; ?>
+					<div class="allpro">
+						<div class="category-image">
+						<?php 
+							// Get the Special Price
+							$specialprice = Mage::getModel('catalog/product')->load($_product->getId())->getSpecialPrice(); 
+							// Get the Special Price FROM date
+							$specialPriceFromDate = Mage::getModel('catalog/product')->load($_product->getId())->getSpecialFromDate();
+							// Get the Special Price TO date
+							$specialPriceToDate = Mage::getModel('catalog/product')->load($_product->getId())->getSpecialToDate();
+							// Get Current date
+							$today =  time();
+						 
+							if ($specialprice):
+							if($today >= strtotime( $specialPriceFromDate) && $today <= strtotime($specialPriceToDate) || $today >= strtotime( $specialPriceFromDate) && is_null($specialPriceToDate)):
+						?>
+							<div class="on-sale-icn"></div>
+						<?php  
+							endif;
+							endif;
+						?>
+							<a href="<?php echo $_product->getProductUrl() ?>"><img src="<?php echo $this->helper('catalog/image')->init($_product, 'small_image')->resize(135); ?>" width="135" height="135" alt="<?php echo $_product->getName(); ?>" /></a>
+						</div>
+						<div class="product-info">
+						<h2 class="product-name"><a href="<?php echo $_product->getProductUrl(); ?>"><?php echo $_product->getName(); ?></a></h2>
+						<div class="price-box">
+							<span id="product-price" class="regular-price">
+							<span class="price"><?php echo Mage::helper('core')->currency($_product->getFinalPrice());?></span>
+						</div>
+						<div class="addtocart">
+							<a href="<?php echo Mage::helper('checkout/cart')->getAddUrl($_product); ?>" title="Add to Cart">Add To Cart</a>
+						</div>
+						</div>
+					</div>
+					<?php if ($x%$_column==0 || $x==$totalproduct): ?>
+					</div>
+					<?php endif; ?>
+				<?php } ?>
+			</div>
+			</div>
+		</div>
+    </div>
+	    
+    
+	 
+	 
+	
+	
+	
+	<div class="product-section homepage-categories">
+		<div class="container clearfix">
+	    <div class="deal-title">
+		<h2><?php echo $this->__('all categories') ?></h2>
+	    </div>
+	    <div class="categoryList products-grid">
+		<div id="owlDemo6" class="owl-carousel"> 
+		<?php $categories = Mage::getModel('catalog/category')->getCollection()->setStoreId(Mage::app()->getStore()->getId());
+		 $categories->addAttributeToSelect('*')
+			 ->addAttributeToFilter('parent_id',613)
+			 ->addAttributeToFilter('is_active', 1)//get only active categories if you want
+			 ->addAttributeToSort('position');
+		 ?>
+		<?php $totalproduct = count($categories);
+		$x= 0; $_column = 2; ?>
+		<?php foreach($categories as $category){ ?>
+			<?php if ($x++%$_column==0): ?>
+				<div class="item">
+					<?php endif; ?>
+					<div class="allpro">
+					    <div class="cat-details">
+						<div class="category-image">
+							<?php $_catObj = Mage::getModel('catalog/category')->load($category->getId());?>
+							<?php /*echo "<pre>";
+							print_r ($_catObj);
+							*/ ?>
+							<?php if($_catObj->getThumbnail()): ?>
+								<a href="<?php echo $category->getUrl();?>"><img height="140" width="140" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA).'catalog/category/'.$_catObj->getThumbnail(); ?>"  alt="<?php echo $category->getName();?>"/></a>
+							<?php else: ?>
+								<a href="<?php echo $category->getUrl();?>"><img height="140" width="140" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA).'catalog/category/default-cat.png' ?>"  alt="<?php echo $category->getName();?>"/></a>
+							<?php endif; ?>
+						</div>
+						<div class="product-info">
+						   <h2 class="product-name"><a href="<?php echo $category->getUrl();?>"><?php echo $category->getName();?></a></h2>
+						</div>
+					    </div>
+					</div>
+					<?php if ($x%$_column==0 || $x==$totalproduct): ?>
+				</div>
+		<?php endif; ?>
+		<?php } ?>
+		</div>
+	    </div>
+	</div>
+    </div>
+    
+    <div class="product-section">
+		<div class="container clearfix">
+			<h2 class="slider-lable"><?php echo $this->__('Why buy from us') ?></h2>
+			<div class="why-section">
+			<div class="why-reason">
+				<h3 class="reason-title">Free Shipping</h3>
+				<p class="reason-text">On all order over $65.00</p>
+			</div>
+			<div class="why-reason">
+				<h3 class="reason-title">WEEKLY DISCOUNT</h3>
+				<p class="reason-text">Integer libero libero amet.</p>
+			</div>
+			<div class="why-reason">
+				<h3 class="reason-title">365-day returns</h3>
+				<p class="reason-text">Integer libero libero amet.</p>
+			</div>
+			<div class="why-reason">
+				<h3 class="reason-title">100% satisfaction</h3>
+				<p class="reason-text">Integer libero libero amet.</p>
+			</div>
+			</div>
+		</div>
+    </div>
+<script type="text/javascript">
+    jQuery( document ).ready(function(){
+	jQuery('.category-image img').css('height','152').css('width','152');
+	
+    });    
+    
+</script>

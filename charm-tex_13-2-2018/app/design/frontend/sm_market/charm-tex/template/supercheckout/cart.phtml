@@ -1,0 +1,146 @@
+<?php $settings = Mage::getSingleton('supercheckout/supercheckout')->getData('settings');
+ 
+        
+if($settings['general']['layout']=='3-Column'){
+            $layout_name='three-column';
+        }elseif($settings['general']['layout']=='2-Column'){
+            $layout_name='two-column';
+        }elseif($settings['general']['layout']=='1-Column'){
+            $layout_name='one-column';
+        }
+?>
+
+<script>
+
+app.controller('imagePopoverController',function($scope,$element){
+    $scope.imagePopover = function getMousePos(event) {
+        var id = 'product_' + event.target.id;
+        var doc = document.documentElement || document.body;
+        
+        var top_scroll = doc.scrollTop;
+        var x3 = document.getElementById(id).offsetWidth;
+        var x2 = document.getElementById(id).getBoundingClientRect().left;
+        var x1 = <?php echo isset($settings['step']['cart']['image_width'])?$settings['step']['cart']['image_width']:'' ?>;
+        var x4 = (x1 - x3)/2;
+        var xR = x2 + x4;
+        var y1 = document.getElementById(id).getBoundingClientRect().top;
+        console.log(y1);
+
+        var y2 = <?php echo isset($settings['step']['cart']['image_height'])?$settings['step']['cart']['image_height']:'' ?>;
+        console.log(y2);
+        console.log(doc.scrollTop);
+        var yR = event.clientY - y2/2;
+        console.log('yr'+yR);
+        $scope.how_cart_popup_model = 1;
+        $scope.supercheckout_popover = event.target.id;
+        $scope.popoverstyle = {position:'fixed',top:yR+'px',left:xR+'px',display:'block'};
+
+
+    }   
+    $scope.imagePopoverClose = function(){
+        $scope.supercheckout_popover = false;
+    };
+    
+    
+})
+
+</script>
+
+<div ng-controller="imagePopoverController">
+
+
+
+<div id="supercheckoutCartBlock"  class="supercheckout-blocks" data-column="<?php echo $settings['step']['cart'][$layout_name]['column']; ?>" data-row="<?php echo $settings['step']['cart'][$layout_name]['row']; ?>" data-column-inside="<?php echo $settings['step']['cart'][$layout_name]['column-inside']; ?>" >
+                
+                <ul>
+                    <li>
+                        <span class="supercheckout-numbers fontss icon-black-check-mark-md"></span>
+                            <span class="heading_style_icon"><?php echo $this->__('Confirm Order'); ?></span>
+                        <div ng-show="displayLoader == 'showCartLoader'" class="loader" id="confirmLoader"></div>
+                    </li>
+                </ul>
+    
+
+
+      
+    
+    
+    
+    <div id="checkout-review" class="onepagecheckout_block">
+    <div ng-show="show_cart_model == 1"  id="checkout-review-load"  >
+        
+    <table  class="supercheckout-summary">
+        <thead>
+            <tr>
+                <th ng-show="show_cart_product_name_model == 1" class="supercheckout-name"></th>
+                <th ng-show="show_cart_product_name_model == 1" class="supercheckout-name"><?php echo $this->__('Product Name'); ?></th>
+                <th ng-show="show_cart_sku_model == 1" class="supercheckout-qty"><?php echo $this->__('Style Number'); ?></th>
+                <th ng-show="show_cart_unit_price_model == 1" class="supercheckout-total" style="text-align:center;"><?php echo $this->__('Price'); ?></th>
+                <th ng-show="show_cart_quantity_model == 1"  class="supercheckout-qty"><?php echo $this->__('Quantity'); ?></th>
+                <th ng-show="show_cart_total_model == 1" class="supercheckout-total"><?php echo $this->__('Total'); ?></th>
+                <th class="supercheckout-qty"><?php echo $this->__('Action'); ?></th>
+            </tr>
+        </thead>
+        
+        <tbody>
+
+            <tr ng-repeat="item in items.product_details">
+                
+                
+                    
+                
+                <td>
+                    
+                    <img ng-if="item.image" style="width:45px !important;" ng-src="{{item.image}}">
+                   
+                   </span>
+                </td>
+                <td  ng-show="show_cart_product_name_model == 1" > 
+                    {{item.name}}
+                   <br />
+                     {{item.custom_options}}</td>
+                <td ng-show="show_cart_sku_model == 1" class="supercheckout-total">{{item.sku}}</td>
+                <td ng-show="show_cart_unit_price_model == 1" class="supercheckout-total">{{item.price}}</td>
+                <td ng-show="show_cart_quantity_model == 1" class="supercheckout-qty"><input id="qty{{item.id}}" type="text" value="{{item.qty}}" class="quantitybox" /><br>
+                    <a><small class="text_link_pointer" id="{{item.id}}" ng-click="updateQuantity($event);" ><?php echo $this->__('Update'); ?></small></a>
+                </td>
+                <td ng-show="show_cart_total_model == 1" class="supercheckout-total">{{item.total}}</td> 
+                <td class="supercheckout-qty">
+                    <a  id="{{item.id}}"  ng-click="removeProduct($event);"  class="removeProduct text_link_pointer">
+                        <div id="{{item.id}}" ng-click="removeProduct($event);"   title="<?php echo $this->__('Remove Item'); ?>"></div>
+                    </a>    
+                </td>
+				
+            </tr>
+        </tbody>
+        
+    </table>
+    <table class="supercheckout-totals">
+	<tfoot>		
+            <tr ng-repeat="total in items.total_details|orderBy:'items.total_details.sort'">
+                <td class="title">{{total.title}}
+                    <a ng-show="total.remove == true" ng-click="removeCoupon();"  class="removeProduct">
+                        <div ng-click="removeCoupon();"   title="<?php echo $this->__('Cancel Coupon'); ?>"></div>
+                    </a>
+                </td>
+                <td class="value">{{total.value}}</td>
+            </tr>	
+        </tfoot>
+    </table>
+
+<table class="supercheckout-totals">
+    <tr ng-show="show_cart_coupon_model==1">
+            <td class="title"><b><?php echo $this->__('Coupon Code:'); ?></b></td>
+            <td class="value"><input  id="coupon_code" name="coupon" type="text" class="voucherText">
+                <input type="hidden" value="coupon" name="next">
+                <input id="button-coupon" type="button" ng-Click="callCoupon()" class="orangebuttonapply" value="Apply">
+            </td>
+        </tr>
+</table>
+    </div>
+    
+</div>
+
+
+</div>
+    </div>

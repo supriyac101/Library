@@ -1,0 +1,138 @@
+<?xml version="1.0"?>
+<config>
+	<modules>
+        <Extendware_EWPRibbon>
+        	<extendware>
+	        	<settings>
+	        		<scopes>
+		        		<main>
+							<tabs>
+						        <main translate="label comment ewhelp" module="ewpribbon">
+						            <label>Product Ribbons</label>
+						            <sort_order>100</sort_order>
+						        </main>
+						    </tabs>
+							<sections>
+								<ewpribbon translate="label comment ewhelp" module="ewpribbon">
+									<class>separator-top</class>
+									<label>General</label>
+									<tab>main</tab>
+									<frontend_type>text</frontend_type>
+									<sort_order>100</sort_order>
+									<show_in_default>1</show_in_default>
+									<show_in_website>1</show_in_website>
+									<show_in_store>1</show_in_store>
+									<groups>
+										<general translate="label comment ewhelp">
+						                    <label>General</label>
+						                    <sort_order>100</sort_order>
+						                    <show_in_default>1</show_in_default>
+						                    <show_in_website>1</show_in_website>
+						                    <show_in_store>1</show_in_store>
+						                    <fields>
+						                        <enabled translate="label comment ewhelp">
+						                            <label>Status</label>
+						                            <frontend_type>select</frontend_type>
+						                            <source_model>ewcore/adminhtml_config_data_option_enabledisable</source_model>
+						                            <sort_order>10</sort_order>
+						                            <show_in_default>1</show_in_default>
+								                    <show_in_website>1</show_in_website>
+								                    <show_in_store>1</show_in_store>
+								                    <comment>Enable or disable product ribbons</comment>
+						                        </enabled>
+						                    </fields>
+						                </general>
+									</groups>
+								</ewpribbon>
+								<ewpribbon_developer translate="label comment ewhelp" module="ewpribbon">
+									<class>separator-top</class>
+									<label>Developer</label>
+									<tab>main</tab>
+									<frontend_type>text</frontend_type>
+									<sort_order>200</sort_order>
+									<show_in_default>1</show_in_default>
+									<show_in_website>1</show_in_website>
+									<show_in_store>1</show_in_store>
+									<groups>
+										<selector translate="label comment ewhelp">
+						                    <label>Selectors</label>
+						                    <fieldset_css>fieldset-wide</fieldset_css>
+						                    <sort_order>100</sort_order>
+						                    <show_in_default>1</show_in_default>
+						                    <show_in_website>1</show_in_website>
+						                    <show_in_store>1</show_in_store>
+						                    <fields>
+						                    	<debugging translate="label comment ewhelp">
+						                            <label>Debugging Status</label>
+						                            <frontend_type>select</frontend_type>
+						                            <source_model>ewcore/adminhtml_config_data_option_enabledisable</source_model>
+						                            <sort_order>0</sort_order>
+						                            <show_in_default>1</show_in_default>
+								                    <show_in_website>1</show_in_website>
+								                    <show_in_store>1</show_in_store>
+								                    <comment>If enabled, then an alert box will give notice why ribbons are not displaying.</comment>
+						                        </debugging>
+						                        <category_product_block translate="label comment ewhelp">
+						                            <label>Category Product Selector</label>
+						                            <frontend_type>text</frontend_type>
+						                            <sort_order>10</sort_order>
+						                            <show_in_default>1</show_in_default>
+								                    <show_in_website>1</show_in_website>
+								                    <show_in_store>1</show_in_store>
+								                    <comment><![CDATA[A prototype CSS selector that finds the product block in your catalog listings]]></comment>
+						                        	<ewhelp><![CDATA[]]></ewhelp>
+						                        </category_product_block>
+						                        <category_product_image translate="label comment ewhelp">
+						                            <label>Category Product Image Selector</label>
+						                            <frontend_type>text</frontend_type>
+						                            <sort_order>20</sort_order>
+						                            <show_in_default>1</show_in_default>
+								                    <show_in_website>1</show_in_website>
+								                    <show_in_store>1</show_in_store>
+								                    <comment><![CDATA[A prototype CSS selector that finds the product image within the product product block]]></comment>
+						                        	<ewhelp><![CDATA[]]></ewhelp>
+						                        </category_product_image>
+						                        <product_image translate="label comment ewhelp">
+						                            <label>Product Image Selector</label>
+						                            <frontend_type>text</frontend_type>
+						                            <sort_order>30</sort_order>
+						                            <show_in_default>1</show_in_default>
+								                    <show_in_website>1</show_in_website>
+								                    <show_in_store>1</show_in_store>
+								                    <comment><![CDATA[A prototype CSS selector that finds the product image on the product page]]></comment>
+						                        	<ewhelp><![CDATA[]]></ewhelp>
+						                        </product_image>
+						                        <fallback_position translate="label comment ewhelp">
+						                            <label>Fallback Position Selectors</label>
+						                            <frontend_model>ewpribbon/adminhtml_config_form_field_fallbackposition</frontend_model>
+                            						<backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+						                            <sort_order>50</sort_order>
+						                            <show_in_default>1</show_in_default>
+								                    <show_in_website>1</show_in_website>
+								                    <show_in_store>1</show_in_store>
+								                    <validators>
+						                            	<validator>
+						                            		<model>ewcore/data_validator_serialized_array</model>
+						                            		<options>
+						                            			<splittable_min_items>1</splittable_min_items>
+						                            			<splittable_max_items>1</splittable_max_items>
+						                            			<splittable_item_types>string</splittable_item_types>
+						                            			<splittable_item_min_length>1</splittable_item_min_length>
+						                            		</options>
+						                            	</validator>
+						                            </validators>
+								                    <comment><![CDATA[]]></comment>
+						                        	<ewhelp><![CDATA[]]></ewhelp>
+						                        </fallback_position>
+						                    </fields>
+						                </selector>
+									</groups>
+								</ewpribbon_developer>
+							</sections>
+						</main>
+					</scopes>
+				</settings>
+			</extendware>
+		</Extendware_EWPRibbon>
+	</modules>
+</config>

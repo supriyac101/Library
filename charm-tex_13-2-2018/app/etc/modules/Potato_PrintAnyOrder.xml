@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Potato_PrintAnyOrder>
+            <active>true</active>
+            <codePool>community</codePool>
+        </Potato_PrintAnyOrder>
+    </modules>
+</config>

@@ -1,0 +1,82 @@
+<?php 
+$settings = Mage::getSingleton('supercheckout/supercheckout')->getData('settings');
+$agreement_array = Mage::getSingleton('supercheckout/supercheckout')->getData('agreement_array');
+$subscription_status = Mage::getSingleton('supercheckout/supercheckout')->getData('subscription_status');
+//$payment_method_details = Mage::getSingleton('supercheckout/supercheckout')->getData('payment_method_details');
+        
+if($settings['general']['layout']=='3-Column'){
+            $layout_name='three-column';
+        }elseif($settings['general']['layout']=='2-Column'){
+            $layout_name='two-column';
+        }elseif($settings['general']['layout']=='1-Column'){
+            $layout_name='one-column';
+        }
+?>
+<div id="supercheckoutConfirmBlock" class="supercheckout-blocks" data-column="<?php echo $settings['step']['confirm'][$layout_name]['column']; ?>" data-row="<?php echo $settings['step']['confirm'][$layout_name]['row']; ?>" data-column-inside="<?php echo $settings['step']['confirm'][$layout_name]['column-inside']; ?>" >
+
+<?php
+
+                foreach ($this->getmethods() as $_method){
+//                    var_dump($_method);
+                    echo $this->getPaymentMethodFormHtml($_method); 
+                }
+?>
+    <div id="supercheckout-comments" ng-show="show_cart_comment_model">
+    <b><?php echo $this->__('Add Comment:'); ?></b>
+    <textarea ng-init="data.orderComment = ''" id="supercheckout-comment_order" ng-model="data.orderComment" rows="8" ></textarea>
+    <br />
+    <br />
+    <?php if(!$subscription_status){ ?>
+        <?php if(isset($settings['general']['newsletter']) && $settings['general']['newsletter'] == 1){ ?>
+        <input ng-model="data.billing.newsletter" type="checkbox" id="newsletter_id" ng-checked="true"/><label for="newsletter_id"><?php echo $this->__('Subscribe to newsletter');?></label>           <!-- Code Modified By Raghubendra Singh on 12-Jan-2015 to set the news letter checkbox selected by default -->
+        <br />
+        <?php }else{ ?>
+         <input ng-init="data.billing.newsletter = 0" ng-model="data.billing.newsletter" type="hidden" id="newsletter_id" />
+        <?php } ?>
+    <?php } ?>
+</div>
+    
+    
+   <div id="supercheckout-comments" ng-show="show_cart_comment_model">
+    <b><?php echo $this->__('PO#'); ?></b>
+    <textarea ng-init="data.msg = ''" id="supercheckout-msg" ng-model="data.msg" rows="3" cols="30"></textarea>
+    <br />
+  
+</div> 
+    
+    
+    
+    <div class="supercheckout-checkout-content" style="display:block">
+        <div ng-show="agree_to_terms_error != null" class="warning">{{agree_to_terms_error_msg}}</div>
+    </div>
+    <?php echo ($agreement_array); ?>
+    <div id="placeorderButton">
+    <div id="buttonWithProgres" style="width:206px;">
+        
+        <input class="orangebutton" ng-click="save_order()" type="submit" id="submit" value="<?php echo $this->__('Place Order'); ?>" />
+        
+        <div ng-show="displayLoaderPlaceOrder == 'showPlaceOrderLoader'" class="loaderPlaceOrder" id="placeorderButtonLoader"><span style="margin-left: 30px; color:#A57349;">Processing...</span></div>
+
+    </div>
+</div>
+</div>
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

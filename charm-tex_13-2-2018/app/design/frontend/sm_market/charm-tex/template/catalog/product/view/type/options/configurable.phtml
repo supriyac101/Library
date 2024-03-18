@@ -1,0 +1,219 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magento.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magento.com for more information.
+ *
+ * @category    design
+ * @package     rwd_default
+ * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+?>
+
+<?php
+$_product    = $this->getProduct();
+$_attributes = Mage::helper('core')->decorateArray($this->getAllowAttributes());
+$_jsonConfig = $this->getJsonConfig();
+$_renderers = $this->getChild('attr_renderers')->getSortedChildren();
+?>
+
+
+<?php /************ start custom code ************************/ ?>
+
+<div class="no-display ak20">
+<?php if($_product->getTypeId()=='configurable'){ ?>
+<?php
+	$simpleProductsData=array();
+	$colorData=array();
+	$skuArray=array();
+	$assoProducts = $_product->getTypeInstance()->getUsedProducts($_product);
+	$attId='';
+	$attCode='';
+	//$iconArray=array();
+	foreach ($assoProducts as $cProduct){
+		$cProduct=Mage::getModel('catalog/product')->load($cProduct->getId());
+		$attValue='';
+		$attValueColor='';
+		$optionTitle='';
+		$flag=0;
+		foreach ($this->getAllowAttributes() as $attribute) {
+			$productAttribute=$attribute->getProductAttribute();
+			$attCode=$productAttribute->getAttributeCode();
+			$aVal=$cProduct->getData($productAttribute->getAttributeCode());						
+			if($attCode=='color'){
+				$attValueColor=$aVal;
+				$attId=$productAttribute->getId();
+				$optionTitle=$cProduct->getAttributeText($productAttribute->getAttributeCode());
+			}					
+			if($aVal){
+				if($flag==0){
+					$attValue=$aVal;
+					$flag=1;
+				}else{
+					$attValue=$attValue.'_'.$aVal;
+				}
+			}// end $aVal			
+		}// end loop
+		$simpleProductsData[$attValue]['sku']=$cProduct->getSku();
+		$simpleProductsData[$attValue]['price']='$'.number_format($cProduct->getFinalPrice(),2);
+
+		if($attValueColor && $cProduct->isSaleable()){
+			$colorData[$attValueColor]['option_title']=$optionTitle;	
+			$colorData[$attValueColor]['image']=Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA).'catalog/product'.$cProduct->getImage();
+			$colorData[$attValueColor]['thumbnail']=Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA).'catalog/product'.$cProduct->getThumbnail();
+		}// end attValueColor
+		//$iconArray[$attValue]=Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA).'catalog/product'.$cProduct->getThumbnail();
+		//echo $cProduct->getFinalPrice().'='.$cProduct->getPrice().'='.$cProduct->getId().'<br/>';
+	}// end loop
+	//print_r($simpleProductsData);
+?>	
+	<script type="text/javascript">
+		var color_id='attribute<?php echo $attId; ?>';
+		var simpleProductsData = <?php echo json_encode($simpleProductsData) ?>;
+		var colorData = <?php echo json_encode($colorData) ?>;
+		var product_id='<?php echo $_product->getId() ?>';
+		
+	
+		// don't use quotes
+		jQuery(document).ready(function(){
+	
+			jQuery('.color_icons img').click(function(){
+				var dd_val=jQuery(this).attr('id');
+				dd_val = dd_val.replace('ci','');
+				jQuery('.color_icons img').removeClass('active');
+				jQuery(this).addClass('active');
+				jQuery('#'+color_id).val(dd_val);
+				jQuery('#'+color_id).trigger('change');
+				return false;
+			});
+	////////////////////////////////////// start color dropdown /////////////////////////////
+			jQuery('.product-essential #'+color_id).change(function(){
+				var ddl_val='';
+				var ddl_val_color=jQuery(this).val();					
+				var p_img=colorData[ddl_val_color]['image'];
+				var thumbnail=colorData[ddl_val_color]['thumbnail'];
+				if(p_img){
+					/////////////// zoom code start //////////////////////
+					var color_icon_id='#ci'+ddl_val_color;
+					jQuery('.color_icons img').removeClass('active');
+					jQuery(color_icon_id).addClass('active');
+					
+					jQuery('.product-img-box .more-views a:first img').attr('src',thumbnail);
+					jQuery('.product-img-box .more-views a:first img').css('width','auto');
+					jQuery('.product-img-box .more-views a:first img').css('height','75px');
+					jQuery('.product-img-box .more-views a:first').attr('data-image-index',ddl_val_color)
+					var smallImage=p_img;
+					var largeImage=p_img;
+					var img_id=jQuery('.product-img-box .gallery-image.visible').attr('id');
+					//jQuery('#image-main a').removeClass('active').eq(currentValue-1).addClass('active');	
+					var ez =   jQuery('#'+img_id).data('elevateZoom');	
+					ez.swaptheimage(smallImage,largeImage);
+					/////////////////// zoom code end ////////////////////
+				}// end p_img	
+			}); // end change			
+			
+	///////////////////////////////////// end color dropdown ////////////////////////////////	
+	
+	///////////////////////////////////// change price and sku start ////////////////////////////////				
+			jQuery('.product-essential #config_dl select').change(function(){
+				var flag=0;
+				var ddl_val='';
+				jQuery('.product-essential #config_dl select').each(function(){					
+					// new code started
+					var active_val=jQuery(this).val();
+					if(active_val=='')
+					active_val=0;
+					if(flag==0){
+						ddl_val=active_val;
+						flag=1;
+					}else{
+						ddl_val=ddl_val+'_'+active_val;
+					}// end else flag			
+				});	// end each	
+				var p_sku=simpleProductsData[ddl_val]['sku'];
+				var p_price=simpleProductsData[ddl_val]['price'];
+				/* change on 29-12-2017 */
+				/*var p_curency	="<?php echo Mage::app()->getLocale()->currency(Mage::app()->getStore()->getCurrentCurrencyCode())->getSymbol() ?>";
+				var p_price_final	= p_curency+p_price;*/
+				/* change on 29-12-2017 */
+				if(p_sku){
+					jQuery('#psku').html(p_sku);
+				} // p_sku
+				if(p_price){
+					jQuery('.product-essential .price-box .price').html(p_price);
+					/* change on 29-12-2017 */
+					//jQuery('.product-essential .price-box .price').html(p_price_final);
+				}// end p_price			
+			}); // end change	
+	///////////////////////////////////// change price and sku end ////////////////////////////////	
+			
+		});// end ready
+	</script>
+	<span id="test1"><?php echo $_product->getSku(); ?></span>
+<?php } ?>
+</div>
+
+<?php /************ end custom code ************************/ ?>
+
+
+<?php if ($_product->isSaleable() && count($_attributes)):?>
+    <dl class="config_dl" id="config_dl">
+    <?php foreach($_attributes as $_attribute): ?>
+        <?php
+        $_rendered = false;
+        foreach ($_renderers as $_rendererName):
+            $_renderer = $this->getChild('attr_renderers')->getChild($_rendererName);
+            if (method_exists($_renderer, 'shouldRender') && $_renderer->shouldRender($_attribute, $_jsonConfig)):
+                $_renderer->setProduct($_product);
+                $_renderer->setAttributeObj($_attribute);
+                echo $_renderer->toHtml();
+                $_rendered = true;
+                break;
+            endif;
+        endforeach;
+
+        if (!$_rendered):
+        ?>
+        <dt><label class="required"><em>*</em><?php echo $_attribute->getLabel() ?></label></dt>
+        <dd<?php if ($_attribute->decoratedIsLast){?> class="last"<?php }?>>
+           
+           <?php 
+			$productAttribute=$_attribute->getProductAttribute();
+			$attCode=$productAttribute->getAttributeCode(); 
+			if(count($colorData)>0 && $attCode=='color'){
+		   ?>
+            <div class="color_icons">
+            	<?php foreach($colorData as $key=>$data){ ?>
+            		<img id="ci<?php echo $key; ?>" title="<?php echo $data['option_title']; ?>" src="<?php echo $data['thumbnail']; ?>" width="20px"/>
+            	<?php } ?>
+            </div>
+            <?php } ?>
+            <div class="input-box">
+                <select name="super_attribute[<?php echo $_attribute->getAttributeId() ?>]" id="attribute<?php echo $_attribute->getAttributeId() ?>" class="required-entry super-attribute-select">
+                    <option><?php echo $this->__('Choose an Option...') ?></option>
+                </select>
+            </div>
+        </dd>
+        <?php endif; ?>
+    <?php endforeach; ?>
+    </dl>
+    <script type="text/javascript">
+        var spConfig = new Product.Config(<?php echo $_jsonConfig ?>);
+    </script>
+    <?php echo $this->getChildHtml('after') ?>
+<?php endif;?>

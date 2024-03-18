@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category   Mconnect
+ * @package   Mconnect_Iconlib
+ * @author     M-Connect Solutions. (http://www.mconnectsolutions.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+-->
+<layout version="0.1.0">
+    <default>
+    </default>
+    <iconlib_index_index>
+        <reference name="content">
+            <block type="iconlib/iconlib" name="iconlib" template="iconlib/iconlib.phtml" />
+        </reference>
+    </iconlib_index_index>
+    <catalog_product_view>        
+        <reference name="product.info.additional">
+            <block type="iconlib/iconlib" before="product.info.description" name="iconlib" template="iconlib/iconlib.phtml" as="iconlib_iconlib">
+            </block>
+        </reference>
+        <reference name="right">
+            <block type="iconlib/iconlib" after="-" name="iconlibright" template="iconlib/iconlibright.phtml" as="iconlib_iconlibright">
+            </block>
+        </reference>
+        <reference name="left">
+            <block type="iconlib/iconlib" after="-" name="iconlibleft" template="iconlib/iconlibleft.phtml" as="iconlib_iconlibleft">
+            </block>
+        </reference>
+    </catalog_product_view>
+</layout> 

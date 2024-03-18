@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <default>
+    </default>
+    <mobilebanner_index_index>
+        <reference name="content">
+            <block type="mobilebanner/mobilebanner" name="mobilebanner" template="mobilebanner/mobilebanner.phtml" />
+        </reference>
+    </mobilebanner_index_index>
+</layout> 

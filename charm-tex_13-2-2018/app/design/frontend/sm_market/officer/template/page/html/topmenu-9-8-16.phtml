@@ -1,0 +1,175 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magento.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magento.com for more information.
+ *
+ * @category    design
+ * @package     rwd_default
+ * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+?>
+<?php
+/**
+ * Top menu for store
+ *
+ * @see Mage_Page_Block_Html_Topmenu
+ */
+?>
+<?php $_menu = $this->getHtml('level-top') ?>
+
+<?php if($_menu): ?>
+    <nav id="nav">
+        <ol class="nav-primary">
+            <?php echo $_menu ?>
+            <!--<li class="level0 nav-1"><a class="level0 has-children" href="<?php //echo $this->getUrl('')?>">home</a> </li>
+            <li class="level0 nav-2"><a class="level0 has-children" href="<?php //echo $this->getUrl('')?>clearance.html">clearance</a> </li>
+            <li class="level0 nav-3"><a class="level0 has-children" href="<?php //echo $this->getUrl('')?>request-catalog">request catalog</a> </li>
+            <li class="level0 nav-4"><a class="level0 has-children" href="<?php //echo $this->getUrl('')?>free-samples">free samples</a> </li>
+            <li class="level0 nav-5"><a class="level0 has-children" href="<?php //echo $this->getUrl('about-us')?>">About Us</a> </li>
+            <li class="level0 nav-6 last"><a class="level0" href="<?php //echo $this->getUrl('contacts')?>">contact us</a></li>-->
+           <!-- <li class="level0 nav-1"><a class="level0 has-children"  href="#"><i class="fa fa-heart"></i>Favorites</a></li>-->
+					<li class="level0 nav-2"><a class="level0 has-children" href="<?php echo Mage::getUrl('customer/account');?>"><i class="fa fa-user"></i>My Account</a></li>
+					<li class="level0 nav-3"><a class="level0 has-children" href="<?php echo Mage::getUrl('checkout/cart');?>"><i class="fa fa-check"></i>Checkout</a></li>
+					<li class="level0 nav-4"><a class="level0 has-children" href="<?php echo Mage::getUrl('customer/account/create');?>"><i class="fa fa-edit"></i>Register</a></li>
+					<?php if (!Mage::getSingleton('customer/session')->isLoggedIn()): ?>
+						<li class="level0 nav-5"><a class="level0 has-children" href="<?php echo Mage::helper('customer')->getLoginUrl(); ?>"><i class="fa fa-lock"></i><?php echo $this->__('Login') ?></a></li>
+					<?php else: ?>
+						<li class="level0 nav-5"><a class="level0 has-children" href="<?php echo Mage::helper('customer')->getLogoutUrl(); ?>"><i class="fa fa-lock"></i><?php echo $this->__('Logout') ?></a></li>
+					<?php endif; ?>
+                    <li class="level0 nav-6"><a class="level0 has-children"  href="#"></a></li>
+        </ol>
+    </nav>
+<?php endif ?>
+<?php
+function getBrowser()
+{
+    $u_agent = $_SERVER['HTTP_USER_AGENT'];
+    $bname = 'Unknown';
+    $platform = 'Unknown';
+    $version= "";
+
+    if (preg_match('/linux/i', $u_agent)) {
+        $platform = 'linux';
+    }
+    elseif (preg_match('/macintosh|mac os x/i', $u_agent)) {
+        $platform = 'mac';
+    }
+    elseif (preg_match('/windows|win32/i', $u_agent)) {
+        $platform = 'windows';
+    }
+
+    if(preg_match('/MSIE/i',$u_agent) && !preg_match('/Opera/i',$u_agent))
+    {
+        $bname = 'Internet Explorer';
+        $ub = "MSIE";
+    }
+    elseif(preg_match('/Firefox/i',$u_agent))
+    {
+        $bname = 'Mozilla Firefox';
+        $ub = "Firefox";
+    }
+   
+    elseif(preg_match('/Opera/i',$u_agent))
+    {
+        $bname = 'Opera';
+        $ub = "Opera";
+    }
+    elseif(preg_match('/Netscape/i',$u_agent))
+    {
+        $bname = 'Netscape';
+        $ub = "Netscape";
+    }
+    elseif(preg_match('/Edge/i',$u_agent))
+    {
+        $bname = 'Edge';
+        $ub = "Edge";
+    }
+
+    // finally get the correct version number
+    $known = array('Version', $ub, 'other');
+    $pattern = '#(?<browser>' . join('|', $known) .
+    ')[/ ]+(?<version>[0-9.|a-zA-Z.]*)#';
+    if (!preg_match_all($pattern, $u_agent, $matches)) {
+        // we have no matching number just continue
+    }
+
+    // see how many we have
+    $i = count($matches['browser']);
+    if ($i != 1) {
+        //we will have two since we are not using 'other' argument yet
+        //see if version is before or after the name
+        if (strripos($u_agent,"Version") < strripos($u_agent,$ub)){
+            $version= $matches['version'][0];
+        }
+        else {
+            $version= $matches['version'][1];
+        }
+    }
+    else {
+        $version= $matches['version'][0];
+    }
+
+    // check if we have a number
+    if ($version==null || $version=="") {$version="?";}
+
+    return array(
+        'userAgent' => $u_agent,
+        'name'      => $bname,
+        'version'   => $version,
+        'platform'  => $platform,
+        'pattern'    => $pattern
+    );
+}
+
+// now try it
+$ua=getBrowser();
+$yourbrowser=$ua['name'];
+//echo $yourbrowser;
+?>
+<?php
+if($yourbrowser == "Edge"){ ?>
+<script type="text/javascript">
+    jQuery(".nav-2").click(function(){
+        //alert("done");
+		window.location.href="<?php echo Mage::getUrl('customer/account');?>";
+    });
+	jQuery(".nav-3").click(function(){
+        //alert("done1");
+		window.location.href="<?php echo Mage::getUrl('checkout/cart');?>";
+    });
+	jQuery(".nav-4").click(function(){
+        //alert("done2");
+		window.location.href="<?php echo Mage::getUrl('customer/account/create');?>";
+    });
+	if (jQuery(".UserIsLogged").length > 0) {
+          jQuery(".nav-5").click(function(){
+					//alert("done3");
+					window.location.href="<?php echo Mage::helper('customer')->getLoginUrl(); ?>";
+		  });
+        }else{
+		  jQuery(".nav-5").click(function(){
+					//alert("done3");
+					window.location.href="<?php echo Mage::helper('customer')->getLogoutUrl(); ?>";
+		  });
+		}
+	
+</script>
+<?php
+}
+?>

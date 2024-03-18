@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<config>
+    <api>
+        <resources>
+            <price_api translate="title" module="price">
+                <title>price</title>
+                <model>price/api_price</model>
+                <acl>price/api</acl>
+                <methods>                    
+                    <createPrice translate="title" module="price">
+                        <title>createPrice</title>
+                        <acl>price/api/create</acl>
+                    </createPrice>
+                    <deletePrice translate="title" module="price">
+                        <title>deletePrice</title>
+                        <acl>price/api/delete</acl>
+                    </deletePrice>
+                    <getPrices translate="title" module="price">
+                        <title>getPrices</title>
+                        <acl>price/api/get</acl>
+                    </getPrices>
+                    <createDiscount translate="title" module="price">
+                        <title>createDiscount</title>
+                        <acl>price/api/create_discount</acl>
+                    </createDiscount>
+                    <deleteDiscount translate="title" module="price">
+                        <title>deleteDiscount</title>
+                        <acl>price/api/delete_discount</acl>
+                    </deleteDiscount>
+                    <getDiscount translate="title" module="price">
+                        <title>getDiscount</title>
+                        <acl>price/api/get_discount</acl>
+                    </getDiscount>
+                </methods>
+            </price_api>
+        </resources>
+        <resources_alias>
+            <api>price_api</api>
+         </resources_alias>
+        <v2>
+            <resources_function_prefix>
+                <api>api</api>
+            </resources_function_prefix>
+        </v2>
+        <acl>
+            <resources>
+                <price translate="title" module="price">
+                    <title>Customer price</title>
+                    <sort_order>1</sort_order>
+                    <api translate="title" module="price">
+                        <title>API</title>
+                        <sort_order>2000</sort_order>                    
+                		<create translate="title" module="price">
+                            <title>Create price</title>
+                        </create>
+                        <delete translate="title" module="price">
+                            <title>Delete price</title>
+                        </delete>
+                        <get translate="title" module="price">
+                            <title>List prices</title>
+                        </get>
+                        <create_discount translate="title" module="price">
+                            <title>Create global discount</title>
+                        </create_discount>
+                        <delete_discount translate="title" module="price">
+                            <title>Delete global discount</title>
+                        </delete_discount>
+                        <get_discount translate="title" module="price">
+                            <title>Get predefined global discount</title>
+                        </get_discount>
+                    </api>
+             	</price>
+            </resources>
+        </acl>
+    </api>
+</config>

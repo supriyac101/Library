@@ -1,0 +1,138 @@
+<?php 
+	$_product = $this->getProduct();
+	$_allChilds = $this->getAllChildProducts();
+	$_superAttr = $this->getSuperAttribute();
+	$_superAttrIds = array_keys($_superAttr);
+	$_isCptp = $this->getMatrixHelper()->isCptpEnable();
+	$_showPrices = $this->getMatrixHelper()->isShowProductPrice($_product);
+	$_displyTab = $this->getMatrixHelper()->getDisplayTabs($_product);
+	$_isMultiple = $this->getMatrixHelper()->isTabMultiple($_product);
+	$_showOption = $this->getMatrixHelper()->getMultipleOption($_product);
+	$_showTotalColumn = $this->getMatrixHelper()->isShowTotalColumn();
+	$_hasReplaced = false;
+	$_selectedThird = $this->getSuperAttrThird();
+    $backorderClass = $this->getMatrixHelper()->getBackordersClass();
+?>
+<?php if(count($_superAttrIds) > 2): ?>
+    <div id="product-matrix-fixedleft">
+        <ul>
+            <li>
+                <img width="20" src="<?php echo $this->getJsUrl('fcpm/table_prev.png')?>" alt="<?php echo $this->__('Previous');?>" id="tLeft"/>
+            </li>
+      
+            <?php foreach($_superAttr[$_superAttrIds[count($_superAttrIds)-2]]['option'] as $attr1Id => $attr1Val):?>
+            <li>
+                <?php echo (($this->getMatrixHelper()->isReplacedWithSwatchs($_superAttrIds[count($_superAttrIds)-2]) && $this->_showImage == 0) ? $this->generateSwatches($_superAttrIds[count($_superAttrIds)-2],$attr1Id,$attr1Val['label'],$_superAttr[$_superAttrIds[count($_superAttrIds)-1]]['code'],'row', $_product) : $attr1Val['label']).'<div id="first-'.$attr1Id.'"></div>';?>
+            </li>
+            <?php endforeach;?>
+            <?php if($_showTotalColumn || $this->getMatrixHelper()->isShowGrandTotal($_product)):?>
+                <li><?php echo ($_showTotalColumn ? $this->__('Total Quantity') : '&nbsp;');?></li>
+            <?php endif;?>
+        </ul>
+    </div>
+
+    <div id="product-matrix" class="product-matrix">
+        <?php foreach($_superAttr[$_superAttrIds[count($_superAttrIds)-1]]['option'] as $attr2Id => $attr2Val):?>
+            <div class="item">
+                <ul>
+                    <li>
+                        <?php echo $this->getMatrixHelper()->isReplacedWithSwatchs($_superAttrIds[count($_superAttrIds)-1]) ? $this->generateSwatches($_superAttrIds[count($_superAttrIds)-1],$attr2Id,$attr2Val['label'],$_superAttr[$_superAttrIds[count($_superAttrIds)-1]]['code'],'col', $_product) : $attr2Val['label'];?>
+                    </li>
+
+                    <?php foreach($_superAttr[$_superAttrIds[count($_superAttrIds)-2]]['option'] as $attr1Id => $attr1Val):?>
+                        <?php $product = $this->isSuperSimpleProductMany($_superAttr[$_superAttrIds[count($_superAttrIds)-2]]['code'],$attr1Id,$_superAttr[$_superAttrIds[count($_superAttrIds)-1]]['code'],$attr2Id);?>
+                        <li>
+                            <?php if($product == false):?>
+                                <?php echo $this->__('-');?>
+                            <?php else:?>
+                                <?php if($this->_showImage == 1 && $product['has_img'] == 1): $divHtml = '<div style="cursor:pointer;" onclick="replaceSimpleMediaImages(\'row_'.$attr1Id.'\');">';?>
+                                    <script type="text/javascript">
+                                        $('first-<?php echo $attr1Id;?>').update("<?php echo addslashes($divHtml.$product['image']);?></div>");
+                                    </script>
+                                <?php endif;?>
+                                <?php if($this->getMatrixHelper()->isOnlyCheckBox($_product)):?>
+                                    <input type="checkbox" class="input-checkbox matrix-qty row_<?php echo $attr1Id;?> col_<?php echo $attr2Id;?>" title="Qty" value="1" maxlength="12" name="product_matrix[qty][<?php echo $product['id'];?>]" id="<?php echo $product['id'];?>" onclick="reloadMatrixPriceQtyCheckbox();"/>
+                                <?php else:?>
+                                    <input type="text" class="<?php echo $backorderClass;?> fcpm-validate input-text qty matrix-qty row_<?php echo $attr1Id;?> col_<?php echo $attr2Id;?>" title="Qty" value="0" maxlength="12" name="product_matrix[qty][<?php echo $product['id'];?>]" id="<?php echo $product['id'];?>" onkeyup="reloadMatrixPriceQty();"/>
+                                    <br />
+                                    <?php if(isset($product['stock'])):?>
+                                        <b><?php echo $this->__('Stock : ');?></b><?php echo $product['stock'];?><br />
+                                    <?php endif;?>
+                                    
+                                    <?php if($_showPrices):?>
+                                    <div id="tier-unit-price-<?php echo $product['id'];?>" class="config-price"><?php echo $product['fprice'];?></div>
+                                    <?php endif;?>
+                                    
+                                    <?php if($this->getMatrixHelper()->isShowRowTotal($_product)):?>
+                                        <div id="matrix-price-<?php echo $product['id'];?>"><?php echo $product['fprice'];?></div>
+                                    <?php endif;?>
+                                <?php endif;?>
+                                <?php if(!empty($_selectedThird)): ?>
+                                    <?php foreach ($_selectedThird as $attr) : ?>
+                                        <input type="hidden" name="product_matrix[<?php echo $product['id'];?>][super_attribute][<?php echo $attr['id'];?>]" value="<?php echo $attr['option'];?>" />
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                                <input type="hidden" name="product_matrix[<?php echo $product['id'];?>][super_attribute][<?php echo $_superAttrIds[count($_superAttrIds)-2];?>]" value="<?php echo $product[$_superAttr[$_superAttrIds[count($_superAttrIds)-2]]['code'].'_value'];?>" />
+                                <input type="hidden" name="product_matrix[<?php echo $product['id'];?>][super_attribute][<?php echo $_superAttrIds[count($_superAttrIds)-1];?>]" value="<?php echo $product[$_superAttr[$_superAttrIds[count($_superAttrIds)-1]]['code'].'_value'];?>" />
+                                <?php if(Mage::getStoreConfig('cpbu/basic_options/update_fields',Mage::app()->getStore()) != ''):?>
+                                    <input type="hidden" name="product_matrix[<?php echo $product['id'];?>][customname]" value="<?php echo $product['name'];?>" />
+                                    <input type="hidden" name="product_matrix[<?php echo $product['id'];?>][customthumb]" value="<?php echo $product['thumb'];?>" />
+                                <?php endif;?>
+                                <?php if($this->isSimple()):?>
+                                    <input type="hidden" id="customprice-tier-<?php echo $product['id'];?>" name="product_matrix[<?php echo $product['id'];?>][customprice]" value="<?php echo $product['exTaxPrice'];?>" />
+                                <?php endif;?>
+                            <?php endif;?>
+                        </li>
+                    <?php endforeach;?>
+
+                    <?php if($_showTotalColumn || $this->getMatrixHelper()->isShowGrandTotal($_product)):?>
+                        <li <?php if($_showTotalColumn):?>class="matrix-col" id="<?php echo $attr2Id;?>"<?php endif;?>><?php if($_showTotalColumn):?>0<?php endif;?></li>
+                    <?php endif;?>
+                </ul>
+            </div>
+        <?php endforeach;?>
+        
+        <?php if($_showTotalColumn):?>
+            <div class="item">
+                <ul>
+                    <li><?php echo $this->__('Total Quantity');?></li>
+                    <?php foreach($_superAttr[$_superAttrIds[count($_superAttrIds)-2]]['option'] as $attr1Id => $attr1Val):?>
+                        <li>
+                            <div class="matrix-row" id="<?php echo $attr1Id;?>">0</div>
+                        </li>
+                    <?php endforeach;?>
+                    <li><div class="matrix-total-qty dyn">0</div></li>
+                </ul>
+            </div>
+        <?php endif;?>
+    </div>
+
+    <?php if($this->getMatrixHelper()->isShowRowTotal($_product) || $this->getMatrixHelper()->isShowGrandTotal($_product)):?>
+        <div id="product-matrix-fixedright">
+            <ul>
+                <li>
+                    <img width="20" src="<?php echo $this->getJsUrl('fcpm/table_next.png')?>" alt="<?php echo $this->__('Next');?>" id="tRight"/>
+                </li>
+          
+                <?php foreach($_superAttr[$_superAttrIds[count($_superAttrIds)-2]]['option'] as $attr1Id => $attr1Val):?>
+                    <?php if($this->getMatrixHelper()->isShowRowTotal($_product)):?>
+                        <li><div id="<?php echo $attr1Id;?>" class="matrix-line-total"><?php echo Mage::helper('core')->currency(0,true);?></div></li>
+                    <?php elseif($this->getMatrixHelper()->isShowGrandTotal($_product)):?>
+                        <li>&nbsp;</li>
+                    <?php endif;?>
+                <?php endforeach;?>
+
+                <?php if($this->getMatrixHelper()->isShowGrandTotal($_product)):?>
+                    <li><div id="matrix-total-price"><?php echo Mage::helper('core')->currency(0,true);?></div></li>
+                <?php elseif($this->getMatrixHelper()->isShowRowTotal($_product)):?>
+                    <li>&nbsp;</li>
+                <?php endif;?>
+                
+            </ul>
+        </div>
+    <?php else:?>
+        <div id="product-matrix-fixedright">
+            <ul><li><img width="20" src="<?php echo $this->getJsUrl('fcpm/table_next.png')?>" alt="<?php echo $this->__('Next');?>" id="tRight"/></li></ul>
+        </div>
+    <?php endif;?>
+<?php endif;?>

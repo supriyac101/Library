@@ -1,0 +1,211 @@
+<?php $_config = $this->mHelper('config'); ?>
+var EWPRibbon = Class.create({
+	data: {},
+	log: {},
+	config: {},
+	domReady: 0,
+	count: 1,
+	timeout: 0,
+	
+    initialize: function (options) {
+        Object.extend(this, options || {});
+    },
+  	
+    rewritePage: function (section) {
+		if (!this.domReady) return;
+		
+		if (!section) {
+			this.rewritePage('category');
+			this.rewritePage('product');
+			return;
+		}
+		
+		// catalog products
+		for (var type in this.data) {
+			if (type != section) continue;
+			for (var key in this.data[type]) {
+				var ribbon = this.data[type][key];
+				var context = $$(ribbon.contextSelector).first();
+				if (type == 'product') {
+					var img = context.select('<?php echo $this->mHelper('config')->getProductImageCssSelector(); ?>').first();
+					if (!img) img = context.select('#image-main').first();
+					if (!img) img = context.select('div.product-view p.product-image-zoom').first();
+					if (!img) img = context.select('div.product-view p.product-image img').first();
+					if (!img) img = context.select('div.product-img-box img').first();
+					<?php echo $this->getDebugMessageJs('if (!img) { %s }', $this->__('Product image cannot be determined from your product page. You will need to adjust the Product Image Selector CSS selector in the developer section of the product ribbon configuration to match your theme, so that product images can be found. We can perform this action for you as part of our custom development service.')); ?>
+					if (img) this.processRibbon(ribbon, img, section);
+				} else if (type == 'category') {
+					var collection = context.select('<?php echo $this->mHelper('config')->getCategoryProductBlockCssSelector(); ?>');
+					<?php echo $this->getDebugMessageJs('if (!collection.size()) { %s }', $this->__('Category product items cannot be found on the page. You will need to alter the Category Product Selector in the developer section of the configuration to match your theme, so that products can be found. We can perform this action for you as part of our custom development service.')); ?>
+					collection.each(function(t) {
+						var pid = 0;
+						var span = t.select("span[id*='product-price-']", "span[id*='product-minimal-price-']", "span[id*='old-price-']", "span[id*='price-excluding-tax-']", "span[id*='extendware-pid-']").first();
+						if (span) pid = span.identify().replace('product-price-', '').replace('product-minimal-price-', '').replace('old-price-', '').replace('price-excluding-tax-', '').replace('extendware-pid-', '');
+						if (!parseInt(pid)) {
+							var btn = t.select("button[class*='btn-cart']").first();
+							if (btn) pid = btn.readAttribute('onclick').replace(/.*product\/(\d+)\/.*/g,'$1');
+						}
+						
+						if (!parseInt(pid)) {
+							var a = t.select("a[class*='link-wishlist']").first();
+							if (a) pid = a.readAttribute('href').replace(/.*product\/(\d+)\/.*/g,'$1');
+						}
+						pid = parseInt(pid);
+						<?php echo $this->getDebugMessageJs('if (!pid) { %s }', $this->__('Product IDs cannot be determined from your category listing page. Inside of each category listing block you should output <span id="extendware-pid-[product id here]"></span> so that the product ID may be determined. We can perform this action for you as part of our custom development service.')); ?>
+						if (ribbon.pid != pid) {
+							return;
+						}
+
+						var img = t.select('<?php echo $this->mHelper('config')->getCategoryProductImageCssSelector(); ?>').first();
+						<?php echo $this->getDebugMessageJs('if (!img) { %s }', $this->__('Product image cannot be determined from your category listing page. You will need to adjust the Category Image Selector CSS selector in the developer section of the product ribbon configuration to match your theme, so that product images can be found. We can perform this action for you as part of our custom development service.')); ?>
+						if (img && pid > 0) {
+							this.processRibbon(ribbon, img, section);
+						}
+					}.bind(this));
+				}
+			}
+		}
+	},
+	
+	getParentContainer: function(e, d) {
+		if (!d) {
+			var t = e.up('.ewribbon-parent');
+			if (t) return t;
+			return this.getParentContainer(e.up(), 1);
+		}
+		var n = e.nodeName;
+		if (n != 'LI' && n != 'DIV') return this.getParentContainer(e.up(), d+1);
+		return e;
+	},
+	
+	processRibbon: function(ribbon, img, section) {
+		var attr = 'ew' + ribbon.uid + '_id';
+		var f = img.readAttribute(attr);
+		var parent = this.getParentContainer(img);
+		if (!f) {
+			img.writeAttribute(attr, 1);
+			var code = '<div id="ewpribbon' + ribbon.uid + '" class="ewpribbon" style="display: none; position: relative; pointer-events: none;">';
+			code += '<div class="ewpribbon-cstm-cls" id="ewpribbon_container' + ribbon.uid + '" ><div style="' + ribbon.innerContainerStyle + '">';
+			if (ribbon.image) code += '<img id="ewpribbon_img' + ribbon.uid + '" src="' + this.rewriteUrl(<?php echo json_encode($this->mHelper('internal_api')->getMediaUrl()); ?> + '/' + ribbon.image) + '" style="' + ribbon.imageStyle + '"/>';
+			if (ribbon.text.length) code += '<div class="ewpribbon-cstm-cls" id="ewpribbon_text' + ribbon.uid + '"' + ribbon.textStyle + '">' + ribbon.text + '</div>';
+			code += '</div></div></div>';
+			
+			var e = this.getParentContainer(img);
+			e.insert({top:code});
+		}
+
+		var r = $('ewpribbon' + ribbon.uid);
+		var rc = $('ewpribbon_container' + ribbon.uid);
+		var ri = $('ewpribbon_img' + ribbon.uid);
+		var rt = $('ewpribbon_text' + ribbon.uid);
+		if (r) {
+			if (
+				(img.tagName != 'IMG' || img.readyState == 'complete' || img.complete || !(typeof img.naturalWidth != 'undefined' && img.naturalWidth == 0))
+				&& (!ri || (ri.readyState == 'complete' || ri.complete || !(typeof ri.naturalWidth != 'undefined' && ri.naturalWidth == 0)))
+			) {
+				if (ri && rt) {
+					rt.setStyle({ minHeight: ri.height+'px', minWidth: ri.width+'px'});
+				}
+				var o = img.cumulativeOffset();
+				var p = $$(ribbon.refSelectors).first();
+				<?php if ($this->mHelper('config')->getFallbackPositionSelector()): ?>
+				if (!ribbon.refSelectors) {
+					$$(<?php echo $this->mHelper('config')->getFallbackPositionSelector(); ?>).each(function(se) {
+						if (se.getStyle('position') == 'relative') {
+							p = se;
+							throw $break;
+						}
+					});
+				}
+				<?php endif; ?>
+
+				var imgCof = img.cumulativeOffset();
+				var parentCof = parent.cumulativeOffset();
+				
+				var relX = imgCof[0] - parentCof[0];
+				var relY = imgCof[1] - parentCof[1];
+				
+				rc.setStyle({left: (relX + img.getWidth()/2 - rc.getWidth()/2) + 'px'});
+				rc.setStyle({top: (relY + img.getHeight()/2 - rc.getHeight()/2) + 'px'});
+				if (ribbon.align == 'left') rc.setStyle({left: '0px'});
+				else if (ribbon.align == 'right') rc.setStyle({left: (img.getWidth() - rc.getWidth()) + 'px'});
+				
+				if (ribbon.valign == 'top') rc.setStyle({top: '0px'});
+				else if (ribbon.valign == 'bottom') rc.setStyle({top: (img.getHeight() - rc.getHeight()) + 'px'});
+
+	    		r.show();
+	    	} else this.regTimeout(500);
+		} else this.regTimeout(500);
+	},
+	
+    reset: function(type) {
+    	if (!type) {
+    		ewpribbon.reset('product');
+    		ewpribbon.reset('category');
+    		return;
+    	}
+    	
+    	for (var t in this.data) {
+    		if (t != type) continue;
+			for (var key in this.data[type]) {
+				var e = $('ewpribbon' + key);
+				if (e) e.replace('');
+				delete this.data[type][key];
+				delete this.log[type][key];
+			}
+		}
+   	},
+   	
+   	regTimeout: function(n) {
+   		clearTimeout(this.timeout);
+   		this.timeout = setTimeout(function() {this.rewritePage()}.bind(this), n);
+   	},
+   	
+   	addConfigTemplate: function (key, rid, text, image, valign, align, textStyle, imageStyle, containerStyle, innerContainerStyle, refSelectors, contextSelector) {
+   		this.config[key] = {'rid': rid, 'text':text, 'image': image, 'valign': valign, 'align': align, 'textStyle': textStyle, 'imageStyle': imageStyle, 'containerStyle': containerStyle, 'innerContainerStyle': innerContainerStyle, 'refSelectors': refSelectors, 'contextSelector': contextSelector};
+   	},
+   	
+	addRibbon: function(type, ctk, pid) {
+		if (typeof this.log[type] == 'undefined') this.log[type] = {};
+		if (typeof this.data[type] == 'undefined') this.data[type] = {};
+		
+		var c = Object.clone(this.config[ctk]);
+		var uid = type+'-'+c['rid']+'-'+pid;
+		if (typeof this.log[type][uid] == 'undefined') {
+			c.pid = pid; c.uid = uid; c.type = type;
+			this.data[type][uid] = c;
+			this.log[type][uid]  = 1;
+		}
+	},
+
+	<?php if ($this->isDebuggingEnabled()): ?>
+    debugLog: {},
+    debug: function (message, type) {
+    	if (!type) type = message;
+    	if (!this.debugLog[type]) {
+    		alert(message);
+    		this.debugLog[type] = 1;
+    	}
+  	},
+  	<?php endif; ?>
+  	
+	rewriteUrl:function(url){
+		url = url.replace('http://', window.location.protocol+'//');
+        return url.replace('https://', window.location.protocol+'//');
+	}
+});
+
+ewpribbon = new EWPRibbon();
+var EWPRibbomDomReady = function () {
+	document.fire('ewpribbon:loaded');
+	ewpribbon.domReady = 1;
+	ewpribbon.rewritePage();
+	ewpribbon.rewritePage();
+};
+Event.observe(document, 'dom:loaded', EWPRibbomDomReady);
+Event.observe(window, 'load', EWPRibbomDomReady);
+
+
+Event.observe(window, "resize", function() {
+    ewpribbon.rewritePage();
+});

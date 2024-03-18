@@ -1,0 +1,102 @@
+<div class="my-account">
+    <div class="page-title">
+    <h1>Recently Purchased Items</h1>
+    </div>
+    <table class="recent-buy">
+        <thead>
+            <tr class="first">
+                <th class="recent-image"></th>
+                <th class="recent-name">PRODUCT NAME</th>
+                <th class="recent-price">PRICE</th>
+                <th class="recent-qunty">QUANTITY</th>
+                <th class="recent-addcart"></th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php
+            $helper = Mage::helper('catalog/product_configuration');
+            $orders = Mage::getResourceModel('sales/order_collection')
+            ->addFieldToSelect('*')
+            ->addFieldToFilter('customer_id', Mage::getSingleton('customer/session')->getCustomer()->getId());
+            //->addFieldToFilter('status', 'complete');
+    
+    
+            $this->setOrders($orders);
+            foreach ($orders as $order){
+                $order_id=$order->getRealOrderId();
+                $order = Mage::getModel('sales/order')->load($order_id, 'increment_id');
+                $order->getAllVisibleItems();
+                $orderItems = $order->getItemsCollection()
+                ->addAttributeToSelect('*')
+                ->load();
+                //echo "Order Total:".$order->getSubtotal();
+                
+                foreach($orderItems as $Items){
+                    /*$attributeSetModel = Mage::getModel("eav/entity_attribute_set")->load($Items->getAttributeSetId());
+                    $parentIds = Mage::getResourceSingleton('catalog/product_type_configurable')->getParentIdsByChild($Items->getId());
+                    if ($Items->getTypeId() == 'simple') {
+                        echo "simple product";
+                    }else{
+                       
+                        
+                    } */
+                    $_productId = $Items->getId();
+                    $_product = Mage::getModel('catalog/product')->load($_productId);
+                    $_url = Mage::helper('checkout/cart')->getAddUrl($_product);
+        ?>
+                              
+                    <tr class="recent-details">
+                       
+                        <?php $Item = Mage::getModel('catalog/product')->setStoreId($Items->getStoreId())->load($Items->getProductId());?>
+                        <td>
+                            <a href="<?php echo $Item->getProductUrl(); ?>"><img src="<?php echo $Item->getImageUrl(); ?>" /></a></td>
+                        <td>
+                            <a href="<?php echo $Item->getProductUrl(); ?>"><?php echo $Item->getName(); ?></a>
+                            <?php
+                                //$arr = array();
+                                $options = $Items->getProductOptions(); 
+                                $customOptions = $options['options'];   
+                                if(!empty($customOptions)){
+                                    foreach ($customOptions as $option){     
+                                        $optionId = $option['option_id'];
+                                        echo '<span class="option-name">'.$optionTitle = $option['label'].': '.'</span>';
+                                        echo '<span class="option-value">'.$optionValue = $option['value']. '</span></br>' ;
+                                    }
+                                }
+                            ?>
+                        </td>
+                        <td>
+                            <a href="<?php echo $Item->getProductUrl(); ?>"><?php echo "$".number_format($Items->getPrice(), '2'); ?></a>
+                        </td>
+                        <td>
+                            <?php echo '<input type="text" class="buy-qnty input-text qty" name="qty" id="qty" value="1">';?>
+                        </td>
+                        <td>
+                            <?php
+                                $_productId = $Item->getId();
+                                $_product = Mage::getModel('catalog/product')->load($_productId);
+                                $_url = Mage::helper('checkout/cart')->getAddUrl($_product); ?>
+                            <?php if($Item->isSaleable()){ ?>
+                                <a class="custom" href="<?php echo $_url ?>]"><?php echo $this->__('Add To Cart'); ?></a>
+                            <?php }else{?>
+                            <p class="action availability out-of-stock"><span><?php echo $this->__('Out of stock') ?></span></p>
+                            <?php
+                                }
+                            ?>
+                        </td>
+                    </tr>     
+                <?php
+                    }
+                ?>
+             
+                
+                <?php
+                }
+            ?>   
+        
+      </tbody>
+        
+        
+    </table>
+ <?php /*<a class="custom" href="<?php echo $this->getBaseUrl(); ?>sales/order/history"><?php echo $this->__('View All'); ?></a> */ ?>  
+</div>

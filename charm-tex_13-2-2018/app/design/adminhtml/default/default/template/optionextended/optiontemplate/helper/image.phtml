@@ -1,0 +1,42 @@
+
+<div class="no-display" id="ox_uploader-template">
+  <div id="{{id}}-container" class="file-row file-row-narrow">
+     <span class="file-info">
+        <span class="file-info-name">{{name}}</span>
+        <span class="file-info-size">({{size}})</span>
+     </span>
+     <span class="progress-text"></span>
+     <div class="clear"></div>
+  </div>
+</div>
+<div class="files" style="width:100%;">       
+   <div id="uploader_row" class="hide_uploader_row" >            
+      <div class="row" >
+            
+         <input type="hidden" id="ox_uploader_save" name="image" value="<?php echo $this->htmlEscape($this->getImageJson()) ?>" />                 
+
+         <div id="ox_uploader-browse">
+           <button id="ox_uploader-browse_button" title="<?php echo Mage::helper('uploader')->__('Browse Files...'); ?>" type="button" class="scalable browse" onclick="" style=""><span><span><span>...</span></span></span></button>
+           <input style="visibility: hidden; position: absolute;" type="file">
+         </div>                
+
+         <img src="<?php echo $this->getSkinUrl('images/spacer.gif')?>" id="ox_uploader_img" width="40" style="display:none;" alt="" /><button id="ox_uploader-delete" title="<?php echo Mage::helper('adminhtml')->__('Delete Image'); ?>" type="button" class="scalable delete" onclick="optionExtended.deleteImage()" style="display:none;"><span><span><span></span></span></span></button>                           
+
+         <div id="ox_uploader" class="uploader a-left">
+             <div id="ox_uploader-old" class="file-row-info"></div>
+             <div id="ox_uploader-new" class="file-row-info new-file"></div>
+             <div class="clear"></div>
+         </div>       
+
+      </div>
+   </div>
+</div> 
+<script type="text/javascript">
+//<![CDATA[
+
+optionExtended.uploaderConfig = <?php echo $this->getConfigJson() ?>;
+optionExtended.uploaderId = '<?php echo $this->getUploaderId(); ?>'; 
+optionExtended.loadUploader();
+
+//]]> 
+</script>

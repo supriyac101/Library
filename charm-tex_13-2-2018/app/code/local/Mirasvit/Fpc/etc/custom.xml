@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<containers>
+		<page_html_header>
+			<block>page/html_header</block>
+			<name>header</name>
+			<container>Mirasvit_Fpc_Model_Container_Base</container>
+			<depends></depends>
+			<in_app>false</in_app>
+		</page_html_header>
+	</containers>
+</config>

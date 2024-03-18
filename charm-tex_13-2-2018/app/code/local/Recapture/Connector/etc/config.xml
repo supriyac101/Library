@@ -1,0 +1,140 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Recapture_Connector>
+            <version>1.3.2</version>
+        </Recapture_Connector>
+    </modules>
+
+    <global>
+
+        <blocks>
+            <recapture>
+                <class>Recapture_Connector_Block</class>
+            </recapture>
+        </blocks>
+
+        <helpers>
+            <recapture>
+                <class>Recapture_Connector_Helper</class>
+            </recapture>
+        </helpers>
+
+        <models>
+            <recapture>
+                <class>Recapture_Connector_Model</class>
+            </recapture>
+        </models>
+
+        <events>
+
+            <sales_quote_save_after>
+                <observers>
+                    <recapture_cart_update>
+                        <type>singleton</type>
+                        <class>Recapture_Connector_Model_Observer</class>
+                        <method>quoteUpdate</method>
+                    </recapture_cart_update>
+                </observers>
+            </sales_quote_save_after>
+
+            <sales_quote_delete_after>
+                <observers>
+                    <recapture_cart_update>
+                        <type>singleton</type>
+                        <class>Recapture_Connector_Model_Observer</class>
+                        <method>quoteDelete</method>
+                    </recapture_cart_update>
+                </observers>
+            </sales_quote_delete_after>
+
+            <sales_order_place_after>
+                <observers>
+                    <recapture_cart_conversion>
+                        <type>singleton</type>
+                        <class>Recapture_Connector_Model_Observer</class>
+                        <method>cartConversion</method>
+                    </recapture_cart_conversion>
+                </observers>
+            </sales_order_place_after>
+
+            <newsletter_subscriber_save_before>
+                <observers>
+                    <recapture_cart_subscriber>
+                        <type>singleton</type>
+                        <class>Recapture_Connector_Model_Observer</class>
+                        <method>newsletterSubscriber</method>
+                    </recapture_cart_subscriber>
+                </observers>
+            </newsletter_subscriber_save_before>
+
+        </events>
+
+    </global>
+
+    <frontend>
+        <routers>
+            <recapture>
+                <use>standard</use>
+                <args>
+                    <module>Recapture_Connector</module>
+                    <frontName>recapture</frontName>
+                </args>
+            </recapture>
+        </routers>
+        <layout>
+            <updates>
+                <recapture>
+                    <file>recapture.xml</file>
+                </recapture>
+            </updates>
+        </layout>
+    </frontend>
+
+    <admin>
+         <routers>
+             <adminhtml>
+                 <args>
+                    <modules>
+                        <recaptureadmin after="Mage_Adminhtml">Recapture_Connector</recaptureadmin>
+                    </modules>
+                 </args>
+             </adminhtml>
+         </routers>
+    </admin>
+
+    <adminhtml>
+        <acl>
+            <resources>
+                <all>
+                    <title>Allow Everything</title>
+                </all>
+                <admin>
+                    <children>
+                        <system>
+                            <children>
+                                <config>
+                                    <children>
+                                        <recapture>
+                                            <title>Recapture Connector - All</title>
+                                        </recapture>
+                                    </children>
+                                </config>
+                            </children>
+                        </system>
+                    </children>
+                </admin>
+            </resources>
+        </acl>
+    </adminhtml>
+
+    <default>
+        <recapture>
+            <abandoned_carts>
+                <return_landing>cart</return_landing>
+                <include_tax_with_products>0</include_tax_with_products>
+            </abandoned_carts>
+        </recapture>
+    </default>
+
+</config>

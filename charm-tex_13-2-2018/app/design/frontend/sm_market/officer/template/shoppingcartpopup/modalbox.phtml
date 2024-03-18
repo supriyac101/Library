@@ -1,0 +1,236 @@
+<?php
+/**
+ * Angular JS dialog app and js for opening dialog
+ * Created By: Brajendra
+ */
+// Shopping cart popup session variable
+$settings = Mage::getSingleton('core/session')->getShoppingCartPopUpSettings();
+$settings_array = unserialize($settings);
+
+// Condition to check whether extension is enabled for current store or not - Brajendra
+if (Mage::getStoreConfig('checkout/shoppingcart/enabled')) {
+    //Mage::getSingleton('core/session')->setShowModalBox(true); // Remove this line
+    // Cart content page URL - Brajendra
+    $url = $this->getUrl() . 'supercheckout/cart_index/cartLayout';
+    ?>
+    <script type="text/javascript" src="<?php echo Mage::getBaseUrl('js') . 'supercheckout/shopping_cart/dialogs.min.js'; ?>"></script>
+
+    <!-- BOC - Code to add the modal box angular app div - Brajendra -->
+    <div class="vss_shoppingcart_modal" id="App2" ng-controller="vss_shoppingcart_dialogService" data-ng-init="init()">
+    </div>
+    <!-- EOC - Code to add the modal box angular app div - Brajendra -->
+
+    <!-- BOC - This will be add a new script for Angular modal box - Brajendra -->
+    <div ng-include src="<?php echo $url; ?>"></div>
+
+    <script type="text/javascript">
+        // Angular App
+        var app_cart_popup = angular.module("vss_shoppingcart_modal",["ui.bootstrap","dialogs"]);
+
+        // App controllers
+        app_cart_popup.controller("vss_shoppingcart_dialogService",function($scope,$rootScope,$timeout,$dialogs,ergastAPIservice){
+      
+        <?php
+        if (Mage::getSingleton('core/session')->getShowModalBox()) {
+        ?>
+                $scope.init = function(){
+                    dlg = $dialogs.create("<?php echo $url; ?>","shoppingCarUpdate",{},{key: false,back: "static"});
+                };
+        <?php
+        }
+        ?>
+            $scope.createDialog = function(){
+                dlg = $dialogs.create("<?php echo $url; ?>","shoppingCarUpdate",{},{
+                    key: false,
+                    back: "static"
+                });
+            };
+      
+        }) // end dialogsServiceTest
+
+        // shoppingCarUpdate Controller
+       app_cart_popup.controller("shoppingCarUpdate",function($scope,$compile,$modalInstance,ergastAPIservice){    
+            $scope.cart_title = "Your Cart";
+            $scope.successShow = false;
+            $scope.showContent = false;
+            $scope.showLoader = true;
+            $scope.cartProducts = "";
+
+            ergastAPIservice.getCart().success(function (response) {
+                if ( angular.isArray(response.cartProducts) ) {
+                    $scope.cartProducts = response.cartProducts;
+                    $scope.cartTotal = response.cartTotal;
+                    $scope.relatedProducts = response.relatedProducts;
+                    $scope.showContent = true;
+                    $scope.showLoader = false;
+                }
+            });
+        
+            $scope.cancel = function(){
+                $modalInstance.dismiss("canceled");
+                window.location.reload(false); 
+            }; // end cancel
+
+            $scope.closeSuccessDiv = function(){
+                $scope.successShow = false;
+            }
+
+            // BOC updateQuantity
+            $scope.updateCart = function(id){
+                $scope.showLoader = true;
+                var loader = angular.element( document.querySelector( ".velsof-content-loading" ) );
+                loader.attr("style", "height: "+ document.getElementById("velsof-popup-dialog").offsetHeight + "px !important; width: "+ document.getElementById("velsof-popup-dialog").offsetWidth + "px !important;");
+                
+                var qty = angular.element( document.querySelector( "#quantity"+id ) ).val();
+
+                var params= { "product_id": id, "qty": qty, "update_cart_action":"update_qty"};
+                ergastAPIservice.updateCart(params).success(function (response) {
+                    $scope.cartProducts = response.cartProducts;
+                    $scope.cartTotal = response.cartTotal;
+                    $scope.relatedProducts = response.relatedProducts;
+                    $scope.messages = response.messages;
+                    $scope.successShow = true;
+                    $scope.showLoader = false;
+                });
+            };
+            
+            $scope.updateQuantity = function(event){
+               $scope.updateCart(event.target.id);
+            }; 
+            
+            $scope.updateQty = function(ev) {
+                  if (ev.which == 13 || ev.keyCode == 13){
+                      var qtyTextBox = angular.element( document.querySelector( "#"+ev.target.id ) );
+                      $scope.updateCart(qtyTextBox.attr('pid'));
+                  }
+            };
+            // EOC updateQuantity
+        
+            // BOC applyCoupon
+            $scope.applyCoupon = function(){
+                $scope.showLoader = true;
+                var loader = angular.element( document.querySelector( ".velsof-content-loading" ) );
+                loader.attr("style", "height: "+ document.getElementById("velsof-popup-dialog").offsetHeight + "px !important; width: "+ document.getElementById("velsof-popup-dialog").offsetWidth + "px !important;");
+            
+                var coupon = angular.element( document.querySelector( "#scp_coupon_code" ) ).val();
+                if(coupon != ""){
+                    var params = { "ajax": "true", "coupon_code": coupon};
+                    ergastAPIservice.applyCoupon(params).success(function (response) {
+                        $scope.cartProducts = response.cartProducts;
+                        $scope.cartTotal = response.cartTotal;
+                        $scope.relatedProducts = response.relatedProducts;
+                        $scope.messages = response.messages;
+                        $scope.successShow = true;
+                        $scope.showLoader = false;
+                    });
+                }else{
+                    $scope.showLoader = false;
+                }
+            }; 
+            $scope.applyCouponCode = function(ev){
+                if (ev.which == 13 || ev.keyCode == 13){
+                    $scope.applyCoupon();
+                }
+            };
+            // EOC applyCoupon
+        
+            // BOC - redeemCoupon
+            $scope.redeemCoupon = function(){
+                $scope.showLoader = true;
+                var loader = angular.element( document.querySelector( ".velsof-content-loading" ) );
+                loader.attr("style", "height: "+ document.getElementById("velsof-popup-dialog").offsetHeight + "px !important; width: "+ document.getElementById("velsof-popup-dialog").offsetWidth + "px !important;");
+            
+                var coupon = angular.element( document.querySelector( "#scp_coupon_code" ) ).val();
+                if(coupon != ""){
+                    var params = { "ajax": "true", "remove": 1, "coupon_code": coupon};
+                    ergastAPIservice.applyCoupon(params).success(function (response) {
+                        angular.element( document.querySelector( "#scp_coupon_code" ) ).val('');
+                        $scope.cartProducts = response.cartProducts;
+                        $scope.cartTotal = response.cartTotal;
+                        $scope.relatedProducts = response.relatedProducts;
+                        $scope.messages = response.messages;
+                        $scope.successShow = true;
+                        $scope.showLoader = false;
+                    });
+                }else{
+                    $scope.showLoader = false;
+                }
+            }; // EOC redeemCoupon
+        
+            // BOC remove Product
+            $scope.removeProduct = function(event){
+                $scope.showLoader = true;
+                var loader = angular.element( document.querySelector( ".velsof-content-loading" ) );
+                loader.attr("style", "height: "+ document.getElementById("velsof-popup-dialog").offsetHeight + "px !important; width: "+ document.getElementById("velsof-popup-dialog").offsetWidth + "px !important;");
+            
+                var productID = event.target.id;
+                ergastAPIservice.removeProduct(productID).success(function (response) {
+                    if(response.cartProductsCount == 0){
+                        $modalInstance.dismiss("canceled");
+                        window.location.reload(false);
+                    }
+                    $scope.cartProducts = response.cartProducts;
+                    $scope.cartTotal = response.cartTotal;
+                    $scope.relatedProducts = response.relatedProducts;
+                    $scope.messages = response.messages;
+                    $scope.successShow = true;
+                    $scope.showLoader = false;
+                });
+        
+            }; // EOC removeProduct
+        });
+
+        // App Services
+        app_cart_popup.factory("ergastAPIservice", function($http) {
+
+            var ergastAPI = {};
+
+            ergastAPI.getCart = function() {
+                return $http({
+                    method: "GET", 
+                    url: "<?php echo $this->getUrl('supercheckout/cart_index/getCart'); ?>"
+                });
+            }
+
+            ergastAPI.updateCart = function(params) {
+                return $http({
+                    method: "POST", 
+                    url: "<?php echo $this->getUrl('supercheckout/cart_index/updateCart'); ?>",
+                    data: params
+                });
+            }
+
+            ergastAPI.applyCoupon = function(params) {
+                return $http({
+                    method: "POST", 
+                    url: "<?php echo $this->getUrl('supercheckout/cart_index/couponPost/'); ?>",
+                    data: params
+                });
+            }
+        
+            ergastAPI.removeProduct = function(productID) {
+                return $http({
+                    method: "GET", 
+                    url: "<?php echo $this->getUrl('supercheckout/cart_index/delete/'); ?>id/"+productID
+                });
+            }
+        
+            return ergastAPI;
+        });
+        
+        function openDialog(){
+            angular.element(document.getElementById('App2')).scope().createDialog();
+        }
+        angular.bootstrap(document.getElementById("App2"),['vss_shoppingcart_modal']);
+    </script>
+    <?php
+    if (!Mage::getSingleton('core/session')->getShowModalBox()) {
+        // Session variable unset so that popup will not open again on page refresh or any other page - Brajendra
+        Mage::getSingleton('core/session')->unsShowModalBox();
+    }
+} else {
+    // Session variable unset so that popup will not open again on page refresh or any other page - Brajendra
+    Mage::getSingleton('core/session')->unsShowModalBox();
+}
+?>
+<link type='text/css' rel='stylesheet' href='<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN) . 'frontend/base/default/css/supercheckout/shopping_cart/css/angular_popup_css.css?v=1.0'; ?>' media='all' />

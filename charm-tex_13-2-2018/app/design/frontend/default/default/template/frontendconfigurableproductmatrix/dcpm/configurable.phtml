@@ -1,0 +1,576 @@
+<?php
+if($this->getRequest()->getModuleName() == 'checkout') return '';
+$_product    = $this->getProduct();
+$_attributes = (array)$_product->getTypeInstance(true)->getConfigurableAttributes($_product)->getData();
+$_matrixHelper = $this->getMatrixHelper();
+?>
+<?php if(count($_attributes) == 2 && $_matrixHelper->isEnable($_product) && $_matrixHelper->isSecondMatrix($_product) == 1 && $this->getMatrixHelper()->getDisplayTabs($_product) != 0):?>
+<?php 
+	$_newAttribute = $_attributes;
+	$_satchAttribute = array_pop($_newAttribute);
+	$_isSwatch = $_matrixHelper->isReplacedWithSwatchs($_satchAttribute['attribute_id']);
+	$_isShowStock = $_matrixHelper->isShowStock($_product);
+	$_mTemplate = $_matrixHelper->getMatrixTemplate($_product);
+	$_mPosition = $_matrixHelper->getSecondMatrixPosition($_product);
+	$arrSimpleData = $this->getAllChildProducts();
+	$_isLinked = $_matrixHelper->isShowLink($_product);
+	$_showTotle = $_matrixHelper->isShowGrandTotal($_product);
+	$_isCptp = $_matrixHelper->isCptpEnable();
+	$_showPrices = $_matrixHelper->isShowProductPrice($_product);
+	$_showOption = $_matrixHelper->getMultipleOption($_product);
+	$_showTotalColumn = $_matrixHelper->isShowTotalColumn();
+	$_swatch_code = Mage::getModel('eav/entity_attribute')->load($_satchAttribute['attribute_id'])->getAttributeCode();
+?>
+<?php if($_isLinked):?><h2><?php echo $this->__('Order Multiple') ?></h2><button type="button" class="button popupHide" onclick="matrixBlockUI();"><span><span><?php echo $this->__('Product Order Matrix') ?></span></span></button><?php endif;?>
+<script type="text/javascript">
+	var arrSimpleData = <?php echo json_encode($arrSimpleData);?>;
+
+	var leftRightFixedOwl = 80, owlFcpm, incrSoTbl = 2;
+    var showOptionTbl = 1*<?php echo 1*$_showOption;?>;
+    var showOptionTbl0 = 1;
+    var showOptionTbl320 = (showOptionTbl < 2) ? showOptionTbl : 2;
+    var showOptionTbl480 = (showOptionTbl < 3) ? showOptionTbl : 3;
+    var showOptionTbl640 = (showOptionTbl < 4) ? showOptionTbl : 4;
+
+    showOptionTbl += incrSoTbl;
+    showOptionTbl0 = incrSoTbl;
+    showOptionTbl320 += incrSoTbl;
+    showOptionTbl480 += incrSoTbl;
+    showOptionTbl640 += incrSoTbl;
+	
+	setUpMyUlSlider = function(limitedHeight)
+    {
+    	if(typeof limitedHeight == 'undefined') limitedHeight = 25;
+        jQuery('#product-matrix-std li').removeAttr('style');
+        
+        var topBotHeightArr = [];
+        var centerHeightArr = [];
+        jQuery('#product-matrix-std ul').each(function(){
+            var thisObj = jQuery(this);
+            thisObj.find('li.first, li.last').each(function(){
+                topBotHeightArr.push(jQuery(this).height());
+            });
+
+            thisObj.find('li').not(thisObj.find('li.first, li.last')).each(function(){
+                centerHeightArr.push(jQuery(this).height());
+            });
+        });
+
+        var centerHeight = Math.max.apply(null, centerHeightArr);
+        centerHeight = (centerHeight <= limitedHeight) ? limitedHeight : centerHeight;
+        
+        var tBheight = Math.max.apply(null, topBotHeightArr);
+        tBheight = (tBheight == 0 ? limitedHeight : tBheight);
+
+        jQuery('#product-matrix-std ul').find('li.first, li.last').height(tBheight);
+
+        jQuery('#product-matrix-std li')
+            .not(jQuery('#product-matrix-std ul').find('li.first, li.last'))
+            .height(centerHeight);
+    }
+
+
+    initMyUlSlider = function(isLoded)
+    {
+        jQuery('#product-matrix-fixedleft, #product-matrix-fixedright').width(leftRightFixedOwl);
+        jQuery('#product-matrix').css('margin','0 '+leftRightFixedOwl+'px');
+        
+        $$('#product-matrix-std ul').each(function(item){
+            decorateGeneric(item.select('li'), ['first'<?php if($_showTotalColumn || $this->getMatrixHelper()->isShowGrandTotal($_product)):?>,'last'<?php endif;?>]);
+        });
+
+        showOptionTbl320 = (showOptionTbl < 2) ? showOptionTbl : 2;
+	    showOptionTbl480 = (showOptionTbl < 3) ? showOptionTbl : 3;
+	    showOptionTbl640 = (showOptionTbl < 4) ? showOptionTbl : 4;
+
+	    showOptionTbl += incrSoTbl;
+	    showOptionTbl0 = incrSoTbl;
+	    showOptionTbl320 += incrSoTbl;
+	    showOptionTbl480 += incrSoTbl;
+	    showOptionTbl640 += incrSoTbl;
+
+        if(isLoded){
+            owlFcpm = jQuery("#product-matrix").owlCarousel({
+                pagination: false,
+                navigation: false,
+                rewindNav: false,
+                mouseDrag : false,
+                <?php if($_mTemplate == 4 || $_isLinked):?>responsiveBaseWidth: '#product-matrix-std',<?php endif;?>
+                itemsCustom : [[0, showOptionTbl0],[320, showOptionTbl320],[480, showOptionTbl480],[640, showOptionTbl640],[800, showOptionTbl]],
+                item : showOptionTbl,
+                afterInit : setUpMyUlSlider,
+                afterUpdate : setUpMyUlSlider,
+                beforeUpdate : function(){
+                    jQuery('#product-matrix-std').removeAttr('style');
+                },
+                afterAction : function()
+                {
+                    var thisOwl = this.owl;
+                    jQuery('#tLeft,#tRight').removeClass('disabled');
+                    if(thisOwl.userItems.size() <= thisOwl.visibleItems.size())
+                    {
+                        jQuery('#tLeft,#tRight').addClass('disabled');
+                    }
+                    else if(thisOwl.currentItem == 0)
+                    {
+                        jQuery('#tLeft').addClass('disabled');
+                    }
+                    else if(thisOwl.userItems.size() == thisOwl.currentItem+thisOwl.visibleItems.size())
+                    {
+                        jQuery('#tRight').addClass('disabled');
+                    }
+                    var origVidth = jQuery('#product-matrix').width();
+                    var calcVidth = this.itemsAmount*this.itemWidth;
+                    if(origVidth >= calcVidth){
+                        var finalCalcWidth = calcVidth+(2*leftRightFixedOwl);
+                        if(origVidth != 0) jQuery('#product-matrix-std').width(finalCalcWidth);
+                    }
+                }
+            });
+        } else {
+        	if(owlFcpm && owlFcpm.data('owlCarousel') != null) owlFcpm.data('owlCarousel').reload();
+        }
+        
+        if($('tLeft'))
+        {
+            $('tLeft').addClassName('mnavs').observe('click',function(){
+                owlFcpm.trigger('owl.prev');
+            });
+        }
+
+        if($('tRight'))
+        {
+            $('tRight').addClassName('mnavs').observe('click',function(){
+                owlFcpm.trigger('owl.next');
+            });
+        }
+
+        <?php if($_isLinked):?>
+        setTimeout(function(){
+        	var newWindowHeight = windowHeight = jQuery(window).height() - 30;
+        	if(jQuery('.blockMsg').outerHeight() > windowHeight)
+	    	{
+	    		while(jQuery('.blockMsg').outerHeight() > windowHeight){
+	    			jQuery('.blockMsg .one-matrix-table').css({'max-height':newWindowHeight+'px', 'overflow-y':'auto'});
+	        		newWindowHeight--;
+	        	}
+	    	}
+        }, 1000);
+    	<?php endif;?>
+    }
+
+	Product.Config.prototype.configureForValues  = Product.Config.prototype.configureForValues.wrap(
+		function(parentMethod){
+			var lastMatrix = this.settings.last(), html = '', LID = 'matrix_'+lastMatrix.id;
+			lastMatrix.hide().removeClassName('required-entry');
+			lastMatrix.up('dd').previous('dt').hide();
+			<?php if($_mPosition == 4):?>
+			lastMatrix.up('dl').setAttribute('id','second-split-dl');
+			<?php endif;?>
+			<?php if($_matrixHelper->isAcspEnable() && $_isSwatch):?>
+			lastMatrix.up('.input-box').next('div').hide();
+			<?php endif;?>
+			<?php if($_mTemplate == 1):?>
+			html = '<div id="'+LID+'" class="data-table one-matrix-table"></div>';
+			<?php else:?>
+			html = '<div id="'+LID+'" class="data-table one-matrix-table"><div id="product-matrix-std">'+
+				<?php if($this->_showImage == 1):?>
+				'<div id="product-matrix-fixedleft"><ul><li><img width="20" src="<?php echo $this->getJsUrl('fcpm/table_prev.png');?>" alt="<?php echo $this->__('Previous');?>" id="tLeft"/></li><li class="body" id="libody_0"></li><li>&nbsp;</li></ul></div>'+
+				<?php else:?>
+				'<div id="product-matrix-fixedleft"><ul><li><img width="20" src="<?php echo $this->getJsUrl('fcpm/table_prev.png');?>" alt="<?php echo $this->__('Previous');?>" id="tLeft"/></li><li class="body" id="libody_1"></li><li>&nbsp;</li></ul></div>'+
+				<?php endif;?>
+				'<div id="product-matrix" class="product-matrix">'+
+				<?php if($this->_showImage == 1):?>
+				'<div class="item"><ul><li>'+lastMatrix.up('dd').previous('dt').down('label').innerHTML+'</li><li class="body" id="libody_1"></li><li>&nbsp;</li></ul></div>'+
+				<?php endif;?>
+				<?php if($_showPrices):?>
+				'<div class="item"><ul><li><?php echo $this->__('Price');?></li><li class="body" id="libody_2"></li>'+
+					<?php if($_showTotle==1):?>
+					'<li><div id="oneMatrixTotal">'+this.formatPrice(0)+'</div></li>'+
+					<?php else:?>
+					'<li>&nbsp;</li>'+
+					<?php endif;?>
+				'</ul></div>'+
+				<?php endif;?>
+				<?php if($_isShowStock == 1):?>
+				'<div class="item"><ul><li><?php echo $this->__('Stock');?></li><li class="body" id="libody_3"></li><li>&nbsp;</li></ul></div>'+
+				<?php endif;?>
+				'</div>'+
+				'<div id="product-matrix-fixedright"><ul><li><img width="20" src="<?php echo $this->getJsUrl('fcpm/table_next.png');?>" alt="<?php echo $this->__('Next');?>" id="tRight"/></li><li class="body" id="libody_4"></li><li><div id="oneMatrixQty">0</div></li></ul></div></div>';
+			<?php endif;?>
+			
+			if(!lastMatrix.next('#'+LID)) {
+				lastMatrix.insert({after: html});
+				$(LID).hide();
+				<?php if($_matrixHelper->isDefaultSwatchEnabled()):?>
+				$(LID).next('.configurable-swatch-list').hide();
+				<?php endif;?>
+				if($('product_addtocart_form')) $('product_addtocart_form').action = '<?php echo $this->getSubmitUrl($_product) ?>';
+				if(showOptionTbl == 0 && $(LID).select('li.body').length > 0) showOptionTbl = $(LID).select('li.body').length;
+				initMyUlSlider(true);
+			}
+			$$('.btn-cart').each(function(button){
+				button.disabled = false;
+			});
+			<?php if($_isLinked):?>
+			jQuery('#product-options-wrapper dl').wrapAll('<div class="both-dl" />');
+			jQuery('body').addClass('body_matrix_link');
+			<?php endif;?>
+			<?php if($_mPosition == 4):?>
+			jQuery('body').addClass('body_matrix_sbs');
+			<?php endif;?>
+			return parentMethod();
+		}
+	);
+	
+	Product.Config.prototype.configureElement  = Product.Config.prototype.configureElement.wrap(
+		function(parentMethod,element) {
+			if(!element.value){
+				<?php if($_mTemplate == 1):?>
+				this.settings.last().next('.one-matrix-table').update('');
+				<?php else:?>
+				this.settings.last().next('.one-matrix-table').select('li.body_upper').invoke('remove');
+				<?php endif;?>
+				this.settings.last().next('.one-matrix-table').hide();
+			}
+			return parentMethod(element);
+		}
+	);	
+	
+	Product.Config.prototype.fillSelect  = Product.Config.prototype.fillSelect.wrap(
+		function(parentMethod,element){
+			var attributeId = element.id.replace(/[a-z]*/, '');
+			var html = '', useLast = (element.id==this.settings.last().id), FID = 'matrix_'+element.id;
+			var options = this.getAttributeOptions(attributeId);
+			this.clearSelect(element);
+			element.options[0] = new Option('', '');
+			element.options[0].innerHTML = this.config.chooseText;
+	
+			var prevConfig = false;
+			if(element.prevSetting){
+				prevConfig = element.prevSetting.options[element.prevSetting.selectedIndex];
+			}
+	
+			if(options) {
+				var index = 1;
+				var thtml = t2Img = '';
+				var html = [];
+				for(var hI = 0; hI < 5; hI++) html[hI] = '';
+
+				for(var i=0;i<options.length;i++){
+					var allowedProducts = [];
+					if(prevConfig) {
+						for(var j=0;j<options[i].products.length;j++){
+							if(prevConfig.config.allowedProducts
+								&& prevConfig.config.allowedProducts.indexOf(options[i].products[j])>-1){
+								allowedProducts.push(options[i].products[j]);
+							}
+						}
+					} else {
+						allowedProducts = options[i].products.clone();
+					}
+	
+					if(allowedProducts.size()>0){
+						options[i].allowedProducts = allowedProducts;
+						element.options[index] = new Option(this.getOptionLabel(options[i], options[i].price), options[i].id);
+						if (typeof options[i].price != 'undefined') {
+							element.options[index].setAttribute('price', options[i].price);
+						}
+						if(options[i].allowedProducts.length == 1){
+							<?php if($_mTemplate == 1):?>
+							if(arrSimpleData[parseInt(options[i].allowedProducts[0])]){
+								thtml += '<div class="item"><ul><li>'+<?php if($_isSwatch):?>arrSimpleData[parseInt(options[i].allowedProducts[0])]['<?php echo $_swatch_code;?>']<?php else:?>options[i].label<?php endif;?>;
+								<?php foreach($_newAttribute as $attr):?>
+								thtml += '<input type="hidden" name="product_matrix['+parseInt(options[i].allowedProducts[0])+'][super_attribute][<?php echo $attr['attribute_id'];?>]" value="'+$('attribute<?php echo $attr['attribute_id'];?>').value+'" />';
+								<?php endforeach;?>
+								thtml += '<input type="hidden" name="product_matrix['+parseInt(options[i].allowedProducts[0])+'][super_attribute]['+attributeId+']" value="'+options[i].id+'" />';
+								<?php if($this->isSimple()):?>
+								thtml += '<input type="hidden" name="product_matrix['+parseInt(options[i].allowedProducts[0])+'][customprice]" value="'+arrSimpleData[parseInt(options[i].allowedProducts[0])]['exTaxPrice']+'" />';
+								<?php endif;?>
+								<?php if(Mage::getStoreConfig('cpbu/basic_options/update_fields',Mage::app()->getStore()) != ''):?>
+									thtml += '<input type="hidden" name="product_matrix['+parseInt(options[i].allowedProducts[0])+'][customname]" value="'+arrSimpleData[parseInt(options[i].allowedProducts[0])]['name']+'" /><input type="hidden" name="product_matrix['+parseInt(options[i].allowedProducts[0])+'][customthumb]" value="'+arrSimpleData[parseInt(options[i].allowedProducts[0])]['thumb']+'" />';
+								<?php endif;?>
+								thtml += '</li>';
+								
+								<?php if($_matrixHelper->isOnlyCheckBox($_product)):?>
+                                	thtml += '<li><input id="'+parseInt(options[i].allowedProducts[0])+'" class="input-checkbox qty" type="checkbox" value="1" title="Qty" name="product_matrix[qty]['+parseInt(options[i].allowedProducts[0])+']" onclick="spConfig.calcTotalMatrixCheck();" /></li>';
+                            	<?php else:?>
+                            		<?php /*---------- changelog 29.12.15 ----------*/?>
+									thtml += '<li><input id="'+parseInt(options[i].allowedProducts[0])+'" class="fcpm-validate input-text qty" type="text" value="0" title="Qty" maxlength="12" name="product_matrix[qty]['+parseInt(options[i].allowedProducts[0])+']" onkeyup="spConfig.calcTotalMatrix();" />';
+									<?php /*---------- changelog 29.12.15 ----------*/?>
+									<?php if($_showPrices):?>
+									thtml += '<div><strong><?php echo $this->__('Price: ');?></strong><span id="tier-price-'+parseInt(options[i].allowedProducts[0])+'">'+this.formateAndCalcPrice(options[i].price,arrSimpleData[parseInt(options[i].allowedProducts[0])])+'</span></div>';
+									<?php endif;?>
+									<?php if($_isShowStock == 1):?>
+									thtml += '<div><strong><?php echo $this->__('Stock: ');?></strong>'+arrSimpleData[parseInt(options[i].allowedProducts[0])]['stock']+'</div></li>';
+									<?php endif;?>
+								<?php endif;?>
+								
+								thtml += '<li>&nbsp;</li></ul></div>';
+								
+								if(t2Img == '' && arrSimpleData[parseInt(options[i].allowedProducts[0])]['has_img'] == 1)
+									t2Img = '<div style="cursor:pointer;" onclick="replaceSimpleMediaImages(\''+parseInt(options[i].allowedProducts[0])+'\');">'+arrSimpleData[parseInt(options[i].allowedProducts[0])]['image']+'</div>';
+								
+							}
+							<?php else:?>
+							if(arrSimpleData[parseInt(options[i].allowedProducts[0])]){
+								<?php if($this->_showImage == 1):?>
+								html[0] += '<li class="body_upper"><div style="cursor:pointer;" onclick="replaceSimpleMediaImages(\''+parseInt(options[i].allowedProducts[0])+'\');">'+arrSimpleData[parseInt(options[i].allowedProducts[0])]['image']+'</div></li>';
+								<?php endif;?>
+								<?php if($_isSwatch):?>
+								html[1] += '<li class="body_upper">'+arrSimpleData[parseInt(options[i].allowedProducts[0])]['<?php echo $_swatch_code;?>'];
+								<?php else:?>
+								html[1] += '<li class="body_upper"><strong>'+options[i].label+'</strong>';
+								<?php endif;?>
+								<?php foreach($_newAttribute as $attr):?>
+								html[1] += '<input type="hidden" name="product_matrix['+parseInt(options[i].allowedProducts[0])+'][super_attribute][<?php echo $attr['attribute_id'];?>]" value="'+$('attribute<?php echo $attr['attribute_id'];?>').value+'" />';
+								<?php endforeach;?>
+								html[1] += '<input type="hidden" name="product_matrix['+parseInt(options[i].allowedProducts[0])+'][super_attribute]['+attributeId+']" value="'+options[i].id+'" />';
+								<?php if($this->isSimple()):?>
+								html[1] += '<input type="hidden" name="product_matrix['+parseInt(options[i].allowedProducts[0])+'][customprice]" value="'+arrSimpleData[parseInt(options[i].allowedProducts[0])]['exTaxPrice']+'" />';
+								<?php endif;?>
+								<?php if(Mage::getStoreConfig('cpbu/basic_options/update_fields',Mage::app()->getStore()) != ''):?>
+									html[1] += '<input type="hidden" name="product_matrix['+parseInt(options[i].allowedProducts[0])+'][customname]" value="'+arrSimpleData[parseInt(options[i].allowedProducts[0])]['name']+'" /><input type="hidden" name="product_matrix['+parseInt(options[i].allowedProducts[0])+'][customthumb]" value="'+arrSimpleData[parseInt(options[i].allowedProducts[0])]['thumb']+'" />';
+								<?php endif;?>
+								html[1] += '</li>';
+								<?php if($_showPrices):?>
+								html[2] += '<li class="body_upper"><div id="tier-price-'+parseInt(options[i].allowedProducts[0])+'">'+this.formateAndCalcPrice(options[i].price,arrSimpleData[parseInt(options[i].allowedProducts[0])])+'</div></li>';
+								<?php endif;?>
+								<?php if($_isShowStock == 1):?>
+								html[3] += '<li class="body_upper">'+arrSimpleData[parseInt(options[i].allowedProducts[0])]['stock']+'</li>';
+								<?php endif;?>
+								
+								<?php if($_matrixHelper->isOnlyCheckBox($_product)):?>
+                                	html[4] += '<li class="body_upper"><input id="'+parseInt(options[i].allowedProducts[0])+'" class="input-checkbox qty" type="checkbox" value="1" title="Qty" name="product_matrix[qty]['+parseInt(options[i].allowedProducts[0])+']" onclick="spConfig.calcTotalMatrixCheck();" /></li>';
+                            	<?php else:?>
+                            		<?php /*---------- changelog 29.12.15 ----------*/?>
+									html[4] += '<li class="body_upper"><input id="'+parseInt(options[i].allowedProducts[0])+'" class="fcpm-validate input-text qty" type="text" value="0" title="Qty" maxlength="12" name="product_matrix[qty]['+parseInt(options[i].allowedProducts[0])+']" onkeyup="spConfig.calcTotalMatrix();" /></li>';
+									<?php /*---------- changelog 29.12.15 ----------*/?>
+								<?php endif;?>
+							}
+							<?php endif;?>
+						}
+						element.options[index].config = options[i];
+						index++;
+					}
+				}
+				if(useLast){
+					<?php if($_mTemplate == 1):?>
+						var tempHtml = thtml;
+						if(showOptionTbl == 0) showOptionTbl = options.length<?php if($_showTotalColumn):?>+1<?php endif;?>;
+						//this.settings.last().up('dd').previous('dt').down('label').innerHTML;
+						thtml = '<div id="product-matrix-std">';
+
+						thtml += '<div id="product-matrix-fixedleft"><ul><li><img width="20" src="<?php echo $this->getJsUrl('fcpm/table_prev.png');?>" alt="<?php echo $this->__('Previous');?>" id="tLeft"/></li><li><?php if($this->_showImage == 1):?>'+t2Img+'<?php endif;?></li><li>&nbsp;</li></div>';
+
+						thtml += '<div id="product-matrix" class="product-matrix">'+tempHtml+'<div class="item"><ul><li><?php echo $this->__('Qty');?></li><li><div id="oneMatrixQty">0</div></li><li>&nbsp;</li></ul></div></div>';
+
+						thtml += '<div id="product-matrix-fixedright"><ul><li><img width="20" src="<?php echo $this->getJsUrl('fcpm/table_next.png');?>" alt="<?php echo $this->__('Next');?>" id="tRight"/></li>'+
+						<?php if($_showTotle == 1):?>
+							'<li><div id="oneMatrixTotal">'+this.formatPrice(0)+'</div></li>'+
+						<?php endif;?>
+						'<li>&nbsp;</li></div>';
+						
+						$(FID).update(thtml);
+						initMyUlSlider(true);
+					<?php else:?>
+						$(FID).select('li.body_upper').invoke('remove');
+						$(FID).select('li.body').each(function(eachUl){
+							var uldex = parseInt(eachUl.id.replace('libody_',''));
+							eachUl.insert({before : html[uldex]});
+						});
+						if($('product-matrix').empty()){
+							setUpMyUlSlider(30);
+							setTimeout(function(){
+					        	jQuery('#product-matrix-std').height(jQuery('#product-matrix-fixedright').outerHeight());
+					        	jQuery('#product-matrix-std').width(2*leftRightFixedOwl);
+					        }, 100);
+					        jQuery('#product-matrix-fixedleft li.first').html(this.settings.last().up('dd').previous('dt').down('label').innerHTML);
+					        jQuery('#product-matrix-fixedright li.first').html('<?php echo $this->__('Quantity')?>');
+						} else {
+							initMyUlSlider();
+						}
+					<?php endif;?>
+					$(FID).show();
+				}
+			}
+		}
+	)
+	
+	Product.Config.addMethods({
+		formateAndCalcPrice: function(price,simplePrd){
+			<?php if($this->isSimple() == true):?>
+			var price = parseFloat(simplePrd['price']);
+			<?php else:?>
+			var orgPrice = parseFloat('<?php echo Mage::helper('tax')->getPrice($_product,$_product->getFinalPrice());?>');
+			var price = parseFloat(price);
+			if (this.taxConfig.includeTax) {
+				var tax = price / (100 + this.taxConfig.defaultTax) * this.taxConfig.defaultTax;
+				var excl = price - tax;
+				var incl = excl*(1+(this.taxConfig.currentTax/100));
+			} else {
+				var tax = price * (this.taxConfig.currentTax / 100);
+				var excl = price;
+				var incl = excl + tax;
+			}
+
+			if (this.taxConfig.showIncludeTax || this.taxConfig.showBothPrices) {
+				price = incl;
+			} else {
+				price = excl;
+			}
+			price += orgPrice;
+			<?php endif;?>
+			return this.formatPrice(price);
+		},
+		
+		calcTotalMatrix: function(){
+			var MQTY = MTTL = 0;
+			var thisObj = this;
+			$$('.one-matrix-table input.qty').each(function(item){
+				var pid  = item.id, itemValue = (1*item.value);
+				<?php if($_isCptp):?>
+				var mttl = (thisObj.returnPriceOrTier(pid,arrSimpleData[pid],itemValue));
+				if(itemValue != 0) MTTL += mttl;
+				<?php else:?>
+				if(itemValue == 0) return true;
+				MTTL += (thisObj.returnPriceOrTier(pid,arrSimpleData[pid],itemValue));
+				<?php endif;?>
+
+				if(/[^\d]/.test(itemValue)) {
+					var message = '<div class="validation-advice">Enter numbers only.</div>';
+					jQuery(item).addClass('validation-failed');
+					if(!jQuery(item).next('.validation-advice:visible').size() > 0) {
+						jQuery(item).after(message).fadeIn(600);
+					}
+					jQuery('#allBtnCart').attr('disabled','disabled');
+				} else {
+					MQTY += itemValue;
+					jQuery(item).removeClass('validation-failed');
+					jQuery(item).next('.validation-advice').replaceWith('').fadeOut(600);
+					if(!jQuery('.fcpm-validate.qty').hasClass('validation-failed')) {
+						jQuery('#allBtnCart').removeAttr('disabled');
+					}
+				}
+
+			});
+
+			$('oneMatrixQty').update(MQTY);
+			if($('oneMatrixTotal')) $('oneMatrixTotal').update(this.formatPrice(MTTL));
+		},
+		
+		calcTotalMatrixCheck: function(){
+			var MQTY = MTTL = 0;
+			var thisObj = this;
+			$$('.one-matrix-table input.qty').each(function(item){
+				var pid  = item.id, itemValue = (1*item.value);
+				<?php if($_isCptp):?>
+				var mttl = (thisObj.returnPriceOrTier(pid,arrSimpleData[pid],itemValue));
+				if(item.checked) {
+					MTTL += mttl;
+					MQTY += itemValue;
+				}
+				<?php else:?>
+				if(!item.checked) return true;
+				MTTL += (thisObj.returnPriceOrTier(pid,arrSimpleData[pid],itemValue));
+				MQTY += itemValue;
+				<?php endif;?>
+			});
+			$('oneMatrixQty').update(MQTY);
+			if($('oneMatrixTotal')) $('oneMatrixTotal').update(this.formatPrice(MTTL));
+		},
+		
+		returnPriceOrTier: function(pid, product, qty){
+            var unitPriceTier = product.price, currentPriceTier;
+            var tierPriceMatrix = product.tier;
+            var tirQty = product.tier_qty, formatedQty = qty;
+			<?php if($_isCptp):?>
+			formatedQty = calcTotalQtyOneMatrix();
+			<?php endif;?>
+            
+            if(product.tier_qty.length > 0){
+                tirQty = tirQty.sort(function(a, b){return b-a});
+                for(var i=0;i<tirQty.length;i++)
+                {
+                    if(formatedQty >= tirQty[i]){
+                        unitPriceTier = tierPriceMatrix[tirQty[i]];
+                        currentPriceTier = unitPriceTier*qty;
+                        break;	
+                    }
+                }
+            }
+            currentPriceTier = unitPriceTier*qty;
+            if($('tier-price-'+pid)) $('tier-price-'+pid).update(optionsPrice.formatPrice(unitPriceTier));
+            return currentPriceTier;
+        }
+	});
+
+	calcTotalQtyOneMatrix = function(){
+		var ttlQ = 0;
+		$$('.one-matrix-table .qty').each(function(item){
+			if(item.type == 'checkbox') {
+				if(item.checked) ttlQ += (1*item.value);
+			} else {
+				ttlQ += (1*item.value);
+			}
+		});
+		return ttlQ;
+	}
+	
+	replaceSimpleMediaImages = function(direction){
+		var pid = direction.split('_');
+		pid = pid[0];
+		if(arrSimpleData[pid]){
+			if(arrSimpleData[pid]['has_img'] == 1 && arrSimpleData[pid]['media']){
+				$$('.product-img-box')[0].update(arrSimpleData[pid]['media']);
+				setTimeout(function() { 
+				<?php if(version_compare(Mage::getVersion(), '1.9.0.1', '<')===true):?>
+					product_zoom = new Product.Zoom('image', 'track', 'handle', 'zoom_in', 'zoom_out', 'track_hint');
+				<?php else:?>
+					ProductMediaManager.init();
+				<?php endif;?>
+				}, 1000);
+			}
+		}
+	}
+	
+	<?php if($_isLinked):?>	
+    matrixBlockUI = function() {
+            //owl.data('owlCarousel').reinit();
+            jQuery.magnificPopup.open({
+            	items: {
+            		src: jQuery('#product-options-wrapper > .both-dl'),
+            		type: 'inline',
+            		alignTop: true
+            	}
+            });
+            var popUpMinWidth = jQuery(window).width()/2;
+            popUpMinWidth = (popUpMinWidth < 480) ? 480 : popUpMinWidth;
+
+            jQuery('.mfp-content > .both-dl')
+				.wrap('<div id="product-options-wrapper-popup" class="product-options" style="max-width:'+popUpMinWidth+'px"></div>')
+				.before('<h2><?php echo $this->__('Order Multiple') ?></h2>')
+				.after('<br/><button id="allBtnCart" class="button btn-cart right" title="<?php echo $this->__('Add to Cart');?>" type="button"><span><span><?php echo $this->__('Add to Cart');?></span></span></button><div class="clearer"></div>');
+				
+    		jQuery('#allBtnCart').click( function() {
+				jQuery.magnificPopup.close();
+				setTimeout(function() { 
+					var objCart = jQuery('.add-to-cart .btn-cart');
+					productAddToCartForm.submit(objCart[0]);
+				},500);			
+			});
+        }
+	<?php endif;?>
+	
+</script>
+<style type="text/css">
+.validation-advice {
+  background: #fff none repeat scroll 0 0;
+  box-shadow: 0 0 2px 2px #ccc;
+  font-size: 10px;
+  margin: auto;
+  max-width: 92%;
+  position: relative;
+}
+</style>
+<?php endif;?>

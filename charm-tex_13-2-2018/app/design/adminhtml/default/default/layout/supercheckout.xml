@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<layout>
+    <supercheckout_adminhtml_supercheckout_index>
+        <update handle="supercheckout_supercheckout_index"/>
+        <reference name="head">
+            <action method="addCss">
+                <name>supercheckout/supercheckout-reset.css</name>
+            </action>
+            
+            <action method="addCss">
+                <name>supercheckout/bootstrap/bootstrap.css</name>
+            </action> 
+            <action method="addCss">
+                <name>supercheckout/theme/fonts/glyphicons/css/glyphicons_regular.css</name>
+            </action>            
+            <action method="addCss">
+                <name>supercheckout/theme/fonts/font-awesome/css/font-awesome.min.css</name>
+            </action>            
+            <action method="addCss">
+                <name>supercheckout/custom.css</name>
+            </action>
+            <action method="addCss">
+                <name>supercheckout/chosen.css</name>
+            </action>            
+            <action method="addCss">
+                <name>supercheckout/angular-toggle-switch.css</name>
+            </action>
+            <action method="addCss">
+                <name>supercheckout/slider.css</name>
+            </action>
+            <action method="addCss">
+                <name>supercheckout/new.css</name>
+            </action>
+            <action method="addCss">
+                <name>supercheckout/angular-ui-tree.min.css</name>
+            </action>
+
+            <action method="addJs">
+                <name>supercheckout/chosen.proto.js</name>
+            </action>
+            <action method="addJs">
+                <name>supercheckout/tooltip.js</name>
+            </action>
+                      
+            <action method="addJs">
+                <name>supercheckout/event.simulate.js</name>
+            </action>
+            <action method="addJs">
+                <name>supercheckout/angular.min.js</name>
+            </action>
+            <action method="addJs">
+                <name>supercheckout/angular-route.min.js</name>
+            </action>
+            <action method="addJs">
+                <name>supercheckout/angular-resource.min.js</name>
+            </action>
+            <action method="addJs">
+                <name>supercheckout/angular-cookies.min.js</name>
+            </action>
+            <action method="addJs">
+                <name>supercheckout/slider_current.js</name>
+            </action>
+            <action method="addJs">
+                <name>supercheckout/angular-ui-tree.min.js</name>
+            </action>
+<!--            <action method="addJs">
+                <name>supercheckout/drag_new/sample4.js</name>
+            </action>-->
+            <action method="addJs">
+                <name>supercheckout/ui-bootstrap-tpls-0.10.0.js</name>
+            </action>
+            <action method="addJs">
+                <name>supercheckout/jquery-2.1.1.min.js</name>
+            </action>
+            <action method="addCss">
+                <name>supercheckout/supercheckout-admin.css</name>
+            </action>
+            
+
+        </reference>
+        <reference name="content">
+            <block type="supercheckout/adminhtml_supercheckout" name="supercheckout" template="supercheckout/supercheckout_admin.phtml"/>
+        </reference>
+        
+    </supercheckout_adminhtml_supercheckout_index>
+    
+</layout>

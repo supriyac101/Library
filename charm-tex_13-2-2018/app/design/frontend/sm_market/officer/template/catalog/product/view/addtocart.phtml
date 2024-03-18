@@ -1,0 +1,63 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magento.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magento.com for more information.
+ *
+ * @category    design
+ * @package     rwd_default
+ * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+?>
+<?php $_product = $this->getProduct(); ?>
+<?php $buttonTitle = $this->__('Add to Cart'); ?>
+<?php if($_product->isSaleable()): ?>
+    <div class="add-to-cart">
+        <div class="qty-grid clearfix">
+            <?php if(!$_product->isGrouped()): ?>
+            <div class="qty-wrapper">
+                <label for="qty"><?php echo $this->__('Quantity ') ?></label>
+                <div class="qty-input">
+                    <input type="text" name="qty" id="qty" maxlength="12" value="1 <?php //echo $this->getProductDefaultQty() * 1 ?>" title="<?php echo $this->__('Qty') ?>" class="input-text qty" />
+                    <span class="qty-plus">+</span>
+                    <span class="qty-minus">-</span>
+                </div>
+            </div>
+            <?php endif; ?>
+            <?php /* ?>
+            <div class="view-order-grid">
+                
+                    <?php if ($_product->isSaleable() && $this->hasOptions()):?>
+                        <div class="gridview-btn clearfix">
+                            <p>Buying multiple sizes or colors? Use our order grid</p>
+                            <a class="ordergrid" href="javascript:void(0);">View order grid</a>
+                        </div>
+                    <?php endif;?>
+            </div>
+            <?php */ ?>
+        </div>
+        
+        <div class="add-to-cart-buttons">
+            <button type="button" title="<?php echo $buttonTitle ?>" class="button btn-cart" onclick="productAddToCartForm.submit(this)"><span><span><?php echo $buttonTitle ?></span></span></button>
+            <?php echo $this->getChildHtml('', true, true) ?>
+        </div>
+        <div class="brand-icon">
+            <?php echo $this->getLayout()->createBlock('manufacturer/manufacturer')->setProduct($_product)->setTemplate('manufacturer/product_manufacturer.phtml')->toHtml(); ?>
+        </div>
+    </div>
+<?php endif; ?>

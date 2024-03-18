@@ -1,0 +1,4 @@
+<?php
+class Extendware_EWPRibbon_Block_Adminhtml_Image_Edit_Tab_General_Element_Image extends Extendware_EWPRibbon_Block_Adminhtml_Ribbon_Edit_Tab_Category_Element_Image {
+	
+}

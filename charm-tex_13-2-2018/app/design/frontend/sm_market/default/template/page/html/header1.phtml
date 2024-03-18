@@ -1,0 +1,292 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category    design
+ * @package     base_default
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+global $var_yttheme;
+?>
+
+<div class="yt-header-top">
+    <div class="container">
+        <div class="row">
+            <?php /*?><div class="language-currency col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            	<div class="inner">
+                <?php echo $this->getChildHtml('store_language') ?>
+                <?php echo $this->getChildHtml('currency'); ?>                    
+                </div>
+            </div><?php */?>
+            <div class="head-quicklink col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            <ul>
+            	<li><a href="<?php echo Mage::getBaseUrl();?>">Home</a></li>
+                <li><a href="<?php echo Mage::getBaseUrl();?>about-us/">About</a></li>
+                <li><a href="<?php echo Mage::getBaseUrl();?>contact/">Contact</a></li>
+                
+                <li><a href="<?php echo Mage::helper('checkout/url')->getCheckoutUrl(); ?>">Checkout</a></li>
+                <?php $myStatus = Mage::getSingleton('customer/session')->isLoggedIn() ?>
+                <?php if($myStatus): ?>
+                <li> <a href="<?php echo Mage::helper('customer')->getLogoutUrl(); ?>" title="Customer Logout">Logout</a></li>
+               
+                <?php else: ?>
+                <li><a href="<?php echo Mage::getBaseUrl();?>/customer/account/create/">Create  Account</a></li>
+               <li> <a href="<?php echo Mage::helper('customer')->getLoginUrl(); ?>" title="Customer Login">Login</a></li>
+                <?php endif ?>
+            </ul>
+            <?php if(!$myStatus){?>
+            <div class="loginarea">
+<!--<input type="text" class="loginfild" />
+<input type="text" class="loginfild" />
+<input type="button" value="Login" class="loginbtn" />-->
+
+
+<form action="<?php echo $this->getUrl('customer/account/loginPost') ?>" method="post">
+		<?php echo $this->getBlockHtml('formkey'); ?>
+		<div class="block-content">
+			<input type="text" name="login[username]" id="mini-login" class="loginfild" />
+			<input type="password" name="login[password]" id="mini-password" class="loginfild" />
+			
+				<button type="submit" class="loginbtn"><?php echo $this->__('Login') ?></button>
+			
+		</div>
+	</form>
+
+
+
+
+
+</div>
+<?php }
+else
+{ ?>
+<div class="loginarea">
+	<p class="welcometo"><?php echo $this->getLayout()->getBlock('header')->getWelcome() ?></p>
+</div>
+<?php } ?>
+            	
+                <?php /*?> |
+                <a href="<?php echo $this->getUrl('wishlist') ?>">Wishlist</a>|
+                <a href="<?php echo Mage::helper('checkout/cart')->getCartUrl(); ?>">My Cart</a>|
+                |<?php */?>
+                 
+                	<div class="inner">
+                <?php //echo $this->getChildHtml('topLinks');?>           
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="yt-header-middle">
+	<div class="container">
+        <div class="row">
+        <div class="logo col-lg-3 col-md-3 col-sm-12 col-xs-12">
+        
+            <a href="<?php echo $this->getUrl('') ?>" title="<?php echo $this->getLogoAlt() ?>" class="logo"><img src="<?php echo $this->getLogoSrc() ?>" alt="<?php echo $this->getLogoAlt() ?>" />
+            </a>
+        </div>
+        <div class="header-middle-right col-lg-9 col-md-9 col-sm-12 col-xs-12">
+            <div class="number">
+ <?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('headercontact')->toHtml(); ?>
+                
+            </div>
+
+			<?php if ($this->getChildHtml('searchbox')) { ?>
+                <div class="head-searchbox">
+                    <?php echo $this->getChildHtml('searchbox') ?>
+                </div>        
+            <?php } ?>    
+            <div class="head-cart">
+                <?php echo $this->getChildHtml('mini-cartpro') ?>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+<div class="mega-horizontal-wrap">
+    <div class="container">
+        <div class="row">
+            <div class="mega-horizontal-left col-lg-3 col-md-3 col-sm-2 col-xs-12">
+            </div>
+            <div class="mega-horizontal-right col-lg-9 col-md-9 col-sm-10 col-xs-12">
+                <?php 
+				$top_menu=$this->getChildHtml('megamenu-horizontal');
+				if($myStatus)
+				{
+				 $top_menu=str_replace("create account","My Account",$top_menu);
+				 $top_menu=str_replace("customer/account/create/","customer/account/",$top_menu);
+				}
+				
+				echo $top_menu;
+				?>
+            </div>
+        </div>
+    </div>
+</div>
+<?php 
+if( Mage::getSingleton('cms/page')->getIdentifier() == 'home'  && 
+                Mage::app()->getFrontController()->getRequest()->getRouteName() == 'cms' ) { /* if is home page*/
+?>
+<div class="yt-header-bottom">
+<div class="container">
+<div class="row">
+    <div id="yt_header_left" class="col-lg-3 col-md-3 col-sm-0 col-xs-12">
+        <div id="yt-responsivemenu" class="yt-responsivemenu">
+            <?php echo $this->getChildHtml('mobiMenu'); ?>
+        </div>
+        <div class="yt-menu">
+            <div id="btn_categories">
+                <span><i class="icon-cate"></i><?php echo $this->__("Categories"); ?></span>
+            </div>
+            <div class="yt-menu-content">
+            <?php if( $var_yttheme->getParam('menustyle') == 'mega' ){
+                echo $this->getChildHtml('megamenu-vertical');
+            } else {
+                echo $this->getChildHtml('topMenu');
+            } ?>
+            </div>
+        </div>
+        
+    </div>
+ 
+    <div id="yt_header_right" class="col-main col-lg-9 col-md-9 col-sm-12 col-xs-12">   
+     
+    	<?php /*?><div id="custom_popular_search"></div><?php */?>
+        <div class="inner">   
+        <?php 
+		echo $this->getLayout()->createBlock('imageslider/imageslider')->setTemplate('imageslider/imageslider.phtml')->toHtml();
+		    
+    //  echo $this->getLayout()->createBlock('cms/block')->setBlockId('home_page_bassi_slider')->toHtml();
+	 ?>
+        
+          
+    
+             
+            
+        <?php /*?>    <?php if($this->getLayout()->createBlock('cms/block')->setBlockId('banner-header-right')->toHtml()) { ?>
+            <!-- <div class="banner-home-right-wrap"> -->
+                <?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('banner-header-right')->toHtml(); ?>
+            <!-- </div> -->
+            <?php } ?>
+            <?php if($this->getLayout()->createBlock('cms/block')->setBlockId('block-policy')->toHtml()) { ?>
+         
+                <?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('block-policy')->toHtml(); ?>
+        
+            <?php } ?><?php */?>
+            
+       
+<?php } 
+else {
+?>
+<div class="yt-header-bottom">
+<div class="container">
+<div class="row">
+    <div id="yt_header_left" class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+        <div id="yt-responsivemenu" class="yt-responsivemenu">
+            <?php echo $this->getChildHtml('mobiMenu'); ?>
+        </div>
+        <div id="yt_menu_short">
+            <div id="btn_categories">
+                <span><i class="icon-cate"></i><?php echo $this->__("Categories"); ?></span>
+            </div>
+            <div class="yt-menu-content">
+            <?php if( $var_yttheme->getParam('menustyle') == 'mega' ){
+                echo $this->getChildHtml('megamenu-vertical');
+
+            } else {
+                echo $this->getChildHtml('topMenu');
+            } ?>
+            </div>
+        </div>        
+    </div>  
+</div>
+</div>
+</div>        
+<?php } ?>
+<script type="text/javascript">
+	jQuery(document).ready(function($){
+        //menu more cate
+		$i = 0;
+		$('.sm_megamenu_wrapper_vertical_menu .sm_megamenu_menu').append('<div class="more-wrap"><span class="more-view"><?php echo $this->__("More Categories"); ?></span></div>');
+		$('.sm_megamenu_wrapper_vertical_menu .sm_megamenu_menu > li.sm_megamenu_lv1').each(function(){
+			$i ++; 
+			if($i>45){ 
+				$(this).css('display', 'none');
+			}			
+		});
+
+		$('.sm_megamenu_wrapper_vertical_menu .sm_megamenu_menu .more-wrap > .more-view').click(function(){
+			if($(this).hasClass('open')){
+				$i=0;
+				$('.sm_megamenu_wrapper_vertical_menu .sm_megamenu_menu > li.sm_megamenu_lv1').each(function(){
+					$i ++;
+					if($i>45){
+						$(this).slideUp(200);
+                        //$(this).addClass('disappear');
+                        //$(this).removeClass('appear');
+					}
+				});
+				$(this).removeClass('open');
+				$('.more-wrap').removeClass('active-i');
+				$(this).text('More Categories');
+			}else{
+				$i=0;
+				$('.sm_megamenu_wrapper_vertical_menu .sm_megamenu_menu > li.sm_megamenu_lv1').each(function(){
+					$i ++;
+					if($i>45){
+						$(this).slideDown(200);
+                        // $(this).addClass('appear');
+                         //$(this).removeClass('disappear');
+					}
+				});
+				$(this).addClass('open');
+				$('.more-wrap').addClass('active-i');
+				$(this).text('Close Menu');
+			}
+		});
+
+        // style for quicklink
+        $("#yt_header .head-quicklink .links li").mouseenter(function(){
+            $("#yt_header .head-quicklink .links li.first").addClass('inactive');
+        });
+        $("#yt_header .head-quicklink .links li").mouseleave(function(){
+            $("#yt_header .head-quicklink .links li.first").removeClass('inactive');
+        });
+        $("#yt_header .head-quicklink .links li.first").mouseenter(function(){
+            $("#yt_header .head-quicklink .links li.first").removeClass('inactive');
+        });
+		
+		/*fix show button more*/
+		
+		var n = $('.sm_megamenu_wrapper_vertical_menu .sm_megamenu_menu > li.sm_megamenu_lv1').length;
+
+		if(n < 45){
+			$('.sm_megamenu_wrapper_vertical_menu .more-wrap').css('display', 'none');
+		} else{
+			$('.sm_megamenu_wrapper_vertical_menu .more-wrap').css('display', 'block');
+		}
+	})
+</script>
+
+
+
+
+
+

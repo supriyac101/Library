@@ -1,0 +1,66 @@
+<div class="my-account">
+    <div class="page-title">
+    <h1>Recently Purchased Items</h1>
+    </div>
+    <table class="recent-buy">
+        <thead>
+            <tr class="first">
+                <th class="recent-image">IMAGE</th>
+                <th class="recent-name">NAME</th>
+                <th class="recent-qunty">QUANTITY</th>
+            </tr>
+        </thead>
+        <tbody>
+         <?php
+    $orders = Mage::getResourceModel('sales/order_collection')
+    ->addFieldToSelect('*')
+    ->addFieldToFilter('customer_id', Mage::getSingleton('customer/session')->getCustomer()->getId());
+    //->addFieldToFilter('status', 'complete');
+    
+    
+    $this->setOrders($orders);
+    foreach ($orders as $order)
+        {
+            $order_id=$order->getRealOrderId();
+            $order = Mage::getModel('sales/order')->load($order_id, 'increment_id');
+            $order->getAllVisibleItems();
+            $orderItems = $order->getItemsCollection()
+            ->addAttributeToSelect('*')
+            ->load();
+            //echo "Order Total:".$order->getSubtotal();
+            ?>
+            
+                <?php
+                foreach($orderItems as $Items)
+                { ?>
+                          
+                            <tr class="recent-details">
+                               
+                                    <?php $Item = Mage::getModel('catalog/product')->setStoreId($Items->getStoreId())->load($Items->getProductId());?>
+                                     <td>
+                                    <a href="<?php echo $Item->getProductUrl(); ?>"><img src="<?php echo $Item->getImageUrl(); ?>" /></a></td>
+                         <td>
+                        <a href="<?php echo $Item->getProductUrl(); ?>"><?php echo $Item->getName(); ?></a> </td>
+                         <td>
+                        <?php echo '<span class="buy-qnty">'. number_format($Items->getQtyOrdered(), '0').'</span>';?>
+                         </td>
+                                
+                            </tr>     
+                        
+                       
+                    
+                    <?php
+                    
+                }
+                ?>
+         
+            
+            <?php
+        }
+    ?>   
+        
+      </tbody>  
+        
+    </table>
+    
+</div>

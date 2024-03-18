@@ -1,0 +1,7 @@
+"On place order","On place order"
+"On ship order","On ship order"
+"On pay order", "On pay order"
+"Email with discount code '%s' has been sent.","Email with discount code '%s' has been sent."
+"Email with discount code '%s' has been sent to %s.","Email with discount code '%s' has been sent to %s."
+"Discount code was successfully sent to customer with email: %s'","Discount code was successfully sent to customer with email: %s'"
+"Problem occured while sending Discount For Order.","Problem occured while sending Discount For Order."
