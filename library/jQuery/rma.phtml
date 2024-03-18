@@ -1,0 +1,381 @@
+<div class="rma-form-container">
+    <h1>RMA</h1>
+    <h2>Bienvenidos al servicio Post Venta</h2>
+    <h5>Esta sección sirve para que nos contacte en caso que alguno de los productos presente las siguientes fallas:</h5>
+    <div class="section section-1">
+        <ul>
+            <li>
+                <img src="<?php echo $this->getSkinUrl('images/icono-no-corresponde.png');?>" alt="" />
+                <p>Producto no corresponde al comprado</p>
+            </li>
+            <li>
+                <img src="<?php echo $this->getSkinUrl('images/icono-defectuoso.png');?>" alt="" />
+                <p>Producto defectuoso (dañado, quebrado, roto ó abollado)</p>
+            </li>
+            <li>
+                <img src="<?php echo $this->getSkinUrl('images/icono-faltante.png');?>" alt="" />
+                <p>Producto faltante</p>
+            </li>
+            
+            <li>
+                <img src="<?php echo $this->getSkinUrl('images/icono-no-funciona.png');?>" alt="" />
+                <p>Producto no funciona</p>
+            </li>
+            <li>
+                <img src="<?php echo $this->getSkinUrl('images/icono-despacho.png');?>" alt="" />
+                <p>Estado de despacho</p>
+            </li>
+            <li>
+                <img src="<?php echo $this->getSkinUrl('images/nota-credito-03.png');?>" alt="" />
+                <p>Solicitud nota de crédito</p>
+            </li>
+        </ul>
+        <p>Favor completar el siguiente formulario para proceder con la gestión correspondiente de acuerdo a su necesidad.</p>
+        <p>Cada solicitud generará un número de RMA que será su comprobante para consultar el estado de su requerimiento. La respuesta a su solicitud será enviada vía correo electrónico.</p>
+        
+        <a class="btn-more-info">Ver más información</a>
+        
+        <div class="more-info-box">
+            <ul>
+                <li>
+                    <img src="<?php echo $this->getSkinUrl('images/icon-internet.png');?>" alt="" />
+                    <div class="txt-cont"><p><strong>1.</strong> El servicio de Post Venta funciona exclusivamente a través del Sitio Web, por favor no insistir vía teléfono o correo electrónico sin un número RMA. Este sistema está hecho para atender todos los requerimientos de Post Venta y dar solución de forma eficaz.</p></div>
+                </li>
+                <li>
+                    <img src="<?php echo $this->getSkinUrl('images/icon-form.png');?>" alt="" />
+                    <div class="txt-cont"><p><strong>2.</strong> Es necesario que complete todos los campos obligatorios del formulario. Si un campo se encuentra vacío, no se generará un número RMA y por ende, su solicitud no será gestionada.</p></div>
+                </li>
+                <li>
+                    <img src="<?php echo $this->getSkinUrl('images/icon-message.png');?>" alt="" />
+                    <div class="txt-cont">
+                        <p><strong>3.</strong> En caso de tener duda con uno o más campos del RMA, se debe comunicar al número de mesa central +56 2 3224 3220 o enviando un correo electrónico a <a href="mailto:atencionalcliente@comercialagustin.cl">atencionalcliente@comercialagustin.cl</a>.</p>
+                        <p>Horario de atención de lunes a viernes de 9:00 a 18:30 hrs.</p>
+                    </div>
+                </li>
+                <li>
+                    <img src="<?php echo $this->getSkinUrl('images/icon-message.png');?>" alt="" />
+                    <div class="txt-cont">
+                        <p><strong>4.</strong> El número de RMA será enviado automáticamente a su correo electrónico luego de completar el formulario.</p>
+                        <p>Nos contactaremos con usted en un plazo máximo de 72 horas para dar respuesta a su requerimiento. En caso que se haya cumplido el plazo y no haya recibido una información, puede contactar directamente a algún ejecutivo llamando al +56 2 3224 3220 y consultando por su número de RMA.</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        
+    </div>
+    
+    <!--<form action="http://mage.ecomsoft.co.in/comercialagustin/rmaform/index/post/" method="post" name="rma-form1">
+        <input type="text" name="test" id="test" />
+    </form>-->
+    <form action="<?php echo $this->getUrl()."rmaform/index/post/";?>" method="post" enctype="multipart/form-data" name="rma-form" id="rmaForm"> 
+        <div class="section section-2">
+            <h2>PASO 1</h2>
+            <p>Formulario de solicitud</p>
+            <div id="error"></div>
+            <div class="inner-blue-box">
+                <h2>Datos de contacto</h2>
+                <ul>
+                    <li>
+                        <label>RUT EMPRESA</label>
+                        <input type="text" name="company" id="" />
+                    </li>
+                    <li>
+                        <label>RAZÓN SOCIAL</label>
+                        <input type="text" name="business_name" id="" />
+                    </li>
+                    <li>
+                        <label>DIRECCIÓN DE FACTURACIÓN</label>
+                        <input type="text" name="billing_address" id="" />
+                    </li>
+                    <li>
+                        <label>DIRECCIÓN DE DESPACHO</label>
+                        <input type="text" name="dispatch_address" id="" />
+                    </li>
+                    <li>
+                        <label>CIUDAD</label>
+                        <input type="text" name="city" id="" />
+                    </li>
+                    <li>
+                        <label>E-MAIL</label>
+                        <input type="text" name="email" id="" />
+                    </li>
+                    <li>
+                        <label>NOMBRE Y APELLIDO</label>
+                        <input type="text" name="name" id="" />
+                    </li>
+                    <li>
+                        <label>Nº ORDEN DE COMPRA</label>
+                        <input type="text" name="purchase_order" id="" />
+                    </li>
+                    <li>
+                        <label>TELÉFONO DE CONTACTO</label>
+                        <input type="text" name="telephone" id="" />
+                    </li>
+                </ul>
+            </div>
+        </div>
+    
+        <div class="section section-3">
+            <h2>PASO 2</h2>
+            <p>Listado de productos</p>
+            <div class="rma-table-container">
+                <table class="rma-table" id="rma-data-table">
+                    <thead>
+                        <tr>
+                            <th>ITEM</th>
+                            <th>ID (CÓDIGO)</th>
+                            <th>Nº FACTURA/Nº GUÍA</th>
+                            <th>NOMBRE DEL PRODUCTO</th>
+                            <th>CANTIDAD</th>
+                            <th>TIPO DE FALLA</th>
+                            <th>IMAGEN</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="slno">01</td>
+                            <td><input type="text" name="itemid[]" id="" /></td>
+                            <td><input type="text" name="invoice[]" id="" /></td>
+                            <td><input type="text" name="product_name[]" id="" /></td>
+                            <td><input type="text" name="quantity[]" id="" /></td>
+                            <td>
+                                <select name="type_of_fault[]" id="">
+                                    <option>----</option>
+                                    <option value="fault-1">fault 1</option>
+                                    <option value="fault-2">fault 2</option>
+                                    <option value="fault-3">fault 3</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="file" name="image[]" id="" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="slno">02</td>
+                            <td><input type="text" name="itemid[]" id="" /></td>
+                            <td><input type="text" name="invoice[]" id="" /></td>
+                            <td><input type="text" name="product_name[]" id="" /></td>
+                            <td><input type="text" name="quantity[]" id="" /></td>
+                            <td>
+                                <select name="type_of_fault[]" id="">
+                                    <option>----</option>
+                                    <option value="fault-1">fault 1</option>
+                                    <option value="fault-2">fault 2</option>
+                                    <option value="fault-3">fault 3</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="file" name="image[]" id="" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="slno">03</td>
+                            <td><input type="text" name="itemid[]" id="" /></td>
+                            <td><input type="text" name="invoice[]" id="" /></td>
+                            <td><input type="text" name="product_name[]" id="" /></td>
+                            <td><input type="text" name="quantity[]" id="" /></td>
+                            <td>
+                                <select name="type_of_fault[]" id="">
+                                    <option>----</option>
+                                    <option value="fault-1">fault 1</option>
+                                    <option value="fault-2">fault 2</option>
+                                    <option value="fault-3">fault 3</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="file" name="image[]" id="" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="slno">04</td>
+                            <td><input type="text" name="itemid[]" id="" /></td>
+                            <td><input type="text" name="invoice[]" id="" /></td>
+                            <td><input type="text" name="product_name[]" id="" /></td>
+                            <td><input type="text" name="quantity[]" id="" /></td>
+                            <td>
+                                <select name="type_of_fault[]" id="">
+                                    <option>----</option>
+                                    <option value="fault-1">fault 1</option>
+                                    <option value="fault-2">fault 2</option>
+                                    <option value="fault-3">fault 3</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="file" name="image[]" id="" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="slno">05</td>
+                            <td><input type="text" name="itemid[]" id="" /></td>
+                            <td><input type="text" name="invoice[]" id="" /></td>
+                            <td><input type="text" name="product_name[]" id="" /></td>
+                            <td><input type="text" name="quantity[]" id="" /></td>
+                            <td>
+                                <select name="type_of_fault[]" id="">
+                                    <option>----</option>
+                                    <option value="fault-1">fault 1</option>
+                                    <option value="fault-2">fault 2</option>
+                                    <option value="fault-3">fault 3</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="file" name="image[]" id="" />
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="7"><button type="button" id="btn-add-row">ADD</button></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            
+            <p class="note-message">El límite de subida de cada imagen es de 2 MB y los formatos aceptados son: .jpg, .jpeg, .png, .gif, pdf, .zip y .rar</p>
+        </div>
+    
+        <div class="section section-4">
+            <h2>PASO 3</h2>
+            <p>Motivo de la solicitud</p>
+            <textarea name="content" id=""></textarea>
+            <div class="captcha-box">
+                <!--<img src="<?php //echo $this->getSkinUrl('images/captcha.jpg');?>" />-->
+                <div class="g-recaptcha" data-sitekey=""></div>
+            </div>
+            <input type="submit" value="Enviar solicitud" class="btn-submit" />
+        </div>
+    </form>
+</div>
+
+<script src='https://www.google.com/recaptcha/api.js'></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.1/jquery.validate.min.js"></script>
+<script type="text/javascript">
+    var $j = jQuery.noConflict();
+    $j(document).ready(function(){
+        $j('#btn-add-row').click(function () {
+            $j('#rma-data-table tbody').append($j('#rma-data-table tbody tr:last').clone());
+            if($j('#rma-data-table tbody tr:last td span.btn-close-row').length === 0){
+                $j('<span class="btn-close-row"><button type="button">X</button></span>').insertAfter('#rma-data-table tbody tr:last td input[type="file"]');
+            }
+            
+            $j('#rma-data-table tr').each(function(i) {
+                if (i === 1)
+                    return;
+        
+                if(i >= 10){
+                    $j(this).find('td.slno').html(i);
+                }else{
+                    $j(this).find('td.slno').html('0'+i);
+                }
+            });
+            //alert($j('#rma-data-table tbody tr td span.btn-close-row button').html());
+            $j('#rma-data-table tbody tr td span.btn-close-row button').click(function(){
+                //alert('remove');
+                //$j('#rma-data-table tbody tr:last').remove();
+                $j(this).parents('tr').remove();
+            });
+        });
+        
+        //$j('.btn-close-row button').click(function(){
+        //    //alert('remove');
+        //    $j('#rma-data-table tbody tr:last').remove();
+        //});
+        
+        /* handle form validation */
+        $j("#rmaForm").validate({
+            rules:
+            {
+                company: {
+                    required: true,
+                    minlength: 3
+                },
+                business_name: {
+                    required: true,
+                    minlength: 3,
+                },
+                billing_address: {
+                    required: true,
+                    minlength: 3,
+                },
+                dispatch_address: {
+                    required: true,
+                    minlength: 3,
+                },
+                city: {
+                    required: true,
+                    minlength: 3
+                },
+                email: {
+                    required: true,
+                    email: true,
+                },
+                name: {
+                    required: true,
+                    minlength: 3,
+                },
+                purchase_order: {
+                    required: true,
+                    minlength: 3,
+                },
+                telephone: {
+                    required: true,
+                    minlength: 3,
+                },
+            },
+            messages:
+            {
+                company: "please enter company name",
+                business_name: "please enter business name",
+                billing_address: "please enter billing address",
+                dispatch_address: "please enter dispatch address",
+                city: "please enter city name",
+                user_email: "please enter a valid email address",
+                name: "please enter your name",
+                purchase_order: "please enter purchase order",
+                telephone: "please enter telephone number",
+            },
+            submitHandler: function(form) {
+                form.submit();
+            }
+        });
+        
+        /* handle form submit */
+        function submitForm() {
+            var formdata = $j("#rmaForm").serialize();
+            try{
+                $j.ajax({
+                    url: '<?php echo $this->getUrl()."rmaform/index/post/";?>',
+                    dataType: 'json',
+                    type: 'POST',
+                    data: formdata,
+                    success: function(){
+                        try{
+                            $j.ajax({
+                                url: '<?php echo $this->getUrl()."rmaform/index/sendmail/";?>',
+                                dataType: 'json',
+                                type: 'POST',
+                                data: formdata,
+                                success: function(data){
+                                    alert(data.success);
+                                },
+                                error: function(data){
+                                    alert(data.error);
+                                }
+                            });
+                        }catch(e){}
+                    }
+                });
+            }catch(e){}
+        }
+    });
+</script>
+
+
+
+
+
+
+
+
+
+

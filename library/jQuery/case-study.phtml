@@ -1,0 +1,200 @@
+<?php
+    $collection = Mage::getModel('casestudy/casestudy')->getCollection()->addFieldToFilter('status',1);
+    //$_casestudyId = array();
+?>
+<div class="container">
+    <div class="prof-serv-container">
+        <div class="top-sec">
+            <div class="case-items-wrap owl-carousel owl-theme">
+                <?php
+                $i=1;
+                foreach ($collection as $case) {
+                    $_casestudyId = $case->getCasestudyId();
+                ?>
+                <div class="case-items">
+                    <input type="hidden" id="casestudyid" name="casestudyid" value="<?php echo $_casestudyId;?>" />
+                    <div class="top-heading">
+                        <h3><?php echo $case->getTitle().",";?></h3>
+                        <p><?php echo $case->getLocation();?></p>
+                    </div>
+                    <div class="left-heading">
+                        <h2>INTRODUCTION</h2>
+                        <h3><?php echo $case->getTitle();?></h3>
+                        <p><?php echo $case->getLocation();?></p>
+                    </div>
+                    <div class="right-content">
+                        <?php echo $case->getContent();?>
+                        <p><strong>Got a project in mind? Get in touch to see how we can help...</strong></p>
+                        <p><a class="btn-prof-serv" href="contacts" target="_blank">Let's Create Something Special</a></p>
+                    </div>
+                </div>
+                <?php
+                    $i++;
+                }
+                ?>
+            </div>
+        </div>
+        <div class="mid-sec" id="mid-sec-banner">
+            <!--<ul class="prof_banner owl-carousel owl-theme">-->
+                <?php
+                /*$_bannerCollection = Mage::getModel('casestudybanner/casestudybanner')->getCollection()
+                        ->addFieldToFilter('casestudy', $case->getCasestudyId());
+                $k=1;
+                foreach($_bannerCollection as $banner){
+                ?>
+                    <li><img title="<?php echo $banner->getTitle() ?>" alt="<?php echo $banner->getTitle() ?>" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA).'/'.$banner->getFilename();?>" /></li>
+                <?php
+                    $k++;
+                }*/
+                ?>
+            <!--</ul>-->
+        </div>
+        <div class="bottom-sec">
+            <?php echo $this->getLayout()->createBlock('cms/block')->setBlockId('case-study-testimonial')->toHtml();?>
+            <!--<div class="case-filter">
+                <select name="casecat" id="case-filter">
+                    <option value="1">Residential Bathroom</option>
+                    <option value="2">Commercial Bathroom</option>
+                </select>
+            </div>-->
+            <ul class="case-study-block" id="case-study-list">
+                <?php
+                    $i=1;
+                    foreach ($collection as $case) {
+                ?>
+                        <li><a href="javascript:void(0);" title="<?php echo $case->getTitle();?>" data="<?php echo $case->getId();?>">
+                            <img title="<?php echo $case->getTitle();?>" alt="<?php echo $case->getTitle();?>" src="<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_MEDIA).'/'.$case->getFilename();?>" />
+                            <h2><?php echo $case->getTitle();?></h2>
+                            <h3><?php echo $case->getLocation();?></h3></a>
+                            <p><strong><?php echo $case->getShortDescription();?></strong></p>
+                            <?php echo $case->getContent();?>
+                        </li>
+                <?php
+                        $i++;
+                    }
+                ?>
+            </ul>
+            <div class="btn-sec" id="loadMore"><a class="btn-prof-serv" href="javascript:void(0);">View More Case Studies</a></div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var $j = jQuery.noConflict();
+    $j(document).ready(function () {
+        var case_items_carousel = $j('.case-items-wrap').owlCarousel({
+            loop:false,
+            //margin:10,
+            nav:true,
+            dots:false,
+            responsive:{
+                0:{
+                    items:1
+                },
+                600:{
+                    items:1
+                },
+                1000:{
+                    items:1
+                }
+            }
+        });
+    });
+    $j(document).ready(function () {
+        //load more casestudies
+        var size_li = $j("#case-study-list li").size();
+        var x=2;
+        $j('#case-study-list li:lt('+x+')').show();
+        $j('#loadMore a').click(function () {
+            //x= (x+2 <= size_li) ? x+2 : size_li;
+            $j('#case-study-list li:lt('+size_li+')').show();
+            //if(x == size_li){
+                $j('#loadMore').hide();
+            //}
+        });
+        
+        //ajax call for case gallery on load
+        var caseid = $j('.case-items-wrap').find('.owl-item.active').find('#casestudyid').val();
+        //alert(caseid);
+        try{
+            $j.ajax({
+                url: '<?php echo $this->getUrl()."casestudybanner/index/getbanner/";?>',
+                dataType: 'json',
+                type: 'POST',
+                data: {caseid: caseid},
+                success: function(data){
+                    var banner = data.banner;
+                    $j('#mid-sec-banner').html(banner);
+                }
+            });
+        }catch(e){}
+        
+        //ajax call for case gallery on click
+        $j('.case-items-wrap .owl-nav button').click(function(){
+            //var caseid = $j(this).closest('.owl-item.active').find('#casestudyid').val();
+            var caseid = $j(this).parent('.owl-nav').prev('.owl-stage-outer').find('.owl-item.active').find('#casestudyid').val();
+            //alert(caseid);
+            try{
+                $j.ajax({
+                    url: '<?php echo $this->getUrl()."casestudybanner/index/getbanner/";?>',
+                    dataType: 'json',
+                    type: 'POST',
+                    data: {caseid: caseid},
+                    success: function(data){
+                        var banner = data.banner;
+                        $j('#mid-sec-banner').html(banner);
+                    }
+                });
+            }catch(e){}
+        });
+        
+        $j('#case-study-list li a').click(function(){
+            var caseid = $j(this).attr('data');
+            //alert($j('#casestudyid[value="'+caseid+'"]').attr('name'));
+            /*$j('#casestudyid[value="'+caseid+'"]').parents('.case-items').parents('.owl-item').siblings('.owl-item').removeClass('active');
+            $j('#casestudyid[value="'+caseid+'"]').parents('.case-items').parents('.owl-item').addClass('active');*/
+            $j('.case-items-wrap').trigger('to.owl.carousel', jQuery('#case-study-list li a').index(jQuery(this)));
+            
+            try{
+                $j.ajax({
+                    url: '<?php echo $this->getUrl()."casestudybanner/index/getbanner/";?>',
+                    dataType: 'json',
+                    type: 'POST',
+                    data: {caseid: caseid},
+                    success: function(data){
+                        var banner = data.banner;
+                        $j('#mid-sec-banner').html(banner);
+                        //$j(window).scrollTop($j('#mid-sec-banner'));
+                        $j('html, body').animate({
+                            scrollTop: $j(".prof-serv-container").offset().top
+                        }, 1000);
+                    }
+                });
+            }catch(e){}
+        });
+        
+        //ajax call for case filter on click
+        $j('#case-filter').change(function(){
+            var casecat = $j(this).children('option:selected').val();
+            //alert(caseid);
+            try{
+                $j.ajax({
+                    url: '<?php echo $this->getUrl()."casestudy/index/filtercase/";?>',
+                    dataType: 'json',
+                    type: 'POST',
+                    data: {casecat: casecat},
+                    success: function(data){
+                        var casalist = data.caselist;
+                        $j('#case-study-list').html(casalist);
+                    }
+                });
+            }catch(e){}
+        });
+    });
+    $j(document).ajaxSuccess(function(){
+        
+    });
+</script>
+<style>
+    #case-study-list li{display:none;}
+</style>

@@ -1,0 +1,5 @@
+import database:::::
+mysql -u webprevi_u5er -p -h 185.216.77.133 webprevi_tissino < casestudy.sql
+
+export table only:::::
+mysqldump -u webprevi_u5er -p webprevi_tissino casestudybanner > casestudybanner.sql

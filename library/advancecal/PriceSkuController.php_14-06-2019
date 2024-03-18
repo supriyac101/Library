@@ -1,0 +1,105 @@
+<?php
+class Custom_Productupdate_PriceSkuController extends Mage_Core_Controller_Front_Action
+{
+    public function indexAction()
+    {
+	Mage::app()->setCurrentStore(Mage_Core_Model_App::ADMIN_STORE_ID);
+    	$products = Mage::getModel('catalog/product')->getCollection();
+	$products->addAttributeToFilter('status', 1);//enabled
+	//$products->addAttributeToFilter('visibility', 4);//catalog, search
+	//$products->addAttributeToSort('name', 'ASC');
+	$products->addAttributeToSelect('*');
+	
+	foreach($products as $product){
+        $_proId = $product->getId();
+        $_product = Mage::getModel('catalog/product')->load($_proId);
+        
+	    echo $sku = $_product->getSku();
+	    echo '->'.$_proId;
+        
+        /*----- 07-06-2019 ----- */
+        $api_key = Mage::getStoreConfig('productupdate/productupdate_group/apiKey');
+        $access_key = Mage::getStoreConfig('productupdate/productupdate_group/accessKey');
+        $time_stmp = gmdate("Y-m-d\TH:i:s\Z");
+        //$string = $api_key.",".$access_key.",".$time_stmp;
+        $string = $api_key.",".$access_key.",";
+        //$signature = hash('sha256', '5119728a-7d9a-4dc0-9733-0dddd7d8207b,e56ad576-9572-43ba-ab04-6b79724b21b9,'.$time_stmp);
+        $signature = hash('sha256', $string.$time_stmp);
+        //exit;
+	    //echo $api_url = 'https://intcomex-test.apigee.net/v1/getproduct?&apiKey=5119728a-7d9a-4dc0-9733-0dddd7d8207b&utcTimeStamp=2019-06-06T00:50:40.982Z&signature=8a4b8a74a4961f1251f41e9a2696db616185b0830eddad6aa8dc9948207b1d9c&sku='.$sku.'&locale=es';
+        $api_url = 'https://intcomex-test.apigee.net/v1/getproduct?&apiKey='.$api_key.'&utcTimeStamp='.$time_stmp.'&signature='.$signature.'&sku='.$sku.'&locale=es';
+        //exit;
+	    //echo '<pre>';
+        /*----- 07-06-2019 ----- */
+        
+	    $ch = curl_init();
+	    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+	    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	    curl_setopt($ch, CURLOPT_URL, $api_url);
+	    $result = curl_exec($ch);
+	    curl_close($ch);
+	    
+	    $get_prod_array = json_decode($result, true);
+        //print_r($get_prod_array);
+	    $price = $get_prod_array['Price']['UnitPrice'];
+	    
+	    /*----- 07-06-2019 ----- */
+        $date = new DateTime();
+        $date->modify("-1 day");
+        $date2 = $date->format('Y-m-d');
+        $date3 = explode("-",$date2);
+        $year = $date3[0];
+        $month = $date3[1];
+        $day = $date3[2];
+        //exit;
+        //$time_stmp = gmdate("Y-m-d\TH:i:s\Z", strtotime('-48 hours', time()));
+        $convert_api = "https://api.sbif.cl/api-sbifv3/recursos_api/dolar/".$year."/".$month."/dias/".$day."?apikey=69536bf6d9eb5bbcf69655411edf08295a60f2d6&formato=xml";
+        $xml = simplexml_load_file($convert_api);
+        //print_r($xml);
+        $val = $xml->Dolares->Dolar->Valor;
+        
+        if($price && $val){
+            $valor_price = str_replace(',','.',$val);
+            //echo "<br>";
+            //echo $price * $val;
+            //$_convertPrice = $price;//will convert later
+            $_convertPrice = $price * $valor_price;
+            //exit;
+            $_priceCat = $_product->getAttributeText('price_category');
+            $_priceCat1 = explode("-", $_priceCat);
+            $_priceCat2 = $_priceCat1[1];
+            $_priceCat3 = explode("%", $_priceCat2);
+            $_profitAmt = $_priceCat3[0];
+            $_finalPrice = $_convertPrice + (($_convertPrice * $_profitAmt)/100);
+            //exit;
+            //$_priceCat1 = ex
+            /*echo "<pre>";
+            print_r($_product->getData());
+            exit;*/
+            //$product->setPrice($price);
+            $product->setCost($_convertPrice);
+            $product->setPrice($_finalPrice);
+            $product->save();
+	    }
+        /*----- 07-06-2019 ----- */
+        
+        $stock = $get_prod_array['InStock'];
+	    $stockItem =Mage::getModel('cataloginventory/stock_item')->loadByProduct($_proId);
+	    $stockItemId = $stockItem->getId();
+        /*----- 07-06-2019 ----- */
+        if($stock != 0){
+            $stockItem->setData('is_in_stock', 1);
+        }else{
+            $stockItem->setData('is_in_stock', 0);
+        }
+        /*----- 07-06-2019 ----- */
+	    $stockItem->setData('qty', (integer)$stock);
+	    $stockItem->save();
+	    
+	    echo '<hr>';
+	    
+	}
+	echo '<br>Completed';
+    
+    }
+}

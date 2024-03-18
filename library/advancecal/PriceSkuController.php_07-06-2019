@@ -1,0 +1,52 @@
+<?php
+class Custom_Productupdate_PriceSkuController extends Mage_Core_Controller_Front_Action
+{
+    public function indexAction()
+    {
+	Mage::app()->setCurrentStore(Mage_Core_Model_App::ADMIN_STORE_ID);
+    	$products = Mage::getModel('catalog/product')->getCollection();
+	$products->addAttributeToFilter('status', 1);//enabled
+	//$products->addAttributeToFilter('visibility', 4);//catalog, search
+	//$products->addAttributeToSort('name', 'ASC');
+	$products->addAttributeToSelect('*');
+	
+	foreach($products as $product){
+	    echo $sku = $product->getSku();
+	    echo '->'.$product->getId();
+	    $api_url = 'https://intcomex-test.apigee.net/v1/getproduct?&apiKey=5119728a-7d9a-4dc0-9733-0dddd7d8207b&utcTimeStamp=2019-06-06T00:50:40.982Z&signature=8a4b8a74a4961f1251f41e9a2696db616185b0830eddad6aa8dc9948207b1d9c&sku='.$sku.'&locale=es';
+	    echo '<pre>';
+	    $ch = curl_init();
+	    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+	    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	    curl_setopt($ch, CURLOPT_URL, $api_url);
+	    $result = curl_exec($ch);
+	    curl_close($ch);
+	    
+	    $get_prod_array = json_decode($result, true);
+	    $price = $get_prod_array['Price']['UnitPrice'];
+	    
+	    /*----- */
+	    
+	    /*----- */
+	    
+	    
+	    //print_r($get_prod_array);
+	    $stock = $get_prod_array['InStock'];
+	    
+	    //$_product = Mage::getModel('catalog/product')->load(65);
+
+	    $product->setPrice($price);
+	    $product->save();
+	    
+	    $stockItem =Mage::getModel('cataloginventory/stock_item')->loadByProduct(65);
+	    $stockItemId = $stockItem->getId();
+	    $stockItem->setData('is_in_stock', 1);
+	    $stockItem->setData('qty', (integer)$stock);
+	    $stockItem->save();
+	    
+	    echo '<hr>';
+	    
+	}
+	echo '<br>Completed';
+    }
+}

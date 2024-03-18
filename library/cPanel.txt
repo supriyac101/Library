@@ -1,0 +1,216 @@
+avid.ragretail.co.uk
+uniquebeyou.ragretail.co.uk
+warpweftclothing	[removed]
+thomasgun.ragretail.co.uk
+scartissueclothing.ragretail.co.uk
+aces-couture.ragretail.co.uk
+ragwholesale.ragretail.co.uk
+uandioriginals.ragretail.co.uk
+
+
+http://www.ragretail.co.uk/skin/
+http://www.ragretail.co.uk/media/
+http://www.ragretail.co.uk/js/
+
+https://www.ragretail.co.uk/skin/
+https://www.ragretail.co.uk/media/
+https://www.ragretail.co.uk/js/
+
+
+http://www.ragretail.co.uk/
+
+https://cpanel.ragretail.co.uk/
+
+Username:	ragretailco
+password:	Q8Cj31t3r2WW
+
+
+https://blue3115.server-cp.com:2087
+Login Username: root 
+Login Password: 2HmYC_3UKR!9
+
+
+
+ssh ragretailco@62.138.4.149
+password:	Q8Cj31t3r2WW
+
+ssh root@62.138.4.149
+password : 2HmYC_3UKR!9
+
+
+ciaran@thomasgun.com
+Vendett@1
+
+
+Database:
+
+user:	ragretai_devusr
+pass:	HT7Js}AR&7.C
+db:	ragretai_dev
+
+
+
+FTP deatils : - 
+
+FTP Username: ragretaildev@ragretail.co.uk
+FTP server: ftp.ragretail.co.uk
+FTP & explicit FTPS port:  21
+Password - OR488FNT~niV
+
+-------------------------------
+SSH for Live server::::::::::
+ssh root@62.138.4.49
+mQ4wmC8!
+-------------------------------
+
+
+cloudflare cache:
+ciaran@thomasgun.com
+Vendett@1
+
+--------------------------------------
+
+mysql -h 62.138.4.149 -u ragretai_devusr -pHT7Js}AR&7.C ragretai_dev < 2018-03-09-06-00_ragwholesale.sql > output.log
+
+/home/ragretailco
+
+mysqldump -uroot -p ragwholesale > ragwholesale_20072018.sql
+
+gzip -c ragwholesale_20072018.sql>ragwholesale_20072018.sql.gz
+bzip2 -c ragwholesale_20072018.sql>ragwholesale_20072018.sql.bz2
+
+mysqldump < mysqldump options> | gzip > outputfile.sql.gz
+
+::::The same can be done using bzip2 compression:
+mysqldump < mysqldump options> | bzip2 > outputfile.sql.bz2
+
+::::and to restore
+bunzip2 < outputfile.sql.bz2 | mysql < mysql options>
+
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Your merchant account details
+Merchant name: Thomas Gun
+Merchant URL: https://www.thomasgun.com
+Merchant ID: K502222
+Merchant Portal administrator: ciaran@rag-retail.com
+API credentials: See below
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+Testing in Playground
+You’ll make sure your system works with Klarna’s system in our Playground environment. To get started, do the following:
+
+Activate your Playground Merchant Portal account.
+
+https://playground.eu.portal.klarna.com
+Username: ciaran@rag-retail.com
+One-time password: Vendett@01
+
+---------------------------------------------------------------
+
+Username:
+K502222_0ce30b4e6b05
+
+Password:
+UaXSvxbi6pmULpyR
+
+---------------------------------------------------------------
+
+Generate your unique API credentials within the Merchant Portal.
+These API credentials can now be used when placing test orders to Klarna’s Playground environment.
+The integration team will be in touch soon to help you test and validate your integration with Klarna.
+Going live
+When the integration is completed and our integration team has dotted the ‘i’s and crossed the ‘t’s, we’ll unlock your production account and you’ll be good to go.
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+Activate your Production Merchant Portal account.
+
+https://eu.portal.klarna.com 
+Username: ciaran@rag-retail.com
+One-time password: Q4JK-R4DM-2ZQK-JFPN
+
+
+Generate your unique API credentials within the Merchant Portal.
+These API credentials can now be used when placing live orders to Klarna’s Production environment.
+Upload your logotype and customer service contact details number into the Merchant Portal. This is used to help consumers in case they have questions about their order.
+You are now live and can place real orders from your store with Klarna.
+is it something other than this?
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Some great Magento merchant example merchants are ego.co.uk, justhype.co.uk and boy-london.com. Other merchants in your space, but on different platforms are 11degrees, Criminal Damage, and Sik Silk (Going live soon). 
+
+
+
+
+Office 33 
+27 Colmore Row 
+Birmingham 
+England B3 2EW
+
+http://www.rag-retail.com/uniquebeyou/
+
+https://www.uniquebeyou.com/
+
+HoldingPageImage-17304.jpg
+
+/*switch($_SERVER['HTTP_HOST']){
+    case 'uniquebeyou.com':
+    case 'www.uniquebeyou.com':
+        $mageRunCode = 'uby';
+        $mageRunType = 'website';
+    break;
+}*/
+
+Distributor customer:::::
+
+ciaran@rag-retail.com
+B@nana1
+:::::::::::::::::::::::::
+
+
+
+
+
+
+
+
+The issue is, please log in with my user ID in live
+
+msalter@fashiondesignsolutions.com
+matthew3891
+++++++++++++
+msalter@rag-retail.com
+matthew3891
+
+
+
+NEW IN should pull from category ID 762
+
+SALE should pull from category ID 763
+
+info@rag-wholesale.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
